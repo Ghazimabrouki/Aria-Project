@@ -1,0 +1,17 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  A([Active alert]) --> K[Compute correlation_key<br/>host + category + time window]
+  K --> M{Matches open<br/>incident?}
+  M -->|yes| L[Link alert to incident<br/>confidence = high/medium]
+  M -->|no| C[Create Incident status=open]
+  C --> L
+  L --> SC{Asset scope<br/>consistent?}
+  SC -->|no| FLAG[Flag cross-asset correlation]
+  SC -->|yes| R{Incident needs<br/>response?}
+  FLAG --> R
+  R -->|no| WAIT([Keep monitoring])
+  R -->|yes| INV[Create Investigation<br/>status=pending]
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class M,SC,R dec;
+  class K,L,C,FLAG,INV act;

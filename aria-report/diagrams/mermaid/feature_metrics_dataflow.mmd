@@ -1,0 +1,12 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart LR
+  TG["Telegraf agent"] -->|9200| ES["telegraf-* indices"]
+  ES --> API["/api/v1/metrics"]
+  API --> SCOPE["asset_scope filter<br/>per-source index pattern"]
+  SCOPE --> FAM["Metric families:<br/>CPU, memory, disk, network,<br/>load, processes"]
+  FAM --> WID["UI widgets:<br/>time-series charts + gauges"]
+  WID --> ANOM["Anomaly -> infrastructure investigation"]
+  classDef e fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef a fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class TG,ES e;
+  class API,SCOPE,FAM,WID,ANOM a;

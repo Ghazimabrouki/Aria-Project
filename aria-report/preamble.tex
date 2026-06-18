@@ -1,0 +1,231 @@
+\documentclass[12pt,a4paper,twoside]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgtermes}
+\usepackage[a4paper,top=2.1cm,bottom=2.1cm,left=2.3cm,right=2.3cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.12}
+\usepackage{ragged2e}
+\justifying
+\setlength{\parindent}{0.5cm}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{3em}
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.72}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{5}
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage\ /\ \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0pt}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\bfseries\Large}{\chaptername\ \thechapter}{0.4cm}{\Huge}
+\titleformat{\section}{\bfseries\Large}{\thesection}{0.2cm}{}
+\titleformat{\subsection}{\bfseries\large}{\thesubsection}{0.2cm}{}
+\titleformat{\subsubsection}{\bfseries\normalsize}{\thesubsubsection}{0.2cm}{}
+
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc}
+\PassOptionsToPackage{obeyspaces}{url}
+\usepackage{xurl}
+\usepackage{adjustbox}
+
+% --- Code, configuration, and command-output listings ---
+\usepackage{listings}
+\definecolor{codebg}{RGB}{248,249,250}
+\definecolor{codeframe}{RGB}{206,212,218}
+\definecolor{codekw}{RGB}{37,99,235}
+\definecolor{codestr}{RGB}{22,128,61}
+\definecolor{codecmt}{RGB}{107,114,128}
+\definecolor{codeln}{RGB}{150,156,164}
+\definecolor{termbg}{RGB}{245,246,248}
+\lstdefinestyle{aria}{%
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{codekw}\bfseries,
+  stringstyle=\color{codestr},
+  commentstyle=\color{codecmt}\itshape,
+  numberstyle=\tiny\color{codeln},
+  numbers=left, numbersep=8pt,
+  frame=single, rulecolor=\color{codeframe},
+  breaklines=true, breakatwhitespace=false,
+  showstringspaces=false, tabsize=2,
+  captionpos=b, xleftmargin=14pt, xrightmargin=4pt,
+  aboveskip=0.6em, belowskip=0.4em,
+  upquote=true, columns=fullflexible, keepspaces=true,
+}
+\lstdefinestyle{ariaterm}{%
+  style=aria, backgroundcolor=\color{termbg},
+  numbers=none, keywordstyle=\color{codekw},
+}
+\renewcommand{\lstlistingname}{Listing}
+% YAML language definition for playbook/config excerpts
+\lstdefinelanguage{yaml}{%
+  keywords={true,false,null,yes,no,on,off},
+  keywordstyle=\color{codekw}\bfseries,
+  comment=[l]{\#}, commentstyle=\color{codecmt}\itshape,
+  morestring=[b]', morestring=[b]", stringstyle=\color{codestr},
+  literate={:}{{\textcolor{codekw}{:}}}1,
+  sensitive=true,
+}
+% INI / dotenv-style configuration definition
+\lstdefinelanguage{conf}{%
+  comment=[l]{\#}, commentstyle=\color{codecmt}\itshape,
+  morestring=[b]", stringstyle=\color{codestr},
+  morekeywords={true,false,enabled,disabled},
+  keywordstyle=\color{codekw},
+  sensitive=false,
+}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue
+}
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{bibliography.bib}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\todo}[1]{\textbf{[TODO: #1]}}
+\newcommand{\project}{ARIA}
+\newcommand{\projectlong}{Adaptive Response Intelligence Automation}
+% url-style commands: robust (safe in captions / List of Figures) and
+% breakable (long paths wrap instead of overflowing). Arguments use raw
+% underscores. Defined with the url package so special characters and line
+% breaks are handled like the original \path.
+\urlstyle{tt}
+\DeclareRobustCommand{\codepath}[1]{\nolinkurl{#1}}
+\DeclareRobustCommand{\sourcefile}[1]{\nolinkurl{#1}}
+
+\newcommand{\visualplaceholder}[3]{%
+\begin{figure}[H]
+\centering
+\fbox{%
+\begin{minipage}[c][#2][c]{0.88\textwidth}
+\centering
+\textbf{#1}\\[0.25cm]
+\small #3
+\end{minipage}}
+\caption{#1}
+\end{figure}
+}
+
+\newcommand{\screenshotplaceholder}[2]{%
+\begin{figure}[H]
+\centering
+\fbox{%
+\begin{minipage}[c][3.2cm][c]{0.88\textwidth}
+\centering
+\textbf{#1}\\[0.2cm]
+\small #2
+\end{minipage}}
+\caption{#1}
+\end{figure}
+}
+
+
+\newcommand{\reservedblock}[3]{%
+\par\vspace{0.35cm}
+\noindent\fbox{%
+\begin{minipage}[c][#2][c]{0.94\textwidth}
+\centering
+\textbf{#1}\\[0.25cm]
+\small #3
+\end{minipage}}
+\par\vspace{0.45cm}
+}
+
+\newcommand{\diagramimage}[2]{%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/diagrams/#1}
+\caption{#2}
+\end{figure}
+}
+\newcommand{\diagramimagecompact}[2]{%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]{assets/diagrams/#1}
+\caption{#2}
+\end{figure}
+}
+% Labeled diagram figure for UML/Mermaid renders (height-capped, cross-referenceable)
+\newcommand{\umlfigure}[3]{%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{assets/diagrams/#1}
+\caption{#2}\label{#3}
+\end{figure}
+}
+\newcommand{\umlfigurecompact}[3]{%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth,height=0.46\textheight,keepaspectratio]{assets/diagrams/#1}
+\caption{#2}\label{#3}
+\end{figure}
+}
+\newcommand{\cloudshot}[3]{%
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=#3,height=0.40\textheight,keepaspectratio]{assets/cloud/#1}}
+\caption{#2}
+\end{figure}
+}
+% --- Real product screenshots ---
+% Main-chapter screenshot: framed, cross-referenceable, height-capped.
+\newcommand{\screenshot}[3]{%
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth,height=0.55\textheight,keepaspectratio]{assets/screenshots/#1}}
+\caption{#2}\label{#3}
+\end{figure}
+}
+% Compact screenshot for appendix evidence gallery (two fit per page region).
+\newcommand{\screenshotc}[3]{%
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.82\textwidth,height=0.40\textheight,keepaspectratio]{assets/screenshots/#1}}
+\caption{#2}\label{#3}
+\end{figure}
+}
+% Two screenshots side by side, one shared caption / LoF line.
+\newcommand{\pairfig}[4]{%
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.48\textwidth,height=0.33\textheight,keepaspectratio]{assets/screenshots/#1}}\hfill
+\fbox{\includegraphics[width=0.48\textwidth,height=0.33\textheight,keepaspectratio]{assets/screenshots/#2}}
+\caption{#3}\label{#4}
+\end{figure}
+}
+% Four screenshots (2x2), one shared caption / LoF line, for dense tab evidence.
+\newcommand{\quadfig}[6]{%
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#1}}\hfill
+\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#2}}\\[3pt]
+\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#3}}\hfill
+\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#4}}
+\caption{#5}\label{#6}
+\end{figure}
+}
+

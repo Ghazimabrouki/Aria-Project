@@ -1,0 +1,46 @@
+\chapter*{General Conclusion}
+\addcontentsline{toc}{chapter}{General Conclusion}
+
+This final-year internship addressed a concrete SOC problem: transforming heterogeneous security and observability events into centralized, understandable, traceable, and actionable operations. The project began with the construction of a monitoring foundation based on Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, and Redis. It then moved to a Huawei Cloud infrastructure context and evolved into the ARIA backend intelligence layer and its operational dashboard.
+
+\section*{Answer to the Initial Problem}
+\addcontentsline{toc}{section}{Answer to the Initial Problem}
+
+The initial problem asked how a SOC can reduce manual effort and response delay when alerts arrive from heterogeneous sources such as Wazuh, Suricata, Falco, Filebeat, and Telegraf, while keeping remediation actions controlled, auditable, and verifiable. The implemented platform answers this question by connecting collection, detection, normalization, filtering, deduplication, enrichment, correlation, AI-assisted explanation, controlled remediation, verification, and archiving into a single workflow. Raw technical events are no longer handled as isolated logs; they become normalized alerts, incidents, investigations, response proposals, execution records, and archived cases. The tools/setup work completes this chain by documenting how monitored VMs are prepared, how agents send data to the central stack, and how each server becomes a scoped asset inside ARIA.
+
+\section*{Main Results}
+\addcontentsline{toc}{section}{Main Results}
+
+A major result of the project is the balance between automation and control. The AI layer helps generate summaries, narratives, risk assessments, and Ansible playbooks, but it does not remove the analyst from sensitive decisions. Playbook execution remains protected by validation, approval workflows, admin-secret checks, Ansible execution tracking, fix verification, and audit persistence. This human-in-the-loop design is essential in cybersecurity, where an incorrect action can affect availability or security.
+
+The work also produced a rich operational interface. The Next.js dashboard exposes alerts, incidents, investigations, runtime investigations, infrastructure investigations, monitoring, metrics, IPS visualization, search, archives, assistant, operator workflows, assets, accounts, data-source settings, pipeline settings, Ansible settings, and protected administrative actions. The backend exposes these capabilities through FastAPI routes and WebSocket updates, while Redis, SQLite, Elasticsearch, and Ansible support the underlying workflow. The validation evidence -- API checks, backend compilation, frontend build verification, multi-server activation on the \codepath{dash-linux} asset, admin-secret verification, and a large automated test suite -- confirms that the main objectives defined at the start of the internship were reached for the controlled-environment scope.
+
+\section*{Difficulties Encountered}
+\addcontentsline{toc}{section}{Difficulties Encountered}
+
+Several difficulties were encountered during the internship. The first was the diversity of tools and formats: Wazuh, Suricata, Falco, Telegraf, Filebeat, and Elasticsearch do not naturally speak the same operational language, which required ARIA to provide source-specific mappers and a common alert model. The second was alert noise, which required filtering, deduplication, and severity handling. A third was AI reliability: LLM output can be incomplete or malformed, so parsing, fallbacks, validation, and human approval were necessary. Finally, multi-server operation introduced asset-scoping requirements that had to be validated carefully against the current backend.
+
+\section*{Skills Acquired}
+\addcontentsline{toc}{section}{Skills Acquired}
+
+On the technical side, the internship strengthened skills in Linux administration, cloud infrastructure, Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Falcosidekick, Telegraf, Redis, Python, FastAPI, SQLAlchemy, SQLite, Next.js, TypeScript, Ansible, prompt engineering, API validation, setup scripting, and SOC workflow design. On the professional side, it strengthened the habit of documenting assumptions, distinguishing proven behavior from limitations, validating work progressively, and keeping sensitive operations under human control.
+
+\section*{Value for the Host Organization}
+\addcontentsline{toc}{section}{Value for the Host Organization}
+
+For the host organization, the internship delivered a working, documented SOC/SOAR foundation that consolidates several open-source security and observability tools into one controlled workflow. The platform reduces the manual effort needed to move from a raw alert to an understood incident, provides a reusable monitored-VM onboarding procedure, and demonstrates a safe pattern for AI-assisted remediation that an internal team can extend. The accompanying validation reports and setup scripts lower the cost of reproducing and operating the environment.
+
+\section*{Value for the Student}
+\addcontentsline{toc}{section}{Value for the Student}
+
+For me as a student, the project was an opportunity to work end to end on a realistic cybersecurity engineering problem rather than an isolated exercise. I designed and integrated a complete pipeline, made and justified architectural trade-offs, confronted the real constraints of heterogeneous telemetry and unreliable external services, and learned to communicate clearly what is proven, what is partial, and what remains future work. This experience consolidated both my technical autonomy and my professional rigor.
+
+\section*{Future Work}
+\addcontentsline{toc}{section}{Future Work}
+
+The current project is a strong controlled-environment SOC/SOAR foundation. Its main future improvements are: full authentication and role-based access control for public exposure; stronger production hardening; a strengthened persistence layer where deployment concurrency and scale require it; expanded asset scoping where some monitoring views remain global by design; richer playbook libraries; improved LLM evaluation and guardrails; automated incident reporting; broader enterprise log integration; and more automated validation of the monitored-VM onboarding path.
+
+\section*{Final Word}
+\addcontentsline{toc}{section}{Final Word}
+
+In conclusion, ARIA demonstrates the value of connecting monitoring, intelligence, and remediation in one controlled workflow. The platform improves visibility, reduces manual investigation effort, accelerates incident understanding, and provides a safer path from detection to response while keeping the analyst responsible for critical decisions.

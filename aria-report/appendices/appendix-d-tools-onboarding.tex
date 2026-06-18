@@ -1,0 +1,76 @@
+\chapter{Tools and Monitored VM Onboarding Inventory}
+
+This appendix summarizes the tools/setup material inspected for the report. It is included as operational documentation because ARIA depends on monitored machines sending logs, alerts, runtime events, and metrics to the central stack.
+
+\section{Central Environment Scripts}
+
+\begin{longtable}{@{}p{0.30\textwidth}p{0.60\textwidth}@{}}
+\caption{Central environment setup files}\\
+\toprule
+\textbf{File} & \textbf{Role} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{File} & \textbf{Role} \\
+\midrule
+\endhead
+\sourcefile{tools/tools/setup_script.sh} & Wrapper that delegates to the maintained central setup flow. \\
+\sourcefile{tools/tools/setup_script_telegraf.sh} & Central orchestration script using component flags for selected services. \\
+\sourcefile{tools/tools/siem_setup.sh} & Elasticsearch, Kibana, Filebeat, TLS and system log forwarding setup. \\
+\sourcefile{tools/tools/wazuh_setup.sh} & Wazuh Manager setup and Wazuh alert integration. \\
+\sourcefile{tools/tools/suricata_setup.sh} & Suricata IDS setup and EVE JSON output configuration. \\
+\sourcefile{tools/tools/setup-falco-server-elastic.sh} & Falco/Falcosidekick setup for runtime event forwarding. \\
+\sourcefile{tools/tools/telegraf_setup.sh} & Telegraf metric collection and forwarding setup. \\
+\sourcefile{tools/tools/detection_rules_setup.sh} & Detection-rule and visualization object setup. \\
+\sourcefile{tools/tools/hardening_setup.sh} & Host hardening actions such as firewall and SSH-related controls. \\
+\bottomrule
+\end{longtable}
+
+\section{Monitored VM Bootstrap Flow}
+
+The monitored VM bootstrap script is located under \sourcefile{tools/Script that i should inject in VMs to monitor them/bootstrap_monitored_vm.sh}. A copy also exists under the backend scripts directory for project distribution. Its purpose is to prepare a VM that will be observed by ARIA.
+
+\begin{enumerate}[leftmargin=1cm]
+\item Confirm that the target is a monitored VM and not the central ARIA/monitoring server.
+\item Collect the VM name, environment label, IP address, central Elasticsearch URL or IP, credentials, optional certificate path, and optional Wazuh manager configuration.
+\item Test central Elasticsearch reachability before installing agents.
+\item Install selected components: Wazuh Agent, Filebeat, Suricata, Falco/Falcosidekick, and Telegraf.
+\item Write configuration files with monitored asset fields such as host name, asset name, environment, and role.
+\item Start and verify services.
+\item Query the central stack to check that expected index families are visible.
+\item Print a JSON payload that can be used to create or edit the ARIA monitored asset.
+\end{enumerate}
+
+\section{Sensitive Values}
+
+Screenshots and appendices must never expose passwords, API keys, private SSH values, or full secret headers. The report should use placeholders such as \codepath{<redacted>} when showing commands that require credentials.
+
+\section{Validation Commands to Capture}
+
+\begin{longtable}{@{}p{0.38\textwidth}p{0.52\textwidth}@{}}
+\caption{Useful onboarding validation commands}\\
+\toprule
+\textbf{Command type} & \textbf{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Command type} & \textbf{Purpose} \\
+\midrule
+\endhead
+\codepath{systemctl status wazuh-agent filebeat suricata falcosidekick telegraf --no-pager -l} & Prove that installed monitored-VM services are running or clearly identify which optional component is absent. \\
+Elasticsearch health query with credentials hidden & Prove that the VM can reach the central stack. \\
+Elasticsearch index listing for asset-specific patterns & Prove that logs, runtime events, and metrics are arriving. \\
+ARIA asset source validation action & Prove that the backend can query source data for the asset. \\
+ARIA alerts or metrics filtered by \codepath{asset_id} & Prove that telemetry is visible in the SOC workflow. \\
+\bottomrule
+\end{longtable}
+
+\section{Known Setup Limitations}
+
+\begin{itemize}[leftmargin=1cm]
+\item The bootstrap script prints the ARIA asset payload but does not automatically register the asset in all environments.
+\item Some components are optional; missing data for a source can be valid when that component was not installed or configured for the VM.
+\item Central setup scripts are provisioning scripts and should be reviewed before use on an existing server.
+\item TLS and certificate handling must be adapted to the deployment constraints and should not be bypassed for a production deployment.
+\end{itemize}
+

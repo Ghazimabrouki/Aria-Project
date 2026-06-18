@@ -1,0 +1,18 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  S([Raw ES document]) --> N[Normalize via source mapper]
+  N --> E[Enrich: GeoIP + MITRE + cloud]
+  E --> D{Duplicate?<br/>dedup_key match}
+  D -->|yes| INC[Increment occurrence_count] --> STOP1([Suppress new row])
+  D -->|no| W{Source IP / domain<br/>whitelisted?}
+  W -->|yes| MARK[Mark whitelisted] --> STOP2([Not actionable])
+  W -->|no| SG{Matches Sigma<br/>noise rule?}
+  SG -->|yes| STOP3([Drop as noise])
+  SG -->|no| SEV{Severity above<br/>threshold?}
+  SEV -->|no| LOW[Store as low-priority]
+  SEV -->|yes| STORE[Store active Alert + asset_id]
+  STORE --> CORR[Hand to correlation]
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class D,W,SG,SEV dec;
+  class N,E,INC,MARK,LOW,STORE,CORR act;

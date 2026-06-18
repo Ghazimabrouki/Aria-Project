@@ -1,0 +1,30 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":55,"curve":"basis"}}}%%
+flowchart LR
+  LOGIN["Login<br/>/login"] --> SHELL["Dashboard Shell<br/>(authenticated)"]
+  SHELL --> OV["Overview"]
+  SHELL --> SO["Security Operations"]
+  SHELL --> IP["Infrastructure & Performance"]
+  SHELL --> RS["Runtime Security"]
+  SHELL --> AI["AI Intelligence"]
+  SHELL --> SM["System Management"]
+
+  OV --> DASH["Dashboard /"]
+  OV --> SRCH["Search /search"]
+  SO --> AL["Alerts /alerts"]
+  SO --> INC["Incidents /incidents"]
+  SO --> INV["Investigations /investigations"]
+  SO --> IPS["IPS Map /ips"]
+  SO --> WL["Whitelist /whitelist"]
+  IP --> MET["Performance /metrics"]
+  IP --> INF["Infrastructure /infrastructure/investigations"]
+  RS --> RUN["Runtime /runtime/investigations"]
+  AI --> ASST["AI Assistant /assistant"]
+  AI --> OPR["AI Operator /operator"]
+  SM --> ARCH["Archives /archives"]
+  SM --> SET["Settings /settings"]
+  SET --> SETG["accounts · ai · ansible · assets<br/>data-sources · monitoring · pipeline<br/>redis · security · workflow"]
+
+  classDef grp fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef leaf fill:#F8FAFC,stroke:#94A3B8,color:#0F172A;
+  class OV,SO,IP,RS,AI,SM grp;
+  class DASH,SRCH,AL,INC,INV,IPS,WL,MET,INF,RUN,ASST,OPR,ARCH,SET,SETG leaf;

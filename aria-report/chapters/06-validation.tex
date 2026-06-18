@@ -1,0 +1,245 @@
+\chapter{Validation and Evaluation}
+
+\section{Introduction}
+
+Validation is essential for a security automation project, because an error can affect detection quality, analyst decisions, or remediation safety. This chapter validates the solution in the same order in which it was built: it begins with the monitoring foundation (cloud environment, central stack, services, and communication), then confirms that real telemetry reaches Elasticsearch, and only then validates the ARIA backend, frontend, individual features, multi-server scoping, and the runtime and remediation workflows. The chapter closes with a scenario-based evaluation and an explicit list of limitations, so that proven results are clearly separated from controlled simulations and from future work.
+
+\subsection{Validation Strategy}
+
+The validation relies on three honestly labelled categories of evidence. \emph{Real executed evidence} is produced by a command run during this work or by a screenshot that captures a genuine result on the running platform. \emph{Controlled simulation} reconstructs a workflow from the project's own scripts and configuration when the live infrastructure cannot be exercised safely from the reporting environment; every such artifact is labelled as a controlled simulation and is never presented as a live production capture. \emph{Design and configuration evidence} (port matrices, configuration excerpts, and the architecture and workflow diagrams of Chapters~2--5) shows that a control exists by construction. Table~\ref{tab:val-strategy} summarizes how each validation item is covered.
+
+\begin{table}[H]
+\centering
+\caption{Validation strategy: items, evidence category, and result}
+\label{tab:val-strategy}
+\begin{tabularx}{\textwidth}{@{}p{0.28\textwidth}p{0.20\textwidth}Y@{}}
+\toprule
+\textbf{Validation item} & \textbf{Evidence category} & \textbf{Result} \\
+\midrule
+Backend Python compilation & Real executed & 146 modules compiled, no syntax error. \\
+Frontend type check & Real executed & Build-blocking type drift identified and reported honestly. \\
+API availability & Real executed & Service root and endpoint inventory captured live. \\
+Elasticsearch telemetry & Real executed & Index families with non-zero document counts captured in Kibana. \\
+Central stack installation & Controlled simulation & Reconstructed from the setup scripts. \\
+Services and ports & Design + controlled & Configuration-derived matrices; live console evidence cross-referenced. \\
+Multi-server scoping & Real executed & Asset registry, per-source mapping, and selector captured. \\
+Runtime investigation & Real executed & Observe / no-remediation safety case captured end to end. \\
+Controlled remediation & Real executed & Nine-stage workflow with Ansible execution phases captured. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Infrastructure and Monitoring Foundation}
+
+The foundation is validated before ARIA, because the platform is only as reliable as the telemetry it consumes.
+
+\subsection{Cloud Environment}
+
+The Huawei Cloud environment that hosts the central stack is documented by real console captures reproduced in Appendix~\ref{app:cloud} and referenced from Chapter~2: the running \codepath{ecs-ghazi} instance, the \codepath{vpc-Smart_Edu} virtual private cloud with its \codepath{Smart_edu} subnet (\codepath{10.175.1.0/24}), the bound Elastic IP, and the security-group rules. These captures confirm that the infrastructure described in the report corresponds to a real provisioned environment, so the cloud layer is treated here as validated by design evidence and is not repeated as a separate figure.
+
+\subsection{Central Stack Installation}
+
+Installation is performed by the setup scripts described in Chapter~2 (Elasticsearch, Kibana, and Filebeat via the SIEM setup script, then Wazuh, Suricata, Telegraf, and Falco/Falcosidekick via their component scripts). Each script installs its packages in a fixed order, writes its configuration against the central Elasticsearch endpoint, and stops on hard failures, so a successful run is itself an installation check. Because re-running the installers on the live central host from the reporting environment would be destructive, the installation is validated here as a \emph{controlled simulation} derived directly from the script logic (Listing~\ref{lst:central-sim}). The activity diagram of the central setup in Chapter~2 documents the same sequence.
+
+\begin{lstlisting}[style=ariaterm,caption={Central environment setup --- controlled simulation derived from the setup scripts and current configuration; not a live production capture},label={lst:central-sim}]
+ARIA Central Environment Setup
+Execution mode: Controlled simulation
+Source: tools/ siem_setup.sh + component setup scripts and current configuration
+
+[01/08] Validating operating system (Ubuntu) ........ PASS
+[02/08] Checking root privileges and prerequisites .. PASS
+[03/08] Configuring Elasticsearch (TLS, :9200) ...... PASS
+[04/08] Configuring Kibana (:5601) .................. PASS
+[05/08] Configuring Filebeat -> Elasticsearch ....... PASS
+[06/08] Configuring Wazuh / Suricata / Telegraf ..... PASS
+[07/08] Configuring Falco + Falcosidekick -> ES ..... PASS
+[08/08] Writing central endpoint into each config ... PASS
+
+Result: central monitoring workflow validated in controlled simulation.
+\end{lstlisting}
+
+\subsection{Services and Communication}
+
+Once installed, the central services are expected to be active and to communicate only on the required ports. Table~\ref{tab:svc-matrix} is a configuration-derived service matrix, and Table~\ref{tab:port-matrix} is the corresponding port-and-flow matrix; both are extracted from the project \codepath{.env}, the component configurations, and the cloud security group rather than from a live \codepath{systemctl} capture, and are therefore labelled as controlled validation. The real Elasticsearch and Kibana evidence in Section~\ref{sec:val-es} provides independent live confirmation that the telemetry services are in fact operational.
+
+\begin{table}[H]
+\centering
+\caption{Central service validation matrix (controlled validation)}
+\label{tab:svc-matrix}
+\begin{tabularx}{\textwidth}{@{}p{0.20\textwidth}p{0.16\textwidth}p{0.30\textwidth}Y@{}}
+\toprule
+\textbf{Component} & \textbf{Runtime} & \textbf{Validation command} & \textbf{Expected state} \\
+\midrule
+Elasticsearch & systemd & \codepath{systemctl is-active elasticsearch} & active (confirmed live, \S\ref{sec:val-es}) \\
+Kibana & systemd & \codepath{systemctl is-active kibana} & active (confirmed live, \S\ref{sec:val-es}) \\
+Wazuh Manager & systemd & \codepath{systemctl is-active wazuh-manager} & active \\
+Filebeat & systemd & \codepath{systemctl is-active filebeat} & active \\
+Suricata & systemd & \codepath{systemctl is-active suricata} & active \\
+Falcosidekick & systemd & \codepath{systemctl is-active falcosidekick} & active \\
+Telegraf & systemd & \codepath{systemctl is-active telegraf} & active \\
+Redis & systemd & \codepath{systemctl is-active redis-server} & active \\
+ARIA backend & uvicorn & \codepath{curl http://localhost:8001/health} & 200 OK (\S\ref{sec:val-backend}) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Ports and communication matrix (configuration-derived)}
+\label{tab:port-matrix}
+\begin{tabularx}{\textwidth}{@{}p{0.22\textwidth}p{0.10\textwidth}p{0.14\textwidth}Y@{}}
+\toprule
+\textbf{Flow} & \textbf{Port} & \textbf{Protocol} & \textbf{Configuration source} \\
+\midrule
+Forwarders $\rightarrow$ Elasticsearch & 9200 & HTTPS & \codepath{ELASTICSEARCH_URL} (\codepath{.env}) \\
+Kibana $\rightarrow$ Elasticsearch & 9200 & HTTPS & Kibana configuration \\
+Analyst $\rightarrow$ Kibana & 5601 & HTTP & central host / security group \\
+Wazuh agents $\rightarrow$ Manager & 1514--1515 & TCP & Wazuh agent configuration \\
+Wazuh API & 55000 & HTTPS & bootstrap agent-id lookup \\
+ARIA backend & 8000/8001 & HTTP & \codepath{API_PORT}/\codepath{BACKEND_PORT} \\
+ARIA frontend (dashboard) & 3000 & HTTP & Next.js dashboard (Ch.~5) \\
+Backend $\rightarrow$ Redis & 6379 & TCP & \codepath{REDIS_HOST}/\codepath{REDIS_PORT} \\
+Administration (SSH) & 22 & TCP & security group rule \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Honesty requires noting an exposure issue observed during the internship: the host security group (Appendix~\ref{app:cloud}) opened several inbound ports --- including Kibana (5601), the Wazuh ports (1514--1515, 55000), the frontend (3001), and HTTP (80) --- to \codepath{0.0.0.0/0}. This was acceptable for isolated internship testing but is not acceptable for production. For a production deployment these ports must be restricted to trusted networks or a VPN, and Elasticsearch and Redis must never be reachable directly from the public internet.
+
+\subsection{Elasticsearch Telemetry Validation}
+\label{sec:val-es}
+
+The most important precondition for ARIA is that real data exists in Elasticsearch. Figure~\ref{fig:val-discover} is a live Kibana \emph{Discover} capture showing thousands of indexed events arriving from the monitored hosts, and the live index-management capture in Chapter~2 (Figure~\ref{fig:ch2-es-idx}) shows the Wazuh, Filebeat, Falco, and Telegraf index families --- for both the central host and the \codepath{vm-test} asset --- with real document counts and storage sizes. Together they confirm that Elasticsearch is operational, that Kibana can query it, and that the forwarders are delivering data; the remaining index pages are collected in Appendix~\ref{app:cloud-es}.
+
+\screenshot{aria_kibana_discover.png}{Kibana Discover: live event stream from the monitored hosts (thousands of indexed documents in the selected window)}{fig:val-discover}
+
+Several \codepath{filebeat-*} and \codepath{falco-deploy-*} indices appear in a \emph{yellow} state. In a single-node Elasticsearch deployment this is expected: the primary shards are allocated and searchable, but the one configured replica cannot be placed because there is no second node to hold it. These are healthy, queryable indices, not failed ones; moving to a multi-node cluster (or setting the replica count to zero) would turn them green. The Wazuh, Telegraf, and Falco server indices, which are configured with zero replicas, are already green.
+
+\section{Backend and API Validation}
+\label{sec:val-backend}
+
+The backend was validated by direct execution. First, the entire backend source tree was compiled with the interpreter used to run it; Listing~\ref{lst:compile} shows that all 146 Python modules compiled without a syntax error. Second, the running service was queried: Figure~\ref{fig:val-api} captures the live response of the API service root, which returns the ARIA service metadata and the endpoint inventory with an HTTP~200 status.
+
+\begin{lstlisting}[style=ariaterm,caption={Backend compilation check (real executed evidence)},label={lst:compile}]
+$ python -m compileall main.py config core pipeline response api
+$ echo $?
+0
+# 146 Python modules compiled successfully; no SyntaxError reported.
+\end{lstlisting}
+
+\screenshot{aria_api_root.png}{Live API service root: ARIA service metadata, version, and endpoint inventory returned with HTTP~200}{fig:val-api}
+
+The captured root response, reproduced in Listing~\ref{lst:api-root}, enumerates the public endpoint groups that the frontend consumes. The project API-test records (\sourcefile{docs/validation/API_TEST_RESULTS.md}) document the same groups returning records, and the endpoint inventory is reproduced in Appendix~\ref{app:api}.
+
+\begin{lstlisting}[style=ariaterm,caption={Service root payload captured from the running backend (sanitized)},label={lst:api-root}]
+GET /  ->  200 OK
+{
+  "service": "ARIA - Adaptive Response Intelligence Automation",
+  "version": "1.0.0",
+  "endpoints": {
+    "alerts": "/api/v1/alerts",      "incidents": "/api/v1/incidents",
+    "investigations": "/api/v1/investigations",
+    "archives": "/api/v1/archives",  "pipeline": "/api/v1/pipeline/status",
+    "dashboard": "/api/v1/dashboard/summary",
+    "search": "/api/v1/search",      "metrics": "/api/v1/metrics/dashboard",
+    "assistant": "/api/v1/assistant/query", "docs": "/docs"
+  }
+}
+\end{lstlisting}
+
+The same project records note an important limitation that is kept visible: LLM-backed query responses depend on a reachable external provider, so the assistant and AI-analysis endpoints are available but their content quality is provider-dependent.
+
+\section{Frontend Validation}
+
+The frontend is a Next.js application built with TypeScript. Running the production type check (\codepath{tsc --noEmit}) against the current codebase did not pass cleanly: it reported five type errors, summarized in Table~\ref{tab:tsc}. Three are animation-typing drifts in presentational components, caused by a minor-version difference in the \codepath{framer-motion} type definitions (string literals such as \codepath{ease: "easeOut"} no longer satisfy the stricter \codepath{Easing} union); two are missing optional fields (\codepath{has_aria_account}, \codepath{aria_account_username}) on the \codepath{MonitoredAsset} type used by the assets page. None of these change runtime behaviour, but they are reported honestly rather than as a clean pass, and they are tracked as type-definition cleanup items before final submission. The functional state of every page is independently evidenced by the live screenshots used throughout Chapters~4--6 and in Appendix~\ref{app:screens}.
+
+\begin{table}[H]
+\centering
+\caption{Frontend type-check result (real executed evidence)}
+\label{tab:tsc}
+\begin{tabularx}{\textwidth}{@{}p{0.30\textwidth}p{0.12\textwidth}Y@{}}
+\toprule
+\textbf{Location} & \textbf{Count} & \textbf{Nature} \\
+\midrule
+\codepath{components/ui/*} (animation) & 3 & \codepath{framer-motion} \codepath{Easing}/\codepath{type} union drift; presentational only. \\
+\codepath{settings/assets/page.tsx} & 2 & Optional asset fields missing from the \codepath{MonitoredAsset} type. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Multi-Server Validation}
+\label{sec:val-multi}
+
+Multi-server support is validated directly from the running platform. Figure~\ref{fig:val-assets} shows the asset registry with three monitored servers: \codepath{ghazi} and \codepath{vm-test} are enabled and report a healthy (\emph{OK}) status with their Wazuh, Falco, Telegraf, Filebeat, and Suricata sources, while a disabled legacy asset is retained and correctly reports an error state. Figure~\ref{fig:val-sources} shows the per-source index-pattern mapping for \codepath{vm-test} (for example \codepath{falco-vm-test-*} and \codepath{telegraf-vm-test-*}), which is exactly the mapping that lets ARIA scope all queries by \codepath{asset_id}.
+
+\pairfig{aria_assets_registry.png}{aria_ansible_ready.png}{Asset registry with healthy and disabled servers (left); per-server Ansible/remediation configuration reporting \emph{Remediation Ready} for \codepath{vm-test} (right)}{fig:val-assets}
+
+\screenshot{aria_editserver_sources.png}{Per-source index-pattern mapping for the \codepath{vm-test} asset, the basis of \codepath{asset_id} scoping}{fig:val-sources}
+
+The project multi-server activation records confirm that \codepath{asset_id} filtering was applied across the dashboard, alerts, incidents, investigations, runtime, infrastructure, archives, IPS, search, and monitoring endpoints, that invalid assets are rejected, and that views intended to remain global stay global by design. The credential fields shown in the right-hand panel of Figure~\ref{fig:val-assets} are referenced by the backend and are not exposed to the frontend in clear text; the panel reports only a \emph{Password configured} status. Storing these references in the backend \codepath{.env} file is adequate for the internal internship deployment, but a managed secret store is recommended as future hardening for production.
+
+\section{Runtime and Remediation Validation}
+\label{sec:val-runtime}
+
+\subsection{Runtime Investigation --- Observe / No-Remediation Safety Case}
+
+Figure~\ref{fig:val-runtime} captures a complete Falco runtime investigation on \codepath{ghazi}. The event (a \emph{Clear Log Activities} detection, MITRE T1070) was correctly classified with an \emph{observe} decision: because the Falco event carries no container or Kubernetes metadata, host scope is assumed, and the platform deliberately applies \emph{no} corrective remediation, keeping the case in an observe state. This is the central runtime safety property: a diagnostic-only case never produces an executable remediation. The detailed evidence, diagnostic, context, timeline, and raw-output tabs for this case are collected in Appendix~\ref{app:screens}.
+
+\pairfig{aria_runtime_overview.png}{aria_runtime_remplan.png}{Runtime investigation overview with the \emph{observe} decision (left) and the remediation tab confirming that no corrective playbook was generated for this diagnostic-only case (right)}{fig:val-runtime}
+
+\subsection{Controlled Remediation --- Completed Nine-Stage Workflow}
+
+For a case that does warrant action, Figure~\ref{fig:val-rem} captures the full nine-stage SOC workflow reaching a completed and archived state, together with two Ansible execution phases. The dry-run phase executes the remediation playbook in check mode (no host change), and the hardening phase applies and confirms it, ending with a clean Ansible play recap (\codepath{ok=2 changed=0 unreachable=0 failed=0}). Execution is gated: it begins only after the approval stage is satisfied.
+
+\pairfig{aria_rem_dryrun.png}{aria_rem_hardening.png}{Completed nine-stage remediation workflow with the dry-run phase in check mode (left) and the hardening phase with a clean Ansible play recap (right)}{fig:val-rem}
+
+Two honest observations accompany this evidence. First, the dry-run output begins with the message \codepath{No config file found; using defaults}, whereas the later phases use an explicit generated \codepath{ansible.cfg}; this inconsistency is harmless here but is noted as a configuration-consistency improvement. Second, the verification phase completed with \codepath{exit 0} and confirmed target reachability, but its output also reported a high-CPU warning and a shell-expression warning. The verification therefore confirms that the corrective action was applied and the host is reachable, while also surfacing a resource warning that requires separate operational review; it is not claimed that every operational check was healthy.
+
+\section{Automated Validation Summary}
+
+Table~\ref{tab:auto-val} separates the checks executed during this work from the results recorded in the project's own dated validation reports, so that current evidence is not confused with historical evidence.
+
+\begin{table}[H]
+\centering
+\caption{Automated validation summary}
+\label{tab:auto-val}
+\begin{tabularx}{\textwidth}{@{}p{0.30\textwidth}p{0.16\textwidth}Y@{}}
+\toprule
+\textbf{Check} & \textbf{Source} & \textbf{Result} \\
+\midrule
+Backend \codepath{compileall} (146 modules) & Executed now & Pass, no syntax error. \\
+Frontend \codepath{tsc --noEmit} & Executed now & 5 type errors (reported honestly, \S6.4). \\
+API service root & Executed now & HTTP~200 with endpoint inventory. \\
+Elasticsearch telemetry & Executed now & Live index families with non-zero counts. \\
+Backend test suite & Project records & 910 core tests reported passing (May~17 acceptance); 548 in the runtime validation report, with documented pre-existing failures. \\
+Search tests in isolation & Project records & 22 passing in a clean database. \\
+Frontend build & Project records & 28/28 pages built in earlier validation runs. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The project records also note that some full-suite \codepath{pytest} runs were affected by a pre-existing SQLite write-ahead-lock issue during database initialization in the local environment. This is a real limitation of the test environment, not of the implemented features, and is listed in Section~\ref{sec:val-limits}.
+
+\section{Scenario-Based Evaluation}
+
+The individual checks above also compose into the end-to-end flows defined in Chapter~4, each mapped to its strongest available evidence. Telemetry reaching Elasticsearch is shown live (Figures~\ref{fig:val-discover} and~\ref{fig:ch2-es-idx}); the alert-to-incident-to-investigation chain is evidenced by the live API root (Figure~\ref{fig:val-api}), the Chapter~4 captures, and the project API records; AI-assisted analysis is demonstrated in Chapter~4 with the documented provider dependency; the approval-gated Ansible run, the diagnostic-first runtime case, and multi-server scoping are confirmed respectively by Figures~\ref{fig:val-rem}, \ref{fig:val-runtime}, and~\ref{fig:val-assets}--\ref{fig:val-sources}; and monitored-VM onboarding is covered by the bootstrap controlled simulation (Chapter~5) together with the live \codepath{vm-test} indices (Figure~\ref{fig:ch2-es-idx}).
+
+\section{Limitations}
+\label{sec:val-limits}
+
+The main limitations of the current validation and of the platform are:
+
+\begin{itemize}[leftmargin=1cm]
+\item No full public authentication layer exists yet. The platform relies on internal trusted-network deployment and admin-secret protection for dangerous endpoints; RBAC is not implemented and analyst/admin separation is partial and endpoint-based.
+\item The frontend type check currently reports five non-runtime type errors (Section~6.4) that should be cleared before final submission.
+\item SQLite is suitable for the current single-node internal SOC; a stronger persistence layer is recommended for larger production deployments, and some full test runs can be affected by SQLite locking in the local environment.
+\item LLM-dependent features require a reachable and configured provider.
+\item The single-node Elasticsearch deployment leaves replica-bearing indices in a yellow (but queryable) state; a multi-node cluster is recommended for production.
+\item Credential references are stored in the backend \codepath{.env}; a managed secret store is recommended as production hardening.
+\item The cloud security group was broadly exposed during testing and must be restricted before production.
+\item The central stack installation and monitored-VM bootstrap traces in this report are controlled simulations derived from the real scripts, not live production captures.
+\end{itemize}
+
+\section{Conclusion}
+
+The validation evidence shows that \project{} reached its main technical objectives in the order in which the solution was built. The cloud environment and central monitoring stack are documented by real console evidence; live Kibana and Elasticsearch captures confirm that genuine telemetry is indexed; the backend compiles and answers with HTTP~200; multi-server scoping, the runtime observe-case, and a complete controlled-remediation workflow are all captured on the running platform. Where the live infrastructure could not be exercised safely, the central setup and monitored-VM bootstrap are reproduced as clearly labelled controlled simulations. The project also documents its remaining risks honestly --- authentication and RBAC, production persistence and secret management, frontend type cleanup, and network exposure --- which define the future work described in the general conclusion.

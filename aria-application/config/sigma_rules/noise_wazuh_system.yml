@@ -1,0 +1,19 @@
+title: Wazuh System Noise
+description: Filter out ONLY truly benign system events - keep ones that need investigation
+status: experimental
+logsource:
+  product: wazuh
+detection:
+  selection:
+    - description|contains:
+        - 'Wazuh server started'
+        - 'New dpkg (Debian Package) requested to install'
+        - 'New dpkg (Debian Package) installed'
+        - 'Dpkg (Debian Package) half configured'
+        - 'Dpkg (Debian Package) warning'
+        - 'Systemd: Service exited due to a failure'
+        - 'Systemd: Started'
+        - 'Systemd: Stopped'
+        - 'Apparmor DENIED'
+        - 'Host-based anomaly detection event (rootcheck)'
+  condition: selection

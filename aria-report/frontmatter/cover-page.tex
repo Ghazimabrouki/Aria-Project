@@ -1,0 +1,40 @@
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+
+  % --- Official ESPRIT cover background (full page) ---
+  \node[anchor=center, inner sep=0] at (current page.center)
+    {\includegraphics[width=\paperwidth,height=\paperheight]{assets/cover/esprit-cover-front.png}};
+
+  % --- Specialty (next to the printed "SPECIALTY :" label) ---
+  \node[anchor=west, font=\bfseries\normalsize]
+    at ([xshift=10.5cm,yshift=-11.9cm]current page.north west)
+    {Cloud Computing};
+
+  % --- Project title block ---
+  \node[anchor=north, align=center, text width=16cm]
+    at ([yshift=-14.0cm]current page.north)
+    {{\fontsize{30}{34}\selectfont\bfseries \project}\\[0.35cm]
+     {\Large\bfseries \projectlong}\\[0.25cm]
+     {\large AI-Assisted Security Operations, Incident Response,\\and Remediation Platform}};
+
+  % --- Author and supervision details ---
+  \node[anchor=north]
+    at ([yshift=-18.0cm]current page.north)
+    {\normalsize
+     \renewcommand{\arraystretch}{1.3}%
+     \begin{tabular}{@{}r@{\hskip 0.4cm}l@{}}
+       \textbf{Prepared by:} & Ghazi Mabrouki \\
+       \textbf{Academic supervisor:} & \todo{Name of academic supervisor} \\
+       \textbf{Company supervisors:} & Arfaoui Ibrahim \& Zhong Yan \\
+       \textbf{Host organization:} & Huawei Technologies -- Tunis, Tunisia \\
+       \textbf{Academic year:} & 2025--2026 \\
+     \end{tabular}};
+
+  % --- Huawei logo in the cover's partner-logo box ---
+  \node[anchor=center, inner sep=0]
+    at ([xshift=13.39cm,yshift=-24.76cm]current page.north west)
+    {\includegraphics[width=5cm]{assets/cover/huawei-logo.png}};
+
+\end{tikzpicture}
+\end{titlepage}

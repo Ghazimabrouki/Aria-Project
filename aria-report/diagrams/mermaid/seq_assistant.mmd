@@ -1,0 +1,19 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant U as SOC Analyst
+  participant FE as Next.js Frontend
+  participant BE as /api/v1/assistant
+  participant CB as context_builder
+  participant DB as SQLite + Elasticsearch
+  participant AI as AI Provider / LLM
+  U->>FE: ask question (optional focus entity)
+  FE->>BE: POST message (conversation_id, focus_entity)
+  BE->>CB: gather context (investigation/incident/alert/system)
+  CB->>DB: read scoped records
+  DB-->>CB: context records
+  CB-->>BE: grounded context + sources
+  BE->>AI: prompt (question + context)
+  AI-->>BE: answer + suggested actions
+  BE->>DB: persist AssistantMessage (sources_json)
+  BE-->>FE: answer + sources + actions

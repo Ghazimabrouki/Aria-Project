@@ -1,0 +1,84 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart TB
+  TITLE["Phase 1 - Visibility Layers & Tool Roles<br/><span style='font-size:14px;color:#2563EB'>Monitoring every critical layer of the system</span>"]
+  TITLE --> DOMAINS
+  subgraph DOMAINS["Monitoring Coverage Domains"]
+    direction LR
+    subgraph NET_DOMAIN["Network Visibility"]
+      direction TB
+      NET["Network Layer<br/>Traffic, packets, protocols"]
+      SUR["Suricata<br/>Network IDS"]
+      SUR_ROLE["Detects scans, suspicious traffic,<br/>malicious flows, IDS alerts"]
+      NET --> SUR --> SUR_ROLE
+    end
+    subgraph HOST_DOMAIN["Host Visibility"]
+      direction TB
+      HOST["Host / Endpoint Layer<br/>Auth, files, agents, processes"]
+      WAZ["Wazuh<br/>Host / Endpoint Security"]
+      WAZ_ROLE["Detects failed logins, file changes,<br/>host alerts, suspicious activity"]
+      HOST --> WAZ --> WAZ_ROLE
+    end
+    subgraph RUN_DOMAIN["Runtime Visibility"]
+      direction TB
+      RUN["Runtime / Container Layer<br/>Processes, syscalls, containers"]
+      FAL["Falco<br/>Runtime Security"]
+      FAL_ROLE["Detects abnormal process behavior,<br/>container activity, suspicious syscalls"]
+      RUN --> FAL --> FAL_ROLE
+    end
+    subgraph RES_DOMAIN["Resource Visibility"]
+      direction TB
+      RES["Resource / Infrastructure Layer<br/>CPU, RAM, disk, load, health"]
+      TEG["Telegraf<br/>Metrics Agent"]
+      TEG_ROLE["Collects system metrics,<br/>performance data, infrastructure health"]
+      RES --> TEG --> TEG_ROLE
+    end
+  end
+  DOMAINS --> PIPELINE
+  subgraph PIPELINE["Collection, Centralization & Visualization"]
+    direction LR
+    FB["Filebeat<br/>Log Collection & Forwarding"]
+    FSK["Falcosidekick<br/>Falco Alert Forwarding"]
+    ES["Elasticsearch<br/>Central Storage, Search & Indexing"]
+    KB["Kibana<br/>Dashboards, Monitoring & Analysis"]
+    FB --> ES
+    FSK --> ES
+    ES --> KB
+  end
+  SUR_ROLE -->|"eve.json events"| FB
+  WAZ_ROLE -->|"host alerts"| FB
+  FAL_ROLE -->|"runtime alerts"| FSK
+  TEG_ROLE -->|"metrics"| ES
+  KB --> OUTCOME["Final Outcome of Phase 1<br/>Complete security monitoring foundation with global visibility across all critical layers."]
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef layer fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef tool fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A,font-weight:bold;
+  classDef role fill:#FFFFFF,stroke:#94A3B8,stroke-width:1px,color:#0F172A;
+  classDef core fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A,font-weight:bold;
+  classDef outcome fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class NET,HOST,RUN,RES layer;
+  class SUR,WAZ,FAL,TEG,FB,FSK tool;
+  class SUR_ROLE,WAZ_ROLE,FAL_ROLE,TEG_ROLE role;
+  class ES,KB core;
+  class OUTCOME outcome;
+  style DOMAINS fill:#FFFFFF,stroke:#94A3B8,stroke-width:1.5px,color:#0F172A
+  style NET_DOMAIN fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A
+  style HOST_DOMAIN fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A
+  style RUN_DOMAIN fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A
+  style RES_DOMAIN fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A
+  style PIPELINE fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A

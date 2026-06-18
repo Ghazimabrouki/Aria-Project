@@ -1,0 +1,19 @@
+title: Suricata ICMP PING Noise
+description: Filter out ICMP PING alerts that are just network probes, not actual attacks
+status: experimental
+logsource:
+  product: suricata
+detection:
+  selection:
+    - signature|contains:
+        - 'GPL ICMP PING'
+        - 'ET ICMP PING'
+        - 'ICMP PING BSDtype'
+        - 'ICMP PING Cisco'
+        - 'ICMP PING Microsoft'
+        - 'ICMP PING Nmap'
+        - 'ICMP Echo Request'
+    - signature|contains|!:
+        - 'attack'
+        - 'exploit'
+  condition: selection

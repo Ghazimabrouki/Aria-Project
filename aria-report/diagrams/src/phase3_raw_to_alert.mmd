@@ -1,0 +1,47 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 2 - Transform Raw Documents into Clean Alerts"]
+  RAW["Raw ES Document<br/>source-specific format"]
+  subgraph MAPPERS["Source-Specific Mappers"]
+    direction TB
+    WAZ["Wazuh Mapper"]
+    SUR["Suricata Mapper"]
+    FAL["Falco Mapper"]
+    FB["Filebeat Mapper"]
+    GEN["Generic Mapper"]
+  end
+  COMMON["Common Alert Model<br/>source, title, severity, category,<br/>source_ip, dest_ip, hostname, metadata"]
+  PIPE["Alert Processing<br/>deduplication, filtering, enrichment,<br/>context, whitelist"]
+  CLEAN["Clean SOC Alert<br/>ready for incident correlation"]
+  TITLE --> RAW
+  RAW --> MAPPERS
+  MAPPERS --> COMMON
+  COMMON --> PIPE
+  PIPE --> CLEAN
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef raw fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef mapper fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef common fill:#ECFDF5,stroke:#16A34A,stroke-width:1.8px,color:#0F172A,font-weight:bold;
+  classDef clean fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class RAW raw;
+  class WAZ,SUR,FAL,FB,GEN mapper;
+  class COMMON common;
+  class PIPE mapper;
+  class CLEAN clean;
+  style MAPPERS fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#0F172A

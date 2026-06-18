@@ -1,0 +1,50 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 1.1 - Cursor-Based Elasticsearch Polling"]
+  subgraph ES["Elasticsearch Sources"]
+    direction TB
+    WZ["wazuh-alerts-*<br/>Wazuh"]
+    FB["filebeat-* / suricata-*<br/>Filebeat + Suricata"]
+    FC["falco-events-*<br/>Falco"]
+    TG["telegraf-*<br/>Telegraf"]
+  end
+  subgraph POLL["Backend Polling Logic"]
+    direction TB
+    DISC["Source Discovery<br/>configured index patterns"]
+    CUR["Cursor<br/>last processed timestamp"]
+    QUERY["Query<br/>@timestamp > cursor"]
+    SORT["Sort<br/>@timestamp ascending"]
+    SEEN["Seen-ID Check<br/>skip processed ES _id"]
+  end
+  PROCESS["process_single_alert()<br/>send fresh document to pipeline"]
+  TITLE --> ES
+  WZ --> DISC
+  FB --> DISC
+  FC --> DISC
+  TG --> DISC
+  DISC --> CUR --> QUERY --> SORT --> SEEN --> PROCESS
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef source fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef poll fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef final fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class WZ,FB,FC,TG source;
+  class DISC,CUR,QUERY,SORT,SEEN poll;
+  class PROCESS final;
+  style ES fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,color:#0F172A
+  style POLL fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#0F172A

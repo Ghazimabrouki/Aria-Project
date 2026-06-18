@@ -1,0 +1,12 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> open : alerts correlated
+  open --> investigating : investigation launched
+  investigating --> resolved : remediation verified
+  open --> resolved : closed (auto | analyst)
+  resolved --> archived : archived for audit
+  archived --> [*]
+  note right of resolved
+    resolved_by: auto | analyst
+  end note

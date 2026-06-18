@@ -1,0 +1,29 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant U as SOC Analyst
+  participant FE as Operator UI
+  participant BE as /api/v1/operator
+  participant IP as intent parser (LLM)
+  participant SP as safety_policy
+  participant AP as approval gate
+  participant AX as ansible_exec
+  participant SRV as Monitored Server
+  U->>FE: natural-language instruction
+  FE->>BE: POST prompt (asset_id)
+  BE->>IP: parse intent + generate playbook
+  IP-->>BE: intent + playbook_yaml + risk_level
+  BE->>SP: safety classification (scope, risky ops)
+  SP-->>BE: tier + blocked_reasons
+  BE-->>FE: preview (explanation, playbook, risk)
+  alt low risk and in scope
+    U->>FE: confirm
+    FE->>AP: approve (admin secret)
+    AP->>AX: execute
+    AX->>SRV: SSH run
+    SRV-->>AX: result
+    AX-->>BE: OperatorRun completed
+  else risky or out of scope
+    BE-->>FE: blocked (requires manual review)
+  end
+  BE-->>FE: result + audit log

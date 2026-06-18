@@ -1,0 +1,19 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant AD as Administrator
+  participant NV as New Server
+  participant BS as bootstrap_monitored_vm.sh
+  participant CS as Central Stack
+  participant ES as Elasticsearch
+  participant AA as ARIA (assets)
+  AD->>NV: run bootstrap script (prompts: identity, central IP)
+  BS->>NV: install Wazuh agent, Suricata, Falco, Filebeat, Telegraf
+  BS->>NV: write forwarding config (host identity fields)
+  BS->>CS: register Wazuh agent (1514/1515)
+  NV->>ES: forward logs/alerts/metrics (HTTPS 9200 via central)
+  BS-->>AD: print ARIA asset payload (source_config_json)
+  AD->>AA: create MonitoredAsset (asset_id, index patterns)
+  AA->>ES: validate per-source telemetry present
+  ES-->>AA: index/document counts
+  AA-->>AD: validation_status = ok | partial | missing

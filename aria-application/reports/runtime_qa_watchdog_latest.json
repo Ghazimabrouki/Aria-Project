@@ -1,0 +1,348 @@
+{
+  "generated_at": "2026-06-05T09:37:40.513421+00:00",
+  "duration_seconds": 0.3619973659515381,
+  "api_reachable": false,
+  "es_reachable": true,
+  "db_reachable": true,
+  "recovery_loop_healthy": true,
+  "ssh_timeout_rate": 0.0,
+  "raw_snapshot_coverage": 1.0,
+  "stats": {},
+  "findings": [
+    {
+      "investigation_id": null,
+      "check": "api_health",
+      "severity": "critical",
+      "reason": "API unreachable: All connection attempts failed",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "ce3d7928-5524-441f-ac6e-ab39083a9424",
+      "check": "data_quality_missing_container_name",
+      "severity": "info",
+      "reason": "container_id present but container_name missing",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "2a10c7fa-d5d0-4a18-b344-d5321fb8bb5f",
+      "check": "data_quality_missing_container_name",
+      "severity": "info",
+      "reason": "container_id present but container_name missing",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "8cd92f05-c421-4730-b39b-20829966d111",
+      "check": "data_quality_missing_container_name",
+      "severity": "info",
+      "reason": "container_id present but container_name missing",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "67f05db5-515a-4f10-b0b1-713424015a75",
+      "check": "data_quality_missing_container_name",
+      "severity": "info",
+      "reason": "container_id present but container_name missing",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "28328ff8-b931-409f-a5fb-6866763f1151",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "69f9363e-d03b-4794-93de-a527625eb0fb",
+      "check": "data_quality_missing_container_name",
+      "severity": "info",
+      "reason": "container_id present but container_name missing",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "1057c81d-b0f0-4a9f-810a-7a553b5a1db4",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "d154035d-ffe5-442b-a638-3743c7477ef9",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "8b6fe6b6-69b0-4b6f-9a2a-83d550fca8a2",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "a8032471-7dc7-4940-89dc-c8cb95eee23f",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "87517b2f-e06e-461f-a209-6f3157d975bb",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "44f4678d-11e7-4c43-b24b-cc344432bf23",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "74be9dbd-9733-4893-a8f8-22117a1cb5ea",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "204e625c-641f-4b86-8359-2b94b223d78d",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "b49883c6-730b-4212-9541-556d85d62556",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "b6dd730e-24b7-4d90-a0fb-2209cb5f574c",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "c3398034-15cc-4283-96f8-d67e975380dc",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "7f46c1dc-e131-4c0b-b7a5-ab0339ba978c",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "24dead68-e750-446e-8143-d3e3ec1bb05f",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "1c5a9ca8-fa4d-4fe6-b542-faa5b65e32d5",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "b8a78689-06e6-4ab2-8f06-ffe5781f7bc3",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "503438b6-9885-4c0d-b6e4-906aa3d63cbf",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "66e19b21-a67d-4be2-9e6f-32eadb3003ca",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "6b4d84da-788a-4904-85bb-502b11221056",
+      "check": "data_quality_missing_rule",
+      "severity": "info",
+      "reason": "Missing rule name in context",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "6b4d84da-788a-4904-85bb-502b11221056",
+      "check": "data_quality_missing_container_name",
+      "severity": "info",
+      "reason": "container_id present but container_name missing",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "6ac1a4b7-11d7-47db-ba14-faf7253ba108",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "784be902-9dc4-4b34-bec4-276321d199cd",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "93ee5365-14de-4e79-bf0a-22eacb5e7dfa",
+      "check": "data_quality_corrupted_proc_name",
+      "severity": "info",
+      "reason": "Corrupted proc_name '9'",
+      "recommendation": "Historical data quality guard should flag this.",
+      "data": {}
+    },
+    {
+      "investigation_id": "46d516ae-7296-469b-a21c-3edba4072523",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "200744e9-e93e-412e-a631-fba7e39ba98f",
+      "check": "data_quality_missing_process",
+      "severity": "info",
+      "reason": "Missing process name",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": null,
+      "check": "data_quality_duplicated_summaries",
+      "severity": "info",
+      "reason": "Summary duplicated 8 times: Runtime security event detected on deploy-dont-delete: Read sensitive file untru...",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": null,
+      "check": "data_quality_duplicated_summaries",
+      "severity": "info",
+      "reason": "Summary duplicated 15 times: Runtime security event detected on ghazi: Critical Linux Service Control Command...",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": null,
+      "check": "data_quality_duplicated_summaries",
+      "severity": "info",
+      "reason": "Summary duplicated 22 times: Runtime security event detected on ghazi: Drop and execute new binary in contain...",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": null,
+      "check": "data_quality_duplicated_summaries",
+      "severity": "info",
+      "reason": "Summary duplicated 11 times: Runtime security event detected on ghazi: Package Manager Change Operation. Cate...",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": null,
+      "check": "data_quality_duplicated_summaries",
+      "severity": "info",
+      "reason": "Summary duplicated 24 times: Runtime security event detected on ghazi: Read sensitive file untrusted. Categor...",
+      "recommendation": "",
+      "data": {}
+    },
+    {
+      "investigation_id": "c88cf379-6e0e-4326-ba9a-f0534ceeb896",
+      "check": "data_quality_historical_stuck",
+      "severity": "warning",
+      "reason": "Historical record stuck in diagnosing since 2026-05-19 10:18:26.466824",
+      "recommendation": "Run backfill script or delete stale record.",
+      "data": {}
+    },
+    {
+      "investigation_id": "8768eb61-006d-408f-9df3-c3b74e6fff7e",
+      "check": "data_quality_historical_stuck",
+      "severity": "warning",
+      "reason": "Historical record stuck in diagnosing since 2026-05-19 10:18:26.553993",
+      "recommendation": "Run backfill script or delete stale record.",
+      "data": {}
+    },
+    {
+      "investigation_id": "5b4796da-cef7-4504-a5be-d9a5ebfe7b98",
+      "check": "data_quality_historical_stuck",
+      "severity": "warning",
+      "reason": "Historical record stuck in diagnosing since 2026-05-19 10:18:26.590577",
+      "recommendation": "Run backfill script or delete stale record.",
+      "data": {}
+    },
+    {
+      "investigation_id": "c98f701d-a93f-4596-ad85-f511c1229543",
+      "check": "data_quality_historical_stuck",
+      "severity": "warning",
+      "reason": "Historical record stuck in diagnosing since 2026-05-19 10:18:26.624120",
+      "recommendation": "Run backfill script or delete stale record.",
+      "data": {}
+    },
+    {
+      "investigation_id": "dbd6bd2c-bd77-4abf-b601-f52344c847af",
+      "check": "data_quality_historical_stuck",
+      "severity": "warning",
+      "reason": "Historical record stuck in diagnosing since 2026-05-19 10:25:52.018354",
+      "recommendation": "Run backfill script or delete stale record.",
+      "data": {}
+    }
+  ],
+  "sampled_investigations": [],
+  "synthetic_results": [],
+  "summary": {
+    "critical": 1,
+    "warning": 5,
+    "total": 6
+  }
+}

@@ -1,0 +1,102 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"14px"}}}%%
+erDiagram
+  MONITORED_ASSETS ||--o{ ALERTS : scopes
+  MONITORED_ASSETS ||--o{ INCIDENTS : scopes
+  MONITORED_ASSETS ||--o{ INVESTIGATIONS : scopes
+  MONITORED_ASSETS ||--o{ OPERATOR_RUNS : scopes
+  ARIA_ACCOUNTS }o--o| MONITORED_ASSETS : bound_to
+  ALERTS ||--o{ ALERT_INCIDENT_LINKS : in
+  INCIDENTS ||--o{ ALERT_INCIDENT_LINKS : groups
+  INCIDENTS ||--o| INVESTIGATIONS : triggers
+  INVESTIGATIONS ||--o{ INVESTIGATION_ALERTS : context
+  INVESTIGATIONS ||--o| PLAYBOOK_APPROVALS : gated_by
+  INVESTIGATIONS ||--o| PLAYBOOK_RUNS : executed_by
+  INVESTIGATIONS ||--o| FIX_VERIFICATIONS : verified_by
+  INVESTIGATIONS ||--o| ARCHIVES : closed_into
+  INVESTIGATIONS ||--o{ INVESTIGATION_AUDIT_EVENTS : audited_by
+
+  MONITORED_ASSETS {
+    string id PK
+    string asset_id UK
+    string name
+    string hostname
+    json source_config_json
+    json ansible_config_json
+    bool remediation_enabled
+    string validation_status
+  }
+  ALERTS {
+    string id PK
+    string source
+    string source_id
+    string severity
+    string status
+    string category
+    string dedup_key
+    string asset_id FK
+  }
+  INCIDENTS {
+    string id PK
+    string correlation_key
+    string severity
+    string status
+    string asset_id FK
+  }
+  ALERT_INCIDENT_LINKS {
+    string alert_id PK_FK
+    string incident_id PK_FK
+    string correlation_confidence
+  }
+  INVESTIGATIONS {
+    string id PK
+    string incident_id FK
+    string status
+    string investigation_type
+    string playbook_yaml
+    string asset_id FK
+  }
+  PLAYBOOK_APPROVALS {
+    string id PK
+    string investigation_id FK
+    string decision
+    bool override
+  }
+  PLAYBOOK_RUNS {
+    string id PK
+    string investigation_id FK
+    string status
+    string current_phase
+    int exit_code
+  }
+  FIX_VERIFICATIONS {
+    string id PK
+    string investigation_id FK
+    string status
+    int new_alerts_found
+  }
+  ARCHIVES {
+    string id PK
+    string investigation_id FK
+    string fix_status
+    string severity
+  }
+  INVESTIGATION_AUDIT_EVENTS {
+    string id PK
+    string investigation_id FK
+    string event_type
+    string actor
+    string auth_mode
+  }
+  OPERATOR_RUNS {
+    string id PK
+    string intent
+    string risk_level
+    string status
+    string asset_id FK
+  }
+  ARIA_ACCOUNTS {
+    string id PK
+    string username UK
+    string role
+    string asset_id FK
+  }

@@ -1,0 +1,19 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  A([Natural-language instruction]) --> P[Parse intent + generate playbook]
+  P --> SCOPE{Target in<br/>allowed asset scope?}
+  SCOPE -->|no| B1([Block: out of scope])
+  SCOPE -->|yes| RISK{Risky operation?<br/>destructive / broad}
+  RISK -->|yes| TIER[risk_level = high]
+  RISK -->|no| TIERL[risk_level = low/medium]
+  TIER --> SEC{Admin secret<br/>provided?}
+  SEC -->|no| B2([Block: needs approval])
+  SEC -->|yes| PREV[Show preview]
+  TIERL --> PREV
+  PREV --> CONF{User confirms?}
+  CONF -->|no| CANC([Cancelled])
+  CONF -->|yes| EXEC[Execute via Ansible] --> LOG[Record OperatorRun + audit]
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class SCOPE,RISK,SEC,CONF dec;
+  class P,TIER,TIERL,PREV,EXEC,LOG act;

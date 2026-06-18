@@ -1,0 +1,10 @@
+title: Suricata Threat Intel Feed Grouping
+description: Threat intel blocklist matches are grouped by rule in dedup, skip individual IP alerts
+status: experimental
+logsource:
+  product: suricata
+detection:
+  selection:
+    - signature|contains:
+        - 'ET CINS Active Threat Intelligence Poor Reputation IP group'
+  condition: selection

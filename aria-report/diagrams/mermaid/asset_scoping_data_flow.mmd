@@ -1,0 +1,30 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":50,"curve":"basis"}}}%%
+flowchart TB
+  ACCOUNT["AriaAccount<br/>role + asset_id"]
+  REQ["API request<br/>/api/v1/*"]
+  SCOPE["asset_scope filter<br/>core/asset_scope.py"]
+  subgraph STORES["asset_id-scoped views"]
+    direction LR
+    AL["Alerts<br/>asset_id"]
+    IN["Incidents<br/>asset_id"]
+    IV["Investigations<br/>asset_id"]
+    OP["Operator runs<br/>asset_id"]
+    MT["Metrics / Runtime<br/>per-source index pattern"]
+  end
+  ASSET["MonitoredAsset<br/>source_config_json"]
+
+  ACCOUNT -->|carries role + asset_id| REQ
+  REQ --> SCOPE
+  ASSET -->|defines index patterns<br/>+ host identity| SCOPE
+  SCOPE -->|super_admin: all assets| STORES
+  SCOPE -->|server_user: own asset only| STORES
+  SCOPE --> AL
+  SCOPE --> IN
+  SCOPE --> IV
+  SCOPE --> OP
+  SCOPE --> MT
+
+  classDef k fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef s fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class SCOPE k;
+  class AL,IN,IV,OP,MT s;

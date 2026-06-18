@@ -1,0 +1,41 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 3 - Enrichment and Context Building"]
+  ALERT["Normalized Alert"]
+  GEO["GeoIP / ASN<br/>country, provider, location"]
+  MITRE["MITRE ATT&CK<br/>tactics and techniques"]
+  IOC["IOC Extraction<br/>IPs, domains, hashes, URLs"]
+  CAMP["Campaign Detection<br/>repeated patterns, brute force,<br/>port scans, web attacks"]
+  WHITE["Whitelist Check<br/>trusted IPs / hosts"]
+  ENRICHED["Enriched Alert<br/>analyst-ready context"]
+  TITLE --> ALERT
+  ALERT --> GEO
+  ALERT --> MITRE
+  ALERT --> IOC
+  GEO --> ENRICHED
+  MITRE --> ENRICHED
+  IOC --> ENRICHED
+  ENRICHED --> CAMP --> WHITE
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A;
+  classDef enrich fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef final fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class ALERT input;
+  class GEO,MITRE,IOC,CAMP,WHITE enrich;
+  class ENRICHED final;

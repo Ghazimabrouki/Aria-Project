@@ -1,0 +1,20 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant DB as SQLite (alerts)
+  participant IM as incident_manager
+  participant LK as AlertIncidentLink
+  participant WA as watcher (main)
+  participant IV as Investigation store
+  IM->>DB: read active alerts
+  IM->>IM: compute correlation_key (host + category + window)
+  alt matches existing incident
+    IM->>LK: link alert to incident (confidence)
+  else new incident
+    IM->>DB: create Incident (status=open)
+    IM->>LK: link alert (confidence=high)
+  end
+  WA->>DB: detect incident needing response
+  WA->>IV: create Investigation (status=pending, incident_id, asset_id)
+  IV-->>WA: investigation id
+  WA->>IV: enqueue for AI analysis

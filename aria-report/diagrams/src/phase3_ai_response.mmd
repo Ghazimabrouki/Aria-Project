@@ -1,0 +1,35 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 7 - AI Response Engine"]
+  CTX["Investigation Context<br/>timeline, IOCs, MITRE, risk"]
+  CB["Circuit Breaker"]
+  PROMPT["Prompt Builder<br/>strict sections"]
+  LLM["LLM Provider<br/>Ollama / Gemini / OpenRouter / NIM"]
+  PARSE["Parser<br/>SUMMARY / NARRATIVE / RISK / PLAYBOOK"]
+  STORE["Store in Investigation"]
+  APPROVE["Auto-Approve Check<br/>or human approval"]
+  TITLE --> CTX
+  CTX --> CB --> PROMPT --> LLM --> PARSE --> STORE --> APPROVE
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef final fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class CTX input;
+  class CB,PROMPT,LLM,PARSE,STORE process;
+  class APPROVE final;

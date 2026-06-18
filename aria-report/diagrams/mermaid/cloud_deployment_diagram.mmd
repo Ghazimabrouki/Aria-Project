@@ -1,0 +1,50 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  ANALYST["SOC Analyst<br/>browser"]
+  subgraph HW["Huawei Cloud"]
+    subgraph VPC["VPC + Subnet + Security Group"]
+      EIP{{"Elastic IP"}}
+      subgraph ECS["ECS node: ecs-ghazi (Ubuntu 24)"]
+        direction TB
+        subgraph APP["ARIA application"]
+          FE["Next.js Frontend :3000"]
+          BE["FastAPI Backend :8001"]
+          DBF[("SQLite<br/>data/investigations.db")]
+          RDS[("Redis")]
+        end
+        subgraph STACK["Central monitoring stack"]
+          ES["Elasticsearch :9200"]
+          KB["Kibana :5601"]
+          WZ["Wazuh Mgr :1514/1515 · API :55000"]
+          FSK["Falcosidekick :2801"]
+          SUR["Suricata"]
+          FB["Filebeat"]
+          TG["Telegraf"]
+        end
+      end
+    end
+  end
+  subgraph EST["Monitored servers"]
+    MV["VM agents:<br/>Wazuh / Suricata / Falco /<br/>Filebeat / Telegraf"]
+  end
+  ANALYST -->|HTTPS via EIP| EIP
+  EIP --> FE
+  FE -->|REST + WS| BE
+  BE --> DBF
+  BE --> RDS
+  BE -->|:9200| ES
+  BE -->|SSH :22| MV
+  FB --> ES
+  TG --> ES
+  FSK --> ES
+  SUR --> FB
+  WZ --> ES
+  ES --> KB
+  MV -->|:1514/1515 + :9200| WZ
+  MV -->|telemetry| ES
+  classDef cloud fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef app fill:#ECFDF5,stroke:#16A34A,color:#0F172A;
+  classDef stack fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  class APP app;
+  class STACK stack;
+  class EST,HW,VPC cloud;

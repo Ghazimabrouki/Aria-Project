@@ -1,0 +1,13 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart LR
+  SUR["Suricata / network alerts"] --> ALERTS["Alerts with source_ip"]
+  WZ["Wazuh auth alerts"] --> ALERTS
+  ALERTS --> GEO["GeoIP enrichment<br/>core/geoip.py"]
+  GEO --> PTS["Geo points: lat/lon,<br/>country, attack count"]
+  PTS --> API["/api/v1/ips"]
+  API --> SCOPE["asset_scope filter"]
+  SCOPE --> MAP["IPS world map<br/>attack arcs + hotspots"]
+  classDef e fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef a fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class SUR,WZ e;
+  class GEO,PTS,API,SCOPE,MAP a;

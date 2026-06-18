@@ -1,0 +1,6 @@
+# Cron entry for Runtime QA Watchdog
+# Add to crontab with: crontab -e
+# Or copy to /etc/cron.d/ (requires root)
+
+# Run every 5 minutes
+*/5 * * * * cd /home/dash/Desktop/opensoar\ backend\ 6\ mai/opensoar\ backend && /usr/bin/python3 scripts/validation/runtime_qa_watchdog.py --silent >> /tmp/runtime_qa_watchdog.log 2>&1

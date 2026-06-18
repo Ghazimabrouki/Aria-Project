@@ -1,0 +1,13 @@
+title: Suricata Informational Noise
+description: Filter out informational events that are not security-relevant
+status: experimental
+logsource:
+  product: suricata
+detection:
+  selection:
+    - signature|contains:
+        - 'ssh-2.0-go version string'
+        - 'gnu/linux apt user-agent'
+        - 'go-http-client user-agent'
+        - 'go http client user-agent'
+  condition: selection

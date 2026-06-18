@@ -1,0 +1,34 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 10 - IPS Attack Visualization"]
+  ALERT["Local SQLite Alerts<br/>+ upstream alerts"]
+  DEDUP["Deduplicate<br/>source IP + time window"]
+  GEO["GeoIP Resolve<br/>country, city, lat/lon, ASN"]
+  CAT["Categorize<br/>brute-force, web attack,<br/>recon, malware, DoS, C2"]
+  LIFE["Lifecycle<br/>active / investigating / mitigated / blocked"]
+  MAP["/ips World Map<br/>paths, stats, live events"]
+  TITLE --> ALERT
+  ALERT --> DEDUP --> GEO --> CAT --> LIFE --> MAP
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef final fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class ALERT input;
+  class DEDUP,GEO,CAT,LIFE process;
+  class MAP final;

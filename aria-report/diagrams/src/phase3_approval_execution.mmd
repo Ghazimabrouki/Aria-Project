@@ -1,0 +1,36 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 8 - Approval, Execution, Verification and Archive"]
+  PLAY["Generated Playbook"]
+  APPROVAL["Approval Gate<br/>guardrails + confidence + human decision"]
+  RUN["Ansible Execution<br/>SSH pre-check + ansible-playbook"]
+  VERIFY["Fix Verification<br/>re-check alerts or metrics"]
+  ARCHIVE["Archive<br/>preserve case history"]
+  UI["Investigation UI"]
+  TITLE --> PLAY
+  PLAY --> APPROVAL --> RUN --> VERIFY --> ARCHIVE --> UI
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef decision fill:#F5F3FF,stroke:#7C3AED,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef final fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class PLAY input;
+  class APPROVAL decision;
+  class RUN,VERIFY process;
+  class ARCHIVE,UI final;

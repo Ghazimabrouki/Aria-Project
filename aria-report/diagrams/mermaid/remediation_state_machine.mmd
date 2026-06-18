@@ -1,0 +1,19 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"}}}%%
+stateDiagram-v2
+  [*] --> pending : run created
+  pending --> evidence : capture baseline
+  evidence --> dry_run : validate playbook
+  dry_run --> containment : apply contain actions
+  containment --> hardening : apply hardening
+  hardening --> forensics : collect forensics
+  forensics --> verification : re-check Elasticsearch
+  verification --> [*] : completion_quality = success
+  dry_run --> rollback : safety failure
+  containment --> rollback : step failed
+  hardening --> rollback : step failed
+  rollback --> failed
+  verification --> failed : not_fixed
+  failed --> [*]
+  note right of verification
+    PlaybookRun.current_phase values
+  end note

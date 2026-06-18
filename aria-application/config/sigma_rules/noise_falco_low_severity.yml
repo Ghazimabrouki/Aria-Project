@@ -1,0 +1,19 @@
+title: Falco Low-Severity Container Events
+description: Filter out low-severity container events that are expected behavior
+status: experimental
+logsource:
+  product: falco
+detection:
+  selection:
+    - rule|contains:
+        - 'Delete or rename shell history'
+        - 'Schedule Cron Jobs'
+        - 'User mgmt binaries'
+        - 'Update Package Repository'
+        - 'Read ssh information'
+        - 'Change thread namespace'
+        - 'Read sensitive file untrusted'
+        - 'Modify binary dirs'
+        - 'Write below etc'
+        - 'Write below monitored dir'
+  condition: selection

@@ -1,0 +1,24 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant ES as Elasticsearch
+  participant PO as Poller (cursor_manager)
+  participant MA as Source Mappers
+  participant EN as Enrichment (geoip/mitre/sigma)
+  participant DB as SQLite (alerts)
+  participant RD as Redis
+  PO->>RD: read last cursor per source
+  PO->>ES: query wazuh-*/suricata-*/falco-*/filebeat-* since cursor
+  ES-->>PO: raw documents
+  loop for each document
+    PO->>MA: map(raw) to normalized alert
+    MA-->>PO: normalized Alert
+    PO->>EN: enrich (GeoIP, MITRE, Sigma noise, dedup_key)
+    EN-->>PO: enriched Alert
+    alt whitelisted or noisy
+      PO->>PO: suppress (no persist)
+    else new alert
+      PO->>DB: upsert Alert (dedup by dedup_key)
+    end
+  end
+  PO->>RD: advance cursor

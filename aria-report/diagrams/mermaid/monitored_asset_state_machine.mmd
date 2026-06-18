@@ -1,0 +1,16 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> created : asset registered
+  created --> configured : source + Ansible config set
+  configured --> validating : validation requested
+  validating --> active : validation_status = ok
+  validating --> partial : some sources missing
+  validating --> missing : no telemetry found
+  validating --> error : validation error
+  partial --> validating : reconfigure + retry
+  missing --> validating : reconfigure + retry
+  error --> validating : fix + retry
+  active --> disabled : enabled = false
+  disabled --> validating : re-enabled
+  active --> [*]

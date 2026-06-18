@@ -1,0 +1,19 @@
+title: Wazuh Authentication Noise
+description: Filter out ONLY truly benign authentication events - keep ones that need investigation
+status: experimental
+logsource:
+  product: wazuh
+detection:
+  selection:
+    - description|contains:
+        - 'Wazuh server started'
+        - 'New dpkg (Debian Package) requested to install'
+        - 'New dpkg (Debian Package) installed'
+        - 'Dpkg (Debian Package) half configured'
+        - 'Systemd: Service exited due to a failure'
+        - 'Apparmor DENIED'
+        - 'Host-based anomaly detection event (rootcheck)'
+        - 'sshd: connection reset'
+        - 'sshd: Disconnected from'
+        - 'sshd: Connection closed'
+  condition: selection

@@ -1,0 +1,143 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"14px"}}}%%
+classDiagram
+direction LR
+
+class Alert {
+  <<Detection>>
+  +str id
+  +str source
+  +str source_id
+  +str severity
+  +str status
+  +str category
+  +str source_ip
+  +str hostname
+  +str dedup_key
+  +str asset_id
+  +int occurrence_count
+}
+class Incident {
+  <<Detection>>
+  +str id
+  +str correlation_key
+  +str severity
+  +str status
+  +list alert_ids
+  +str asset_id
+  +str resolved_by
+}
+class AlertIncidentLink {
+  <<Detection>>
+  +str alert_id
+  +str incident_id
+  +str correlation_confidence
+  +str correlation_reason
+}
+class Investigation {
+  <<Remediation>>
+  +str id
+  +str incident_id
+  +str status
+  +str investigation_type
+  +str source
+  +str ai_summary
+  +str playbook_yaml
+  +str target_host
+  +str completion_quality
+  +str verification_status
+  +str asset_id
+}
+class InvestigationAlert {
+  <<Remediation>>
+  +str id
+  +str investigation_id
+  +str alert_id
+  +str alert_json
+}
+class PlaybookApproval {
+  <<Remediation>>
+  +str id
+  +str investigation_id
+  +str decision
+  +str decided_by
+  +bool override
+  +str original_safety_tier
+}
+class PlaybookRun {
+  <<Remediation>>
+  +str id
+  +str investigation_id
+  +str status
+  +str current_phase
+  +int exit_code
+  +str completion_quality
+}
+class FixVerification {
+  <<Remediation>>
+  +str id
+  +str investigation_id
+  +str status
+  +int new_alerts_found
+  +str detail
+}
+class Archive {
+  <<Audit/Archive>>
+  +str id
+  +str investigation_id
+  +str incident_id
+  +str fix_status
+  +str severity
+  +str full_context_json
+}
+class InvestigationAuditEvent {
+  <<Audit/Archive>>
+  +str id
+  +str investigation_id
+  +str event_type
+  +str actor
+  +str auth_mode
+}
+class MonitoredAsset {
+  <<Asset Scope>>
+  +str id
+  +str asset_id
+  +str name
+  +str hostname
+  +str ip_address
+  +dict source_config_json
+  +dict ansible_config_json
+  +bool remediation_enabled
+  +str validation_status
+}
+class AriaAccount {
+  <<Asset Scope>>
+  +str id
+  +str username
+  +str role
+  +str asset_id
+}
+class OperatorRun {
+  <<Remediation>>
+  +str id
+  +str prompt
+  +str intent
+  +str risk_level
+  +str status
+  +str asset_id
+}
+
+Alert "*" -- "*" Incident : correlated via
+AlertIncidentLink ..> Alert
+AlertIncidentLink ..> Incident
+Incident "1" --> "0..1" Investigation : triggers
+Investigation "1" *-- "*" InvestigationAlert : context
+Investigation "1" *-- "0..1" PlaybookApproval : gated by
+Investigation "1" *-- "0..1" PlaybookRun : executed by
+Investigation "1" *-- "0..1" FixVerification : verified by
+Investigation "1" *-- "0..1" Archive : closed into
+Investigation "1" *-- "*" InvestigationAuditEvent : audited by
+MonitoredAsset "1" --> "*" Alert : scopes
+MonitoredAsset "1" --> "*" Incident : scopes
+MonitoredAsset "1" --> "*" Investigation : scopes
+MonitoredAsset "1" --> "*" OperatorRun : scopes
+AriaAccount "*" --> "0..1" MonitoredAsset : bound to

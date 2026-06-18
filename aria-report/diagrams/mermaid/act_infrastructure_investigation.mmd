@@ -1,0 +1,22 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  A([Telegraf metric stream]) --> R{Resource type}
+  R -->|CPU| C[CPU saturation check]
+  R -->|memory| M[Memory pressure check]
+  R -->|disk| D[Disk usage / IO check]
+  R -->|network| N[Throughput / errors check]
+  C --> TH{Above baseline /<br/>anomaly?}
+  M --> TH
+  D --> TH
+  N --> TH
+  TH -->|no| OK([Normal - no action])
+  TH -->|yes| INV[Create infrastructure Investigation<br/>resource_type set]
+  INV --> DG[Run diagnostic playbook on host]
+  DG --> AIP[AI: diagnostic_interpreter]
+  AIP --> PLAN{Safe auto-remediation?}
+  PLAN -->|yes| AUTO[Propose performance playbook]
+  PLAN -->|no| MAN[Recommend manual action]
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class R,TH,PLAN dec;
+  class C,M,D,N,INV,DG,AIP,AUTO,MAN act;

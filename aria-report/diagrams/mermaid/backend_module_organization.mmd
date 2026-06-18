@@ -1,0 +1,42 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":55,"curve":"basis"}}}%%
+flowchart LR
+  ROOT["ARIA Backend"]
+  subgraph API["api/"]
+    AR["routes/<br/>alerts, incidents, investigations,<br/>assets, operator, assistant, ips,<br/>runtime, infrastructure, settings"]
+    AW["websocket.py · app.py"]
+  end
+  subgraph PIPE["pipeline/"]
+    PP["poller/<br/>alert_processor, cursor_manager,<br/>seen_ids, pattern_tracker"]
+    PM["mappers/<br/>wazuh, suricata, falco,<br/>filebeat, ip_extractor"]
+    PE["enrichment/<br/>mitre, geoip, sigma,<br/>anomaly_detector, root_cause"]
+    PD["datausage/<br/>incident_manager, ai_pipeline,<br/>runtime_orchestrator, action_executor"]
+  end
+  subgraph RESP["response/"]
+    RW["watcher/<br/>context_builder, ai_runner, main"]
+    RA["ai_engine/<br/>llm_clients, prompt_builder,<br/>response_parser"]
+    RI["infrastructure_ai_engine/"]
+    RR["remediation_planner · safety_policy<br/>ansible_exec · fix_verifier · archiver"]
+    RM["models.py · db.py (SQLite)"]
+  end
+  subgraph CORE["core/"]
+    CC["elasticsearch · redis · geoip<br/>asset_scope · whitelist · circuit_breaker"]
+  end
+  subgraph CONF["config/"]
+    CO["settings.py · sigma_rules/<br/>telegraf_procstat.conf"]
+  end
+
+  ROOT --> API
+  ROOT --> PIPE
+  ROOT --> RESP
+  ROOT --> CORE
+  ROOT --> CONF
+  AR --> RM
+  PP --> PM --> PE --> PD
+  PD --> RM
+  RW --> RA
+  RR --> RM
+  AR --> CC
+  PP --> CC
+
+  classDef g fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class API,PIPE,RESP,CORE,CONF g;

@@ -1,0 +1,39 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 9 - Performance Monitoring and Remediation"]
+  TG["Elasticsearch<br/>telegraf-* metrics"]
+  POLL["Performance Poller<br/>per-host metrics"]
+  REDIS["Redis<br/>current metrics, history, baselines"]
+  DETECT["Anomaly Detector<br/>threshold + baseline + cooldown"]
+  RCA["Root Cause<br/>top process + playbook type"]
+  INV["Performance Investigation"]
+  PLAY["Dynamic Playbook"]
+  EXEC["Approval + Ansible + Verification"]
+  UI["/metrics Dashboard"]
+  TITLE --> TG
+  TG --> POLL --> REDIS --> DETECT --> RCA --> INV --> PLAY --> EXEC --> UI
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef storage fill:#F5F3FF,stroke:#7C3AED,stroke-width:1.5px,color:#0F172A;
+  classDef final fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class TG input;
+  class POLL,DETECT,RCA,INV,PLAY,EXEC process;
+  class REDIS storage;
+  class UI final;

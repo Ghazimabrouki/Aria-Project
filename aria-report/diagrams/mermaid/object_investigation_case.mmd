@@ -1,0 +1,35 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":55,"curve":"basis"}}}%%
+flowchart TB
+  asset["asset : MonitoredAsset<br/>asset_id = dash-linux<br/>hostname = dash-linux<br/>remediation_enabled = true<br/>validation_status = ok"]
+  raw["rawDoc : ElasticsearchDocument<br/>index = wazuh-alerts-4.x-*<br/>rule = sshd brute force<br/>agent.name = dash-linux"]
+  a1["a1 : Alert<br/>source = wazuh<br/>severity = high<br/>category = authentication<br/>source_ip = 203.0.113.10<br/>asset_id = dash-linux"]
+  inc["inc : Incident<br/>status = open<br/>correlation_key = dash-linux|auth<br/>severity = high"]
+  link["link : AlertIncidentLink<br/>correlation_confidence = high"]
+  invest["invest : Investigation<br/>investigation_type = security<br/>status = completed<br/>target_host = dash-linux"]
+  ai["aiResult : AI Output<br/>ai_summary = SSH brute force<br/>ai_risk = high<br/>playbook_valid = true"]
+  appr["appr : PlaybookApproval<br/>decision = approved<br/>decided_by = analyst"]
+  run["run : PlaybookRun<br/>status = completed<br/>current_phase = verification<br/>exit_code = 0"]
+  ver["ver : FixVerification<br/>status = likely_fixed<br/>new_alerts_found = 0"]
+  arch["arch : Archive<br/>fix_status = verified<br/>severity = high"]
+
+  raw -->|normalize + enrich| a1
+  asset -.->|scopes| a1
+  a1 -->|grouped by| link
+  link --> inc
+  inc -->|triggers| invest
+  invest -->|produces| ai
+  ai -->|requires| appr
+  appr -->|approved| run
+  run -->|then| ver
+  ver -->|closed into| arch
+
+  classDef det fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef rem fill:#ECFDF5,stroke:#16A34A,color:#0F172A;
+  classDef ai fill:#F5F3FF,stroke:#7C3AED,color:#0F172A;
+  classDef ass fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef arc fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  class raw,a1,inc,link det;
+  class invest,appr,run,ver rem;
+  class ai ai;
+  class asset ass;
+  class arch arc;

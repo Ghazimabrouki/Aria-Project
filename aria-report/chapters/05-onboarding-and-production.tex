@@ -1,0 +1,234 @@
+\chapter{Multi-Server Onboarding and Production Deployment}
+
+\section{Introduction}
+
+So far the solution has been described as a single central node: one server hosting the monitoring stack and ARIA, observing itself. A real SOC, however, must watch many servers. This final technical chapter closes the engineering story by explaining how a new server is onboarded automatically, that is, prepared to send its own logs, security events, runtime events, and metrics to the central stack, and how it becomes a scoped asset inside ARIA. It then describes how the complete solution is deployed and hardened for production. The central instrument is a single bootstrap script that turns a bare Linux server into a fully monitored asset and prints exactly the information ARIA needs to register it.
+
+\section{Why Multi-Server Monitoring Is Needed}
+
+A SOC that can only observe its own host is a demonstration, not an operational tool. The value of ARIA grows with the number of servers it can see, but adding servers introduces two hard requirements. First, each new server must be configured \emph{consistently}: the same agents, the same forwarding targets, and a predictable index naming convention, otherwise data either fails to arrive or cannot be attributed to the right server. Second, once data from several servers shares one Elasticsearch cluster, the platform must keep it separated, so that an alert, an investigation, or a remediation for one server is never confused with another. The first requirement is solved by the bootstrap script described below; the second is solved by the asset-scoping logic of Chapter~3, which this chapter connects to onboarding.
+
+\section{Monitored Server Bootstrap Script}
+
+The onboarding script, \sourcefile{bootstrap_monitored_vm.sh}, is designed to run on a server that will be \emph{observed} by ARIA, never on the central host. Its first action is therefore a safety guard: it detects central indicators (a local Elasticsearch, Kibana, or Wazuh Manager, or a central-looking hostname) and refuses to continue unless the operator confirms with an explicit phrase. This prevents the most damaging mistake, which would be reconfiguring the central server as if it were a monitored client.
+
+After the guard, the script collects the onboarding inputs: the server name, an environment label (such as \codepath{safe}, \codepath{prod}, or \codepath{dmz}), the server IP, the central Elasticsearch URL or IP and credentials, an optional certificate authority path, and optional Wazuh Manager details. Component flags (\codepath{--wazuh}, \codepath{--falco}, \codepath{--telegraf}, \codepath{--filebeat}, \codepath{--suricata}) let the operator install only what a given server needs, and a \codepath{--yes} mode supports non-interactive runs. The script then tests Elasticsearch reachability before installing anything, installs the selected agents, writes their configurations with the server's identity, starts and verifies the services, checks that the expected indices appear, and finally prints a ready-to-use ARIA asset payload. A sandboxed test mode (\codepath{ARIA_TEST_MODE}) allows the whole flow to be exercised safely against a fake root before touching a real server.
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  vmstep/.style={draw, rounded corners, align=center, text width=2.55cm, minimum height=0.85cm, fill=gray!8},
+  check/.style={draw, rounded corners, align=center, text width=2.55cm, minimum height=0.85cm, fill=green!8},
+  arrow/.style={-Latex, thick}
+]
+\node[vmstep] (safe) {Confirm target\\is monitored VM};
+\node[vmstep, right=0.55cm of safe] (collect) {Collect VM and\\central stack values};
+\node[check, right=0.55cm of collect] (test) {Test central\\Elasticsearch};
+\node[vmstep, below=0.75cm of test] (install) {Install selected\\agents};
+\node[vmstep, left=0.55cm of install] (config) {Write configs\\with asset fields};
+\node[check, left=0.55cm of config] (verify) {Verify services\\and indices};
+\node[vmstep, below=0.75cm of verify] (payload) {Print ARIA\\asset payload};
+\node[vmstep, right=0.55cm of payload] (aria) {Register asset\\and validate sources};
+\draw[arrow] (safe) -- (collect);
+\draw[arrow] (collect) -- (test);
+\draw[arrow] (test) -- (install);
+\draw[arrow] (install) -- (config);
+\draw[arrow] (config) -- (verify);
+\draw[arrow] (verify) -- (payload);
+\draw[arrow] (payload) -- (aria);
+\end{tikzpicture}\end{adjustbox}
+\caption{Monitored server bootstrap flow}
+\end{figure}
+
+Figure~\ref{fig:act-bootstrap} expands this flow into the activity diagram of the real script, including its decision points (the safety guard, the apt-lock wait, and the per-service health checks with restart-on-failure), and Figure~\ref{fig:seq-onboard} shows the same onboarding as a sequence across the administrator, the new server, the central stack, Elasticsearch, and the ARIA asset API.
+
+\umlfigure{act_monitored_bootstrap.png}{Monitored-server bootstrap script activity flow}{fig:act-bootstrap}
+
+\umlfigure{seq_onboarding.png}{Monitored-server onboarding sequence}{fig:seq-onboard}
+
+\section{Wazuh Agent Configuration on Monitored Servers}
+
+On a monitored server, the script installs the \textbf{Wazuh Agent} (not the manager) and points it at the central Wazuh Manager. The manager host defaults to the Elasticsearch host unless overridden, and the agent enrolls into a configurable group through the enrollment channel on port~1515, then reports security events on port~1514. A useful detail is that the script can query the Wazuh API on port~55000 to retrieve the agent's identifier by name, so that the resulting ARIA asset records the exact \codepath{agent_id}. From then on, that server's host security alerts flow through the manager into the shared \codepath{wazuh-alerts-*} index, where ARIA can attribute them to the asset using the recorded agent identity.
+
+\section{Suricata Configuration}
+
+If network monitoring is requested, the script installs and configures Suricata on the monitored server using the same logic as the central node: it detects the active interface so capture happens on the right link, and it enables the EVE JSON output. On monitored servers, however, the Suricata events are shipped by the local Filebeat into the server's own \codepath{filebeat-<server>-*} index rather than a central one. This keeps each server's network events attributable, and ARIA's asset configuration records that the Suricata source for this server lives in the Filebeat index family.
+
+\section{Filebeat Forwarding Logic}
+
+Filebeat is the workhorse of monitored-server onboarding. The script installs it from the Elastic repository, trusts the central certificate authority, and configures it to forward the server's system and authentication logs, and its Suricata EVE events, into a per-server index named \codepath{filebeat-<server>-*}. The per-server naming is the heart of attribution: because the index name embeds the server identity, ARIA can later scope all log and network data to exactly one asset simply by targeting that pattern. Without this convention, multiple servers would write into a shared index and could not be cleanly separated.
+
+\section{Telegraf Metrics Forwarding}
+
+When metrics are requested, the script installs \textbf{Telegraf} from the InfluxData repository, trusts the Elasticsearch certificate authority, and configures the Elasticsearch output to write into \codepath{telegraf-<server>-*}. As on the central node, it verifies the Elasticsearch version before writing the output so the metrics pipeline is not silently broken, and it collects the standard host metrics (CPU, memory, disk, network, processes, sockets). These per-server metric indices feed the metrics page and the infrastructure investigations for that specific asset.
+
+\section{Falco and Falcosidekick Runtime Forwarding}
+
+For runtime monitoring, the script installs \textbf{Falco} with the modern eBPF driver and \textbf{Falcosidekick} as the forwarder, configured to send runtime events to the central Elasticsearch under \codepath{falco-<server>-*}. The same validation discipline applies: the Elasticsearch endpoint is checked before Falcosidekick is started, so a misconfigured credential or unreachable target fails loudly during onboarding rather than silently producing no runtime data. ARIA's runtime investigation engine then consumes this per-server index for the asset.
+
+\section{Elasticsearch Target Configuration}
+
+Every agent on a monitored server points back to the same central Elasticsearch, reached over HTTPS using the central credentials and certificate authority. The script tests this target before installing anything, which is the single most important precondition: if the server cannot reach and authenticate to Elasticsearch, no amount of agent installation will produce visible data. Centralizing the target also means a monitored server holds no analytical state of its own; it is purely a producer, and all correlation and intelligence happen centrally in ARIA.
+
+\section{ARIA Asset Creation from Script Output}
+
+The bootstrap script ends by printing a JSON payload for ARIA's asset API (\codepath{POST /api/v1/assets}). This is the connective tissue between onboarding and the platform: the script already knows the server's identity and exactly which sources were installed, so it emits a payload that describes them precisely. The payload carries the asset identifier, name, hostname, IP, environment, an enabled flag, a remediation flag (off by default for safety), and a \codepath{source_config_json} that lists, for each installed source, its per-server index pattern and host identity, including the Wazuh \codepath{agent_id} when applicable. Listing~\ref{lst:asset-payload} shows the payload printed for the \codepath{dash-linux} server.
+
+\begin{lstlisting}[style=aria,caption={ARIA asset payload printed by the bootstrap script (sanitized)},label={lst:asset-payload}]
+{
+  "asset_id": "dash-linux",
+  "name": "dash-linux",
+  "hostname": "dash-linux",
+  "ip_address": "192.168.1.10",
+  "environment": "safe",
+  "enabled": true,
+  "remediation_enabled": false,
+  "source_config_json": {
+    "wazuh":    {"index_pattern": "wazuh-alerts-4.x-*", "agent_name": "dash-linux", "agent_id": "001"},
+    "falco":    {"index_pattern": "falco-dash-linux-*",    "host_name": "dash-linux"},
+    "telegraf": {"index_pattern": "telegraf-dash-linux-*", "host_name": "dash-linux"},
+    "filebeat": {"index_pattern": "filebeat-dash-linux-*", "host_name": "dash-linux"}
+  }
+}
+\end{lstlisting}
+
+\begin{table}[H]
+\centering
+\caption{Per-source index patterns recorded in the ARIA asset}
+\begin{tabularx}{\textwidth}{@{}p{0.18\textwidth}p{0.30\textwidth}Y@{}}
+\toprule
+\textbf{Source} & \textbf{Index pattern} & \textbf{Attribution key} \\
+\midrule
+Wazuh & \codepath{wazuh-alerts-*} & Agent name and \codepath{agent_id} recorded for the asset. \\
+Filebeat & \codepath{filebeat-<server>-*} & Per-server index name embeds the identity. \\
+Suricata & \codepath{filebeat-<server>-*} & Carried by the server's Filebeat. \\
+Falco & \codepath{falco-<server>-*} & Per-server runtime index. \\
+Telegraf & \codepath{telegraf-<server>-*} & Per-server metric index. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The administrator pastes this payload into the asset registry (or the \codepath{/settings/assets} page). Because the script generated it from the real installation, the asset in ARIA matches the server's actual sources without manual guesswork. The default \codepath{remediation_enabled: false} embodies a safe-by-default policy: a freshly onboarded server is observed first and only later, deliberately, allowed to be a remediation target.
+
+\section{Source Validation Inside ARIA}
+
+Registering an asset is not the same as proving it works. ARIA exposes a source-validation action that queries Elasticsearch for each configured pattern and reports whether data is actually arriving. This was exercised during the multi-server activation, where validating the \codepath{dash-linux} asset against live Elasticsearch produced concrete counts and, importantly, an \emph{expected} absence for a source that was not installed:
+
+\begin{table}[H]
+\centering
+\caption{Source validation for the dash-linux asset}
+\begin{tabularx}{\textwidth}{@{}p{0.18\textwidth}p{0.32\textwidth}p{0.16\textwidth}Y@{}}
+\toprule
+\textbf{Source} & \textbf{Index pattern} & \textbf{Result} & \textbf{Evidence} \\
+\midrule
+Wazuh & \codepath{wazuh-alerts-4.x-*} & OK & 1{,}978 documents. \\
+Falco & \codepath{falco-dash-linux-*} & OK & 1{,}817 documents. \\
+Telegraf & \codepath{telegraf-dash-linux-*} & OK & 6{,}000 documents. \\
+Filebeat & \codepath{filebeat-dash-linux-*} & OK & 21{,}334 documents. \\
+Suricata & \codepath{filebeat-dash-linux-*} & Missing & 0 documents; expected, source not installed. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+This validation step turns onboarding into a repeatable, verifiable workflow rather than a hopeful one. A source with zero documents is either a real problem or, as with Suricata above, an expected consequence of not installing that component, and the asset configuration records which case applies. Because re-running the installer on a live host from the reporting environment would modify that host, Listing~\ref{lst:bootstrap-out} reproduces the script's own validation sequence as a \emph{controlled simulation} derived directly from the bootstrap script branches; no production host was modified to produce it.
+
+\begin{lstlisting}[style=ariaterm,caption={Monitored-server bootstrap --- controlled simulation derived from the bootstrap script; not a live production capture},label={lst:bootstrap-out}]
+ARIA Monitored Server Bootstrap
+Mode: Controlled simulation    Asset: vm-test    Environment: test
+Central Elasticsearch: https://<CENTRAL_ES>:9200
+
+[PASS] Not running on the central ARIA server (guard check)
+[PASS] Elasticsearch endpoint reachable and authenticated
+[PASS] Wazuh Agent installed, enrolled, and active
+[PASS] Filebeat active        -> filebeat-vm-test-*
+[PASS] Telegraf active        -> telegraf-vm-test-*
+[PASS] Falco + Falcosidekick  -> falco-vm-test-* (test alert reached ES)
+[PASS] Suricata eve events carried by Filebeat
+[PASS] Expected index patterns generated
+[PASS] ARIA asset-registration payload generated
+
+No production host was modified during this controlled simulation.
+\end{lstlisting}
+
+The script ends by printing the exact JSON payload that registers the asset in ARIA (the same payload shown in Listing~\ref{lst:asset-payload}); because the script generates it from the real installation, the asset in ARIA matches the server's actual sources. The ARIA side of this workflow is shown in Figure~\ref{fig:ss-add-server}: each declared source carries an index pattern and a host identity, and a per-source validation control queries Elasticsearch to confirm that data is actually arriving before the asset is trusted. The equivalent mapping for \codepath{vm-test} is captured live in the validation chapter (Figure~\ref{fig:val-sources}).
+
+\screenshot{aria_add_server.png}{ARIA asset registration: per-source index patterns and host identity with inline source validation against Elasticsearch}{fig:ss-add-server}
+
+\section{Containerized and Global Deployment}
+
+Beyond individual agents, the platform itself is deployed as cooperating services. The production-oriented layout runs the HTTP API and the background workers as separate processes, so that a crash in a long-running polling or correlation loop cannot take down the API that serves the dashboard. The FastAPI application listens on port~8001 and the dashboard on port~3000, while Redis and SQLite are local data services and Elasticsearch is the external source shared by all monitored servers. This process separation, combined with the restart-and-graceful-shutdown handling of the background process, is what lets the platform run unattended.
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  node distance=0.9cm,
+  host/.style={draw, rounded corners, align=center, minimum width=4.0cm, minimum height=0.8cm, fill=blue!6},
+  svc/.style={draw, rounded corners, align=center, minimum width=3.4cm, minimum height=0.7cm, fill=gray!8},
+  arrow/.style={-Latex, thick}
+]
+\node[host] (user) {SOC user browser};
+\node[svc, below=of user] (front) {Next.js dashboard\\port 3000};
+\node[svc, below=of front] (api) {FastAPI API\\port 8001};
+\node[svc, below left=0.9cm and 1.8cm of api] (main) {main.py\\background tasks};
+\node[svc, below=of main] (sqlite) {SQLite\\investigations.db};
+\node[svc, below right=0.9cm and 1.8cm of api] (redis) {Redis\\cache and cursors};
+\node[svc, right=2.0cm of redis] (es) {Elasticsearch\\alerts and metrics};
+\node[svc, left=2.0cm of sqlite] (ansible) {Ansible targets};
+\draw[arrow] (user) -- (front);
+\draw[arrow] (front) -- (api);
+\draw[arrow] (api) -- (sqlite);
+\draw[arrow] (api) -- (redis);
+\draw[arrow] (main) -- (sqlite);
+\draw[arrow] (main) -- (redis);
+\draw[arrow] (main) -- (es);
+\draw[arrow] (main) -- (ansible);
+\end{tikzpicture}\end{adjustbox}
+\caption{Deployment architecture}
+\end{figure}
+
+\section{Production Deployment Workflow}
+
+Putting the whole solution into production follows the same order as the report itself, which is also the order of dependencies. The cloud infrastructure and hardened central host are provisioned first; the monitoring foundation is installed and verified to deliver data into Elasticsearch; the ARIA backend and dashboard are deployed on top; monitored servers are onboarded one by one with the bootstrap script and registered as assets; each asset is source-validated; and only then is remediation selectively enabled per asset. This staged rollout means the platform is never trusted with action before it has been proven to see data correctly. Figure~\ref{fig:seq-rollout} shows the deployment steps as a sequence: setting the masked \codepath{.env}, running the SQLite migrations, enabling the backend and worker processes under \codepath{systemd}, building and starting the dashboard, running health checks, and finally applying the production hardening.
+
+\umlfigure{seq_production_rollout.png}{Production deployment sequence}{fig:seq-rollout}
+
+\begin{table}[H]
+\centering
+\caption{Production rollout stages}
+\begin{tabularx}{\textwidth}{@{}p{0.06\textwidth}p{0.30\textwidth}Y@{}}
+\toprule
+\textbf{\#} & \textbf{Stage} & \textbf{Gate before proceeding} \\
+\midrule
+1 & Provision cloud and harden central host & Firewall, SSH hardening, and Fail2Ban active. \\
+2 & Install and verify monitoring foundation & Real telemetry present in Elasticsearch indices. \\
+3 & Deploy ARIA backend and dashboard & API health and dashboard build succeed. \\
+4 & Onboard monitored servers & Bootstrap completes; services active; indices visible. \\
+5 & Register and validate assets & Source validation returns expected data per asset. \\
+6 & Enable remediation selectively & Ansible reachability confirmed; admin-secret configured. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Production Limitations and Hardening}
+
+The platform was validated for an internal, trusted-network deployment, and this scope must be stated honestly. Several items must be addressed before public exposure. There is no full public authentication layer yet: the platform relies on internal trusted-network deployment and the admin-secret gate for dangerous endpoints, and role-based access control is not implemented. SQLite is appropriate for the current single-node SOC, but a higher-concurrency production deployment should strengthen the persistence layer accordingly. TLS and certificate handling must be adapted to the production environment rather than bypassed. Finally, Elasticsearch and Redis must remain internal, administrative access should be restricted to trusted networks or a VPN, and only strictly required ports should be exposed. These constraints define the production-hardening work and align with the future work in the general conclusion.
+
+\begin{table}[H]
+\centering
+\caption{Production hardening checklist}
+\begin{tabularx}{\textwidth}{@{}p{0.30\textwidth}Y@{}}
+\toprule
+\textbf{Area} & \textbf{Action before public production} \\
+\midrule
+Authentication and RBAC & Add full authentication and role-based access control for analyst/admin separation. \\
+Persistence & Strengthen the database where deployment concurrency requires it. \\
+Network exposure & Keep Elasticsearch and Redis internal; restrict Kibana and SSH; open only required ports. \\
+Transport security & Use environment-appropriate TLS and certificate management throughout. \\
+Secret management & Continue redacting secrets; manage admin secret and credentials through a secrets store. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Conclusion}
+
+This chapter completed the engineering story: a single bootstrap script turns any Linux server into a consistently configured, fully attributable monitored asset, ARIA registers and source-validates that asset, and the whole platform is deployed as separated services with a staged, gated production rollout. The solution therefore scales from one self-monitored host to a fleet of servers without losing the separation and control that make it safe. The honest production limitations, authentication, RBAC, persistence, and exposure, frame the work that remains, which the general conclusion now summarizes alongside the project's overall results.

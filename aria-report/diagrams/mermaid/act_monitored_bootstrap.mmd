@@ -1,0 +1,20 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  S([Run bootstrap on new server]) --> ROOT{Root + safe target?}
+  ROOT -->|no| FAIL([Abort - not a monitored VM])
+  ROOT -->|yes| PR[Prompt: VM name, central IP,<br/>ES password masked]
+  PR --> LOCK[Wait for apt locks]
+  LOCK --> WAZ[Install + register Wazuh Agent 1514/1515]
+  WAZ --> SUR[Install Suricata + EVE JSON]
+  SUR --> FAL[Install Falco + Falcosidekick]
+  FAL --> FB[Install Filebeat -> ES 9200 HTTPS]
+  FB --> TG[Install Telegraf -> ES]
+  TG --> CFG[Write host-identity forwarding config]
+  CFG --> HEALTH{All services active?}
+  HEALTH -->|no| RST[Restart + show status] --> HEALTH
+  HEALTH -->|yes| PAY[Print ARIA asset payload<br/>source_config_json]
+  PAY --> DONE([Ready to register in ARIA])
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class ROOT,HEALTH dec;
+  class PR,LOCK,WAZ,SUR,FAL,FB,TG,CFG,PAY act;

@@ -1,0 +1,65 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart TB
+  TITLE["Phase 1 - Global Architecture & Data Flow<br/><span style='font-size:14px;color:#2563EB'>Security Monitoring Foundation</span>"]
+  TITLE --> ARCH
+  subgraph ARCH["End-to-End Monitoring Architecture"]
+    direction LR
+    subgraph SOURCES["1. Security & Monitoring Sources"]
+      direction TB
+      SYS["System Logs<br/>OS activity"]
+      AUTH["Authentication Logs<br/>SSH / login / access events"]
+      SUR["Suricata<br/>Network IDS"]
+      WAZ["Wazuh<br/>Host / Endpoint Security"]
+      FAL["Falco<br/>Runtime / Container Security"]
+      TEG["Telegraf<br/>System Metrics"]
+    end
+    subgraph FORWARD["2. Collection & Forwarding Layer"]
+      direction TB
+      FB["Filebeat<br/>Reads and ships logs"]
+      FSK["Falcosidekick<br/>Receives and forwards Falco alerts"]
+    end
+    subgraph CORE["3. SIEM Core"]
+      direction TB
+      ES["Elasticsearch<br/>Central Storage<br/>Search<br/>Indexing"]
+      KB["Kibana<br/>Dashboards<br/>Monitoring<br/>Analysis"]
+    end
+  end
+  SYS -->|"system logs"| FB
+  AUTH -->|"auth logs"| FB
+  SUR -->|"eve.json events"| FB
+  WAZ -->|"host alerts"| FB
+  FAL -->|"runtime alerts"| FSK
+  FB -->|"logs + alerts"| ES
+  FSK -->|"falco-events"| ES
+  TEG -->|"metrics"| ES
+  ES -->|"indexed data"| KB
+  KB --> OUTCOME["Unified Monitoring View<br/>Logs, alerts, runtime events, and metrics are centralized and ready for analysis."]
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef source fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef forward fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A;
+  classDef core fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef outcome fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class SYS,AUTH,SUR,WAZ,FAL,TEG source;
+  class FB,FSK forward;
+  class ES,KB core;
+  class OUTCOME outcome;
+  style ARCH fill:#FFFFFF,stroke:#94A3B8,stroke-width:1.5px,color:#0F172A
+  style SOURCES fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#0F172A
+  style FORWARD fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A
+  style CORE fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,color:#0F172A

@@ -1,0 +1,27 @@
+[Unit]
+Description=OpenSOAR Backend API
+After=network.target
+
+[Service]
+Type=simple
+User=dash
+Group=dash
+WorkingDirectory=/home/dash/opensoar backend
+Environment="PATH=/home/dash/opensoar backend/.venv/bin"
+ExecStart=/home/dash/opensoar backend/.venv/bin/python3 -m uvicorn api.app:app --host 0.0.0.0 --port 8001 --timeout-keep-alive 120
+Restart=always
+RestartSec=10
+
+# Logging: Option A (recommended) — systemd journald
+# Logs are captured by journald. View with: journalctl -u opensoar-backend -f
+# No file redirection needed.
+
+# Logging: Option B — file logging with logrotate
+# Uncomment the two lines below to write logs to /var/log/aria/backend.log
+# instead of journald. Requires /var/log/aria to exist and be writable by
+# the service user, and the logrotate config in deploy/logrotate/aria.
+# StandardOutput=append:/var/log/aria/backend.log
+# StandardError=append:/var/log/aria/backend.log
+
+[Install]
+WantedBy=multi-user.target

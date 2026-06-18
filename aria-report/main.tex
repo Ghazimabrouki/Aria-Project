@@ -1,0 +1,56 @@
+\input{preamble}
+
+\begin{document}
+
+\pagenumbering{gobble}
+\input{frontmatter/cover-page}
+\clearpage
+\input{frontmatter/validation-form}
+\clearpage
+
+\pagenumbering{roman}
+\input{frontmatter/dedication}
+\clearpage
+\input{frontmatter/acknowledgments}
+\clearpage
+\input{frontmatter/abstract}
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+\input{frontmatter/abbreviations}
+\clearpage
+
+\pagenumbering{arabic}
+\input{chapters/00-general-introduction}
+\input{chapters/01-general-context}
+\input{chapters/02-cloud-and-monitoring}
+\input{chapters/03-aria-design}
+\input{chapters/04-aria-realization}
+\input{chapters/05-onboarding-and-production}
+\input{chapters/06-validation}
+\input{chapters/06-general-conclusion}
+
+\printbibliography[title={Bibliography / Netography}]
+
+\appendix
+\renewcommand{\chaptername}{Appendix}
+\input{appendices/appendix-a-api-inventory}
+\input{appendices/appendix-b-validation-evidence}
+\input{appendices/appendix-c-configuration-extracts}
+\input{appendices/appendix-d-tools-onboarding}
+\input{appendices/appendix-e-screenshot-guide}
+\input{appendices/appendix-f-cloud-evidence}
+
+% --- Official ESPRIT back cover ---
+\clearpage
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=center, inner sep=0] at (current page.center)
+    {\includegraphics[width=\paperwidth,height=\paperheight]{assets/cover/esprit-cover-back.png}};
+\end{tikzpicture}
+
+\end{document}

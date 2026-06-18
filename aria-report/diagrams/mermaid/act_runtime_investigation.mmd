@@ -1,0 +1,20 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  A([Falco runtime event]) --> CL{Event class}
+  CL -->|file integrity| F[Sensitive file access]
+  CL -->|process/exec| PR[Unexpected process / shell]
+  CL -->|privilege| PV[Privilege escalation]
+  CL -->|network| NW[Suspicious connection]
+  F --> SEV{Severity + context}
+  PR --> SEV
+  PV --> SEV
+  NW --> SEV
+  SEV -->|low / known| BENIGN([Benign - log only])
+  SEV -->|high / unknown| INV[Create runtime Investigation]
+  INV --> DIAG[Run diagnostic playbook]
+  DIAG --> AI[AI interprets diagnostic_output]
+  AI --> FIND[findings_json + recommended action]
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class CL,SEV dec;
+  class F,PR,PV,NW,INV,DIAG,AI,FIND act;

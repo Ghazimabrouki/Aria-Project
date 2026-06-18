@@ -1,0 +1,20 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"}}}%%
+stateDiagram-v2
+  [*] --> pending : created from incident
+  pending --> awaiting_approval : AI playbook generated
+  pending --> manual_review_required : low AI quality
+  pending --> reviewed_no_action : no action needed
+  manual_review_required --> regeneration_requested : analyst asks rerun
+  regeneration_requested --> awaiting_approval
+  awaiting_approval --> approved : analyst approves
+  awaiting_approval --> declined : analyst declines
+  approved --> running : Ansible execution
+  running --> completed : all phases ok
+  running --> completed_with_warnings : non-fatal warnings
+  running --> failed : execution error
+  completed --> archived
+  completed_with_warnings --> archived
+  failed --> archived
+  declined --> archived
+  reviewed_no_action --> archived
+  archived --> [*]

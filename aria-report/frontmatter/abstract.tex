@@ -1,0 +1,21 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This final-year internship focused on the design and implementation of \project{}, also named \projectlong{}, a security operations automation platform. The project addresses the fragmentation of SOC workflows by connecting alert ingestion, enrichment, incident correlation, AI-assisted investigation, human approval, Ansible remediation, post-fix verification, archiving, monitoring, and dashboard visualization in one coherent system.
+
+The implemented platform ingests telemetry from Elasticsearch indices related to Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic alerts. It normalizes these alerts through source-specific mappers, removes duplicates, applies Sigma-based noise filtering, enriches alerts with GeoIP and MITRE ATT\&CK context, correlates them into incidents, and persists operational data in SQLite while using Redis for cursors, cache, deduplication, and performance metrics. A FastAPI backend exposes the workflow through REST and WebSocket endpoints, while a Next.js dashboard provides interfaces for alerts, incidents, investigations, runtime remediation, infrastructure analysis, IPS visualization, search, archives, monitoring, assets, and settings.
+
+The response layer integrates AI-generated investigation summaries, risk analysis, narrative explanations, and Ansible playbooks. It includes approval workflows, admin-secret protection for sensitive actions, safety validation, execution tracking, fix verification, audit persistence, and multi-server asset scoping. Validation artifacts show successful API checks, backend compilation, frontend TypeScript/build verification, multi-server activation, admin-secret verification, and a large automated test suite, while also documenting honest limitations such as internal-trusted authentication and SQLite suitability for single-node deployment.
+
+\textbf{Keywords:} SOAR, SOC automation, FastAPI, Next.js, Elasticsearch, Redis, SQLite, Ansible, MITRE ATT\&CK, Sigma, AI-assisted incident response.
+
+\vspace{1cm}
+\chapter*{Resume}
+\addcontentsline{toc}{chapter}{Resume}
+
+Ce projet de fin d'etudes porte sur la conception et la realisation de \project{}, egalement appele \projectlong{}, une plateforme d'automatisation des operations de securite. Le projet vise a reduire la fragmentation des activites SOC en reliant l'ingestion des alertes, l'enrichissement, la correlation d'incidents, l'investigation assistee par intelligence artificielle, l'approbation humaine, la remediation par Ansible, la verification post-correction, l'archivage, la supervision et la visualisation dans une solution coherente.
+
+La plateforme realisee collecte les donnees depuis Elasticsearch, notamment Wazuh, Suricata/Filebeat, Falco, Telegraf et des alertes generiques. Elle normalise les alertes, elimine les doublons, filtre le bruit, ajoute un contexte GeoIP et MITRE ATT\&CK, correle les evenements, puis stocke les donnees operationnelles dans SQLite avec Redis pour les curseurs, le cache, la deduplication et les metriques. Le backend FastAPI expose les fonctionnalites via REST et WebSocket, tandis que le tableau de bord Next.js fournit les interfaces d'exploitation.
+
+\textbf{Mots-cles:} SOAR, SOC, FastAPI, Next.js, Elasticsearch, Redis, SQLite, Ansible, MITRE ATT\&CK, Sigma, reponse aux incidents.
+

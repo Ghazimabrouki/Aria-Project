@@ -1,0 +1,112 @@
+---
+- name: Deploy and run bootstrap_monitored_vm.sh on monitored VMs
+  hosts: monitored_vms
+  gather_facts: yes
+
+  vars:
+    vm_environment: "safe"
+    es_ip: "193.95.30.97"
+    es_user: "elastic"
+    es_password: "ghazi123"
+    wazuh_group: "default"
+    wazuh_choice: "2"
+    _remote_script: "/tmp/bootstrap_monitored_vm.sh"
+
+  tasks:
+    - name: Stop unattended-upgrades to prevent apt lock conflicts
+      ansible.builtin.systemd:
+        name: unattended-upgrades
+        state: stopped
+        enabled: false
+      ignore_errors: true
+
+    - name: Clean up stuck apt/dpkg/debconf processes and locks
+      ansible.builtin.shell: |
+        set -euo pipefail
+        export DEBIAN_FRONTEND=noninteractive
+
+        echo "Stopping any running unattended-upgrades..."
+        systemctl stop unattended-upgrades 2>/dev/null || true
+        systemctl disable unattended-upgrades 2>/dev/null || true
+
+        cleanup_apt() {
+          for pid in $(ps -eo pid,comm | awk '$2 ~ /^(apt|apt-get|dpkg|debconf)$/ {print $1}'); do
+            kill -9 "$pid" 2>/dev/null || true
+          done
+          for pid in $(ps -eo pid,args | grep '/usr/share/debconf/frontend' | grep -v grep | awk '{print $1}'); do
+            kill -9 "$pid" 2>/dev/null || true
+          done
+          rm -f /var/lib/apt/lists/lock /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock \
+                /var/cache/apt/archives/lock /var/cache/debconf/*.lock 2>/dev/null || true
+        }
+
+        echo "Waiting for apt/dpkg to be completely free (max 5 min)..."
+        for i in {1..30}; do
+          cleanup_apt
+          sleep 10
+          if ! pgrep -x 'apt|apt-get|dpkg|debconf' >/dev/null 2>&1 \
+             && ! ps -eo args | grep -q '/usr/share/debconf/frontend'; then
+            break
+          fi
+        done
+
+        echo "Reconfiguring any half-installed packages..."
+        dpkg --configure -a || true
+
+        echo "Fixing postfix if half-installed..."
+        apt-get install --reinstall postfix -y || apt-get remove --purge postfix -y || true
+
+        echo "Running apt update..."
+        apt-get update -y
+        apt-get install -f -y
+      args:
+        executable: /bin/bash
+      register: apt_cleanup
+      changed_when: apt_cleanup.rc == 0
+
+    - name: Determine VM name from remote hostname
+      ansible.builtin.set_fact:
+        _vm_name: "{{ ansible_hostname | lower | regex_replace('[^a-z0-9_-]', '-') }}"
+
+    - name: Copy bootstrap script to remote VM
+      ansible.builtin.copy:
+        src: "bootstrap_monitored_vm.sh"
+        dest: "{{ _remote_script }}"
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Build script argument list
+      ansible.builtin.set_fact:
+        _script_args:
+          - "--yes"
+          - "--vm-name"
+          - "{{ _vm_name }}"
+          - "--environment"
+          - "{{ vm_environment }}"
+          - "--es-ip"
+          - "{{ es_ip }}"
+          - "--es-user"
+          - "{{ es_user }}"
+          - "--wazuh-group"
+          - "{{ wazuh_group }}"
+
+    - name: Run bootstrap_monitored_vm.sh with supplied answers
+      ansible.builtin.command:
+        argv: "{{ ['bash', _remote_script] + _script_args }}"
+      environment:
+        ARIA_ES_PASSWORD: "{{ es_password }}"
+        MONITORED_VM_CONFIRM: "I_UNDERSTAND_THIS_IS_A_MONITORED_VM"
+        WAZUH_CHOICE: "{{ wazuh_choice }}"
+      register: bootstrap_result
+      async: 1800
+      poll: 10
+
+    - name: Show bootstrap output
+      ansible.builtin.debug:
+        msg: "{{ bootstrap_result.stdout | regex_replace('\\x1b\\[[0-9;]*[a-zA-Z]', '') }}"
+
+    - name: Show bootstrap errors (if any)
+      ansible.builtin.debug:
+        msg: "{{ bootstrap_result.stderr | regex_replace('\\x1b\\[[0-9;]*[a-zA-Z]', '') }}"
+      when: bootstrap_result.stderr | length > 0

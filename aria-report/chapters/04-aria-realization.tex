@@ -1,0 +1,425 @@
+\chapter{ARIA Functional Realization}
+
+\section{Introduction}
+
+The previous chapter described the internal logic of ARIA. This chapter shows how that logic becomes a working product: the Next.js dashboard and the features an analyst actually uses. The platform is presented page by page, because each page realizes a part of the functional requirements catalogued below and works directly on top of the data collected in Chapter~2 and transformed in Chapter~3. For each feature, the goal is to explain what it does and why it behaves the way it does, not only to enumerate its controls. Access to all of these pages begins at the authenticated entry point shown in Figure~\ref{fig:ss-login}.
+
+\screenshot{aria_login.png}{ARIA authenticated entry point to the security operations platform}{fig:ss-login}
+
+\begin{longtable}{@{}p{0.14\textwidth}p{0.25\textwidth}p{0.52\textwidth}@{}}
+\caption{Functional requirements realized by the dashboard}\\
+\toprule
+\textbf{ID} & \textbf{Actor} & \textbf{Requirement} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Actor} & \textbf{Requirement} \\
+\midrule
+\endhead
+FR-01 & SOC analyst & View alerts from multiple sources with severity, source, IPs, tags, and relationships. \\
+FR-02 & Pipeline & Poll Elasticsearch indices for Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic alerts. \\
+FR-03 & Pipeline & Normalize source-specific documents into a common alert model. \\
+FR-04 & Pipeline & Deduplicate alerts using Redis, memory cache, and local database checks. \\
+FR-05 & Pipeline & Apply Sigma noise filtering and severity filtering. \\
+FR-06 & Pipeline & Enrich alerts with GeoIP and MITRE ATT\&CK context. \\
+FR-07 & Pipeline & Correlate alerts into incidents using time windows and shared indicators. \\
+FR-08 & AI response layer & Build investigation context and generate summaries, narratives, risk assessments, and playbooks. \\
+FR-09 & SOC analyst & Approve, decline, edit, execute, or archive investigations according to status and safety rules. \\
+FR-10 & SOC administrator & Protect dangerous endpoints with an admin secret. \\
+FR-11 & Response layer & Execute approved Ansible playbooks and record execution results. \\
+FR-12 & Response layer & Verify remediation by re-querying evidence or checking remote state. \\
+FR-13 & SOC analyst & Search alerts, incidents, investigations, archives, IPs, and domains. \\
+FR-14 & SOC analyst & Visualize attack paths and GeoIP events through the IPS map. \\
+FR-15 & SOC analyst & Monitor performance metrics, anomalies, and infrastructure investigations. \\
+FR-16 & SOC administrator & Manage monitored assets and scope data by \codepath{asset_id}. \\
+FR-17 & Frontend user & Receive real-time WebSocket updates for investigations, performance, and system channels. \\
+FR-18 & SOC administrator & Onboard a monitored VM by installing agents, validating data visibility, and registering the asset. \\
+FR-19 & Security operator & Use an asset-scoped operator workflow that previews actions before any execution. \\
+FR-20 & SOC administrator & Configure data sources, pipeline cursors, Ansible settings, and protected changes without exposing secrets. \\
+\bottomrule
+\end{longtable}
+
+\section{Dashboard}
+
+The dashboard is the landing view and the operational summary of the whole SOC. It loads a set of independent widgets: quick stats, investigation statistics, trends, ARIA alert statistics, source breakdown, MITRE coverage, response metrics, and geo threats. A deliberate design choice is \emph{partial failure tolerance}: each widget loads independently, so if one data source is temporarily unavailable, the rest of the dashboard still renders. This matters in a SOC, where a single slow query should never blank out the analyst's overview.
+
+Figure~\ref{fig:df-dashboard} shows where each widget's data comes from: the dashboard endpoint aggregates Elasticsearch counts, SQLite case state, and worker heartbeats, passes them through the asset-scope filter, and returns the cards the page renders. Table~\ref{tab:dashboard-cards} maps the visible cards to those backend sources.
+
+\umlfigurecompact{feature_dashboard_dataflow.png}{Dashboard data-flow: from data stores to dashboard cards}{fig:df-dashboard}
+
+\begin{table}[H]
+\centering
+\caption{Dashboard cards mapped to backend data}
+\label{tab:dashboard-cards}
+\begin{tabularx}{\textwidth}{@{}p{0.30\textwidth}Y@{}}
+\toprule
+\textbf{Card / widget} & \textbf{Backend data source} \\
+\midrule
+Quick stats, alert counts & Elasticsearch source indices (aggregations) \\
+Investigation statistics, pipeline & SQLite \codepath{investigations} / \codepath{incidents} \\
+ARIA alert statistics & SQLite \codepath{aria_alerts} \\
+Source breakdown, MITRE coverage & Enriched alert metadata \\
+Response metrics & SQLite \codepath{playbook_runs} / \codepath{fix_verifications} \\
+System health, worker status & SQLite \codepath{worker_heartbeats} \\
+Geo threats & GeoIP-enriched alert IPs \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:ss-dashboard} shows the realized page, with the quick-stat cards, the alert-trend chart, the source and severity breakdown, and the live system-status indicator rendered together.
+
+\screenshot{aria_dashboard.png}{ARIA dashboard: KPI cards, alert-trend chart, source and severity breakdown, and live system status}{fig:ss-dashboard}
+
+\section{Alerts}
+
+The alerts page is the entry point to the raw signal, after normalization and enrichment. It supports filtering by source, severity, status, whitelist state, MITRE technique, tactic, time window, and selected asset, and it exposes alert details, evidence, an indicator-of-compromise panel, a whitelist action, and manual incident creation. The logic behind the filters mirrors the pipeline: because every alert was normalized into a common model, the same filter controls work uniformly across Wazuh, Suricata, Falco, Filebeat, and Telegraf-derived alerts. The whitelist action feeds back into enrichment, so trusting a source here suppresses its future noise.
+
+Behind the page, each alert is produced by the ingestion sequence in Figure~\ref{fig:seq-ingest}: the poller reads the per-source cursor from Redis, queries Elasticsearch, and runs every document through the mappers and enrichment before upserting it into SQLite. The row the analyst sees then follows the lifecycle in Figure~\ref{fig:alert-states}, whose \codepath{status} field (\texttt{active}, \texttt{processed}, \texttt{archived}) is exactly what the status filter on this page exposes; a representative normalized record was given in Listing~\ref{lst:normalized-alert}.
+
+\umlfigure{seq_alert_ingestion.png}{Elasticsearch alert ingestion sequence}{fig:seq-ingest}
+
+\umlfigurecompact{alert_state_machine.png}{Alert lifecycle state diagram}{fig:alert-states}
+
+The realized page is shown in Figure~\ref{fig:ss-alerts}: the filter bar, the severity badges, the per-source labels, and the normalized alert list are the visible counterpart of the ingestion logic described above.
+
+\screenshot{aria_alerts.png}{ARIA alerts page: normalized events with severity badges, source labels, and analyst triage filters}{fig:ss-alerts}
+
+\section{Incidents}
+
+The incidents page presents the result of correlation: related alerts grouped into a single case. It lists incidents, filters by status, severity, time, and asset, and shows detail tabs with the correlated alerts, the timeline, and related investigations. From here an analyst can assign an incident, change its status, or launch an investigation manually. The page exists so that the analyst reasons at the level of an incident, not at the level of dozens of individual alerts. The grouping logic and the incident lifecycle this page exposes were modelled in Chapter~3 as the correlation activity diagram (Figure~\ref{fig:act-correlation}), the incident state machine (Figure~\ref{fig:incident-states}), and the investigation-creation sequence (Figure~\ref{fig:seq-incident}).
+
+Figure~\ref{fig:ss-incident} shows a realized incident detail view, where the correlated alerts, the case metadata, and the status controls let the analyst reason at the incident level rather than over individual alerts.
+
+\screenshot{aria_incident.png}{ARIA incident detail: correlated alerts grouped into a single case with status and assignment controls}{fig:ss-incident}
+
+\section{Investigations}
+
+The security investigation page is where a case is understood and resolved. It shows the workflow stages, the AI analysis (summary, narrative, risk assessment), the supporting evidence, the proposed playbook, rollback information, post-rollback verification, the timeline, and a set of actions. The key realization detail is that the available actions are \emph{driven by the backend state machine}, not by the frontend: the page renders only the transitions that the investigation's current status allows. This guarantees that the user interface can never offer an action that the backend would reject. The state machine that drives these actions is Figure~\ref{fig:investigation-states}, and a single real case moving through this page end to end is the object diagram of Figure~\ref{fig:object-case}.
+
+Figure~\ref{fig:ss-investigation} shows a realized investigation, with the workflow stages, the AI summary and risk assessment, the supporting evidence, and the state-driven action controls displayed in one view.
+
+\screenshot{aria_investigation.png}{ARIA investigation detail: workflow stages, AI analysis and risk assessment, evidence, and backend-driven actions}{fig:ss-investigation}
+
+\section{Remediation Workflow}
+
+Remediation is not a separate page but a controlled sequence that runs through the investigation view: review the AI-proposed playbook, approve or edit it, satisfy the admin-secret gate, execute through Ansible, and read back the execution result and the fix verification. The interface makes each gate explicit, so the analyst always sees that execution is blocked until approval and that a case is marked resolved only after verification. This is the visible expression of the safety boundary described in Chapter~3, whose full interaction is the end-to-end sequence of Figure~\ref{fig:seq-remediation}, whose gate logic is the approval activity of Figure~\ref{fig:act-approval}, and whose staged execution is the remediation state machine of Figure~\ref{fig:remediation-states}.
+
+Figure~\ref{fig:ss-remediation} shows this sequence inside the investigation view: the AI-proposed playbook with its corrective actions, the approval controls, and the explicit gate that keeps execution blocked until the analyst approves.
+
+\screenshot{aria_remediation.png}{ARIA remediation workflow: AI-proposed playbook, corrective actions, and the explicit approval gate before execution}{fig:ss-remediation}
+
+\section{IPS Map}
+
+The IPS map visualizes attack paths and GeoIP-located events on a world map. It consumes the enriched IP context produced by the pipeline and exposes map data, events, statistics, per-country breakdowns, filters, a summary, status, and event creation. Its purpose is situational awareness: it answers ``where is this traffic coming from'' at a glance, which a tabular alert list cannot convey as quickly.
+
+\diagramimagecompact{phase3_ips_visualization.png}{IPS attack visualization workflow from restitution diagrams}
+
+The data path that feeds the map is shown in Figure~\ref{fig:df-ips}: network and authentication alerts carrying a \codepath{source_ip} are passed through GeoIP enrichment, turned into geo-located points, scoped by asset, and rendered as attack arcs and hotspots. Table~\ref{tab:ips-fields} explains the geolocation fields used and how they drive the visualization.
+
+\umlfigurecompact{feature_ips_dataflow.png}{IPS map data-flow: from network/security alerts to map points}{fig:df-ips}
+
+\begin{table}[H]
+\centering
+\caption{Geolocation fields and IPS visualization logic}
+\label{tab:ips-fields}
+\begin{tabularx}{\textwidth}{@{}p{0.26\textwidth}Y@{}}
+\toprule
+\textbf{Field} & \textbf{Use in the map} \\
+\midrule
+\codepath{source_ip} & Origin of the event; resolved to coordinates. \\
+country, city & Per-country breakdown and hotspot grouping. \\
+latitude, longitude & Marker placement and attack-arc endpoints. \\
+ASN / provider & Attribution context shown on marker detail. \\
+attack count & Marker size / intensity for repeated sources. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:ss-ips} shows the realized IPS map: GeoIP-located attack arcs over the world map, the traffic-source and category statistics, and the protocol breakdown, giving the analyst the situational awareness that a tabular alert list cannot convey at a glance.
+
+\screenshot{aria_ips_map.jpg}{ARIA IPS map: GeoIP-located attack arcs with traffic-source, category, and protocol statistics}{fig:ss-ips}
+
+\section{Runtime Investigations}
+
+Runtime investigations are dedicated to Falco runtime security events and are deliberately \emph{diagnostic-first}. The runtime engine builds an evidence-based decision from the Falco context, diagnostic output, findings, alert payloads, and verification history, and classifies each case. Corrective execution is possible only when the plan contains real corrective actions and explicitly marks remediation as available; container and Kubernetes cases block host-level changes until namespace and mount scope are manually validated. The page reflects this exactly: the \codepath{approve_run} action appears only when the case is awaiting approval \emph{and} the plan has corrective actions, so diagnostic-only findings are never dressed up as executable fixes.
+
+\begin{table}[H]
+\centering
+\caption{Runtime investigation decision model}
+\begin{tabularx}{\textwidth}{@{}p{0.32\textwidth}Y@{}}
+\toprule
+\textbf{Decision} & \textbf{Meaning in the implemented platform} \\
+\midrule
+\codepath{no_action_expected_activity} & The event matches expected administrative or system behavior; no corrective action is proposed. \\
+\codepath{observe} & Evidence does not justify a system change, but the case remains visible for recurrence monitoring. \\
+\codepath{manual_review_required} & Evidence is insufficient, the context is sensitive, or the scope is container/Kubernetes-related; the analyst must review manually. \\
+\codepath{remediation_not_supported_for_category} & The event category has no supported automated runtime remediation path. \\
+\codepath{high_risk_action_requires_approval} & A real corrective action exists, but execution requires explicit approval and safety controls. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The classification that produces these decisions is the activity diagram of Figure~\ref{fig:act-runtime}: a Falco event is sorted by class (file integrity, process/exec, privilege, network), weighed against severity and context, and only a high or unknown case becomes a runtime investigation that runs a diagnostic playbook and an AI interpretation of its output.
+
+\umlfigure{act_runtime_investigation.png}{Runtime (Falco) event classification and decision flow}{fig:act-runtime}
+
+Figure~\ref{fig:ss-runtime} shows the implemented page: a list of Falco runtime cases with status, severity, and decision badges, and a detail view in which a \emph{Clear Log Activities} event on \codepath{ghazi} (MITRE T1070) is classified as \emph{observe} with no corrective remediation generated, because the event carries no container metadata and host scope is assumed. The full set of detail tabs for this case is collected in Appendix~\ref{app:screens}, and an end-to-end remediation run is validated in Chapter~6.
+
+\pairfig{aria_runtime_list.png}{aria_runtime_overview.png}{Runtime investigations: case list with decision badges (left) and the \emph{observe} / no-remediation safety decision for a host-scope Falco event (right)}{fig:ss-runtime}
+
+
+\section{Metrics}
+
+The metrics page exposes the Telegraf-derived observability data: host metrics with CPU, memory, network, disk, and process tabs, history, root-cause information, and live refresh. It also shows asset and global banners so the analyst knows whether the numbers are scoped to one server or aggregated. This page is the human-facing side of the same metric stream that the infrastructure engine analyzes automatically.
+
+Figure~\ref{fig:df-metrics} traces the metric stream from the Telegraf agent into the \codepath{telegraf-*} indices, through the asset-scoped metrics endpoint, and into the page's widgets; the same stream feeds the anomaly path that can open an infrastructure investigation. Table~\ref{tab:metric-families} maps the metric families to the UI widgets that display them.
+
+\umlfigurecompact{feature_metrics_dataflow.png}{Metrics data-flow: Telegraf to Elasticsearch to the metrics UI}{fig:df-metrics}
+
+\begin{table}[H]
+\centering
+\caption{Metric families mapped to UI widgets}
+\label{tab:metric-families}
+\begin{tabularx}{\textwidth}{@{}p{0.26\textwidth}Y@{}}
+\toprule
+\textbf{Metric family} & \textbf{UI widget} \\
+\midrule
+CPU (usage, load) & CPU tab: time-series + load gauge \\
+Memory (used, cached) & Memory tab: usage chart \\
+Disk (usage, IO) & Disk tab: per-mount usage + IO \\
+Network (throughput, errors) & Network tab: in/out charts \\
+Processes (top, counts) & Process tab: top-process table \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The realized metrics page (Figure~\ref{fig:ss-metrics-infra}, left) presents the CPU, memory, and disk gauges, the time-series charts, and the scope banner that render the Telegraf stream in the analyst-facing form described above.
+
+\section{Infrastructure Investigations}
+
+Infrastructure investigations apply the investigation model to resource anomalies rather than security events. When the performance subsystem detects a threshold or statistical anomaly from the metric baselines, it creates a diagnostic case. The page presents the resource anomaly, gauges, a metrics snapshot, top processes, diagnostic findings, and suggested actions, with acknowledge, escalate, and archive controls. Reusing the same investigation lifecycle for infrastructure means an operator handles a runaway process with the same controlled, auditable workflow used for a security incident.
+
+\diagramimagecompact{phase3_performance_remediation.png}{Performance monitoring and remediation workflow}
+
+The detection-to-diagnosis logic is the activity diagram of Figure~\ref{fig:act-infra}: the metric stream is routed by resource type, checked against a baseline or anomaly threshold, and a confirmed anomaly opens an infrastructure investigation that runs an on-host diagnostic and an AI interpretation before proposing a safe action or recommending manual handling. Table~\ref{tab:infra-interpret} summarizes how each resource signal is interpreted.
+
+\umlfigure{act_infrastructure_investigation.png}{Infrastructure anomaly detection and investigation decision flow}{fig:act-infra}
+
+\begin{table}[H]
+\centering
+\caption{Resource signal interpretation}
+\label{tab:infra-interpret}
+\begin{tabularx}{\textwidth}{@{}p{0.20\textwidth}Y@{}}
+\toprule
+\textbf{Resource} & \textbf{Typical interpretation} \\
+\midrule
+CPU & Sustained saturation suggests a runaway or under-provisioned process. \\
+Memory & Growing usage with low cache suggests a leak or memory pressure. \\
+Disk & High usage or IO wait suggests a filling volume or IO bottleneck. \\
+Network & Throughput spikes or error rates suggest exfiltration, scanning, or link faults. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:ss-metrics-infra} (right) shows a realized infrastructure investigation opened from a CPU anomaly, with the resource banner, the metrics snapshot, and the diagnostic findings presented through the same case lifecycle used for security events.
+
+\pairfig{aria_metrics.png}{aria_infrastructure.png}{Metrics and infrastructure: host resource gauges and time-series charts from the Telegraf stream (left); an infrastructure investigation opened from a resource anomaly through the same case lifecycle as security events (right)}{fig:ss-metrics-infra}
+
+\section{Assistant}
+
+The assistant is a contextual question-answering interface for the SOC. It provides conversations, structured sources, action confirmations, timeout handling, and asset context. Its realization detail is that answers are grounded: the assistant scopes its context to the selected asset and returns structured sources and statistics alongside the answer, so a response can be checked against the underlying data rather than taken on faith. When the LLM provider is unreachable, the timeout handling keeps the interface responsive instead of hanging.
+
+\diagramimagecompact{phase3_ai_assistant.png}{Contextual AI assistant workflow}
+
+The grounding mechanism is the sequence in Figure~\ref{fig:seq-assistant}: the question and any focus entity are sent to the assistant endpoint, a context builder reads the asset-scoped records from SQLite and Elasticsearch, and only that grounded context is sent to the LLM, whose answer is stored with its \codepath{sources_json} so it can be checked against the underlying data.
+
+\umlfigure{seq_assistant.png}{Assistant question-answer sequence (context grounding)}{fig:seq-assistant}
+
+The realized assistant (Figure~\ref{fig:ss-assistant-operator}, left) shows a SOC question, the grounded answer, and the structured sources returned alongside it, so the response can be checked against the underlying records.
+
+\section{Operator}
+
+The operator workflow is the most safety-sensitive page, because it can drive remote action from a natural-language request. It provides asset-scoped sessions, inventory host discovery, readiness banners, prompt submission, playbook preview, approval, run polling, and result display. The logic enforces every guard in sequence: the operator validates that the selected asset exists, is enabled, and has remediation configured, refuses \codepath{asset_id=all}, invalid, or disabled assets, generates a preview or playbook with risk information, blocks execution until approval, and re-validates before the run. A request never becomes an action without passing all of these gates.
+
+\diagramimagecompact{phase3_ai_operator.png}{AI operator workflow}
+
+The full natural-language-to-action path is the sequence in Figure~\ref{fig:seq-operator}, and the safety decision that can block it at every step is the activity diagram in Figure~\ref{fig:act-operator}: the request is parsed into an intent and a playbook, the target is checked against the allowed asset scope, the operation is classified by risk, and a risky operation requires the admin secret before any preview can be confirmed. Table~\ref{tab:operator-risk} summarizes how risk levels gate execution, using the real \codepath{OperatorRun.risk_level} values.
+
+\umlfigure{seq_operator.png}{Operator natural-language-to-action sequence}{fig:seq-operator}
+
+\umlfigurecompact{act_operator_safety.png}{Operator safety-validation decision flow}{fig:act-operator}
+
+\begin{table}[H]
+\centering
+\caption{Operator risk levels and execution gating}
+\label{tab:operator-risk}
+\begin{tabularx}{\textwidth}{@{}p{0.16\textwidth}p{0.30\textwidth}Y@{}}
+\toprule
+\textbf{Risk level} & \textbf{Example actions} & \textbf{Gating} \\
+\midrule
+low & Read state, list processes, gather diagnostics & Preview then confirm \\
+medium & Restart a service, rotate a log, adjust a config & Preview then confirm \\
+high & Destructive or broad changes, firewall/system edits & Admin secret + explicit approval \\
+\midrule
+out of scope & Target not in the account's asset scope & Blocked outright \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:ss-assistant-operator} (right) shows the realized operator workflow: a natural-language request scoped to a concrete asset, the readiness state, and the previewed plan that must be approved before any execution.
+
+\pairfig{aria_assistant.png}{aria_operator.png}{Assistant and operator: a grounded assistant answer with its structured, asset-scoped sources (left); an asset-scoped operator request with a previewed plan gated behind approval (right)}{fig:ss-assistant-operator}
+
+\section{Archive}
+
+The archive holds resolved and closed cases with their summaries. It supports listing and statistics and is scoped by asset like the rest of the workflow. Archiving is the deliberate end of the lifecycle: a case is retained as evidence, with its decisions and verification, so the SOC keeps an auditable history rather than discarding closed work.
+
+The realized archive (Figure~\ref{fig:ss-archive-settings}, left) retains closed and resolved cases with their summaries and statistics, giving the SOC an auditable history of past work.
+
+\section{Settings}
+
+The settings area configures the platform: assets, accounts, data sources, Redis, AI, Ansible, workflow, monitoring, and pipeline configuration. Sensitive changes are protected by the admin-secret gate, and secrets are never returned in responses. This is where an administrator wires ARIA to its environment, for example by adjusting source patterns or pipeline cursors, without ever exposing credentials in the interface. The settings area is organized into the groups in Table~\ref{tab:settings-groups}, which correspond to the \codepath{/settings/*} routes of the navigation map (Figure~\ref{fig:frontend-nav}).
+
+\begin{table}[H]
+\centering
+\caption{Settings groups}
+\label{tab:settings-groups}
+\begin{tabularx}{\textwidth}{@{}p{0.24\textwidth}Y@{}}
+\toprule
+\textbf{Group} & \textbf{Configures} \\
+\midrule
+Assets & Monitored-server registry and per-source patterns. \\
+Accounts & ARIA login accounts and roles (super\_admin / server\_user). \\
+Data sources & Source index patterns and connection settings. \\
+Pipeline & Polling cursors and ingestion parameters. \\
+AI & LLM provider, model, and enablement. \\
+Ansible & Remediation connection and inventory parameters. \\
+Redis & Cache / cursor store connection. \\
+Monitoring, Workflow, Security & Health, workflow, and protected-change options. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:ss-archive-settings} (right) shows the settings overview, where each configuration domain reports its health, and where the per-domain pages expose protected fields without ever returning the underlying secret.
+
+\pairfig{aria_archive.png}{aria_settings_overview.png}{Archive and settings: resolved and closed cases retained as an auditable history (left); the settings overview with per-domain configuration health and protected fields (right)}{fig:ss-archive-settings}
+
+\section{Assets Management}
+
+The assets page manages the monitored-server registry that powers scoping. Each asset has an identifier, source validation, an enabled state, and a remediation flag. The administrator can create or edit an asset, validate that its sources actually return data, and enable or disable it. This page is the bridge between the onboarding work of Chapter~5 and the rest of the dashboard: once a server is registered and validated here, every other page can be filtered to it. The asset lifecycle it drives is the state machine of Figure~\ref{fig:asset-states}, and the way an asset confines every other page's data is the scoping data-flow of Figure~\ref{fig:asset-scoping}.
+
+The monitored-server registry (Figure~\ref{fig:ss-assets-ansible}, left) shows each asset with its identifier, its per-source validation badges, an enabled state, and the remediation flag that the rest of the platform reads when scoping data.
+
+\section{Ansible Settings}
+
+The Ansible settings configure how remediation reaches target hosts: inventory and connection parameters used by the executor. Connection tests can be run to confirm reachability. As everywhere else, credentials are handled without exposure, the inventory is written with restrictive permissions, and passwords are never placed on a command line. This page makes the remediation capability operational while keeping it within the security boundary. Listing~\ref{lst:inventory} shows a sanitized inventory entry of the form ARIA writes for an asset: the connection parameters are concrete, but the password is stored only as a secret reference (\codepath{password_secret_ref}), never as a literal value.
+
+\begin{lstlisting}[style=aria,language=yaml,caption={Sanitized Ansible asset inventory entry (from ansible\_config\_json)},label={lst:inventory}]
+dash-linux:
+  ansible_host: 192.168.1.10
+  ansible_user: root
+  ansible_port: 22
+  auth_type: private_key
+  ssh_key_ref: /keys/dash-linux.pem      # path reference, key not shown
+  become_method: sudo
+  become_password_secret_ref: <SECRET>   # resolved at run time
+  remediation_enabled: false
+\end{lstlisting}
+
+Figure~\ref{fig:ss-assets-ansible} (right) shows the per-server Ansible configuration: the connection authentication, the privilege-escalation method, and the connection-test controls, with every credential kept as a stored reference rather than a visible value.
+
+\pairfig{aria_assets.png}{aria_ansible.png}{Assets and Ansible settings: the monitored-server registry with per-source validation badges and remediation flags (left); per-server Ansible connection and privilege-escalation configuration with credentials kept as stored references only (right)}{fig:ss-assets-ansible}
+
+\section{End-to-End SOC Scenarios}
+
+The pages above are not used in isolation; they form end-to-end flows. The following scenarios connect them so that the reader can see how the modules interact in practice.
+
+\begin{description}[leftmargin=0.6cm]
+\item[Scenario 1 -- Security alert to investigation.] A Wazuh or Suricata event arrives in Elasticsearch. The poller reads the source index after the saved cursor, maps the document, removes duplicates, filters noise, enriches, persists, and broadcasts an update. Correlation links the alert to an incident, the analyst opens it, and launches or reviews an investigation. The AI engine builds context and produces the explanation and proposed playbook; execution stays blocked until approval.
+\item[Scenario 2 -- Runtime Falco event.] A Falco event is forwarded through Falcosidekick into the asset-specific runtime index. ARIA maps it as a runtime event, the runtime engine assigns a decision (observe, manual review, or approval-required remediation), and the frontend exposes only the backend-provided actions. Diagnostic-only cases show no fake remediation button.
+\item[Scenario 3 -- Infrastructure anomaly.] Telegraf metrics arrive and are read by the performance components. Redis keeps recent metrics and baselines. When a threshold or anomaly condition is detected, the infrastructure workflow creates a diagnostic investigation with resource context, top processes, findings, and acknowledge/escalate/archive actions.
+\item[Scenario 4 -- Operator prompt to safe execution.] The operator selects a concrete asset and sends a natural-language request. The backend validates that the asset exists, is enabled, and has remediation configured, maps the request to a capability, generates a preview with risk information, blocks until approval, and runs through Ansible with the output recorded.
+\item[Scenario 5 -- New server onboarding.] An administrator runs the monitored-server bootstrap script (Chapter~5), which installs agents, writes configurations with asset identity, verifies services and index visibility, and prints the ARIA asset payload. The administrator registers the asset, runs source validation, and then views that server's data through the asset selector.
+\item[Scenario 6 -- Asset filtering prevents data mixing.] Selecting an asset sends \codepath{asset_id} to supported endpoints; the backend validates and scopes the queries. The operator refuses \codepath{asset_id=all} for execution, so remediation always targets one concrete server and unrelated servers are never mixed.
+\end{description}
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  flowstep/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=gray!8},
+  gate/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=red!8},
+  arrow/.style={-Latex, thick}
+]
+\node[flowstep] (alert) {Normalized alert\\or anomaly};
+\node[flowstep, right=0.55cm of alert] (incident) {Incident or\\runtime/infra case};
+\node[flowstep, right=0.55cm of incident] (invest) {Investigation\\evidence};
+\node[flowstep, right=0.55cm of invest] (ai) {AI or rule-based\\analysis};
+\node[gate, below=0.75cm of ai] (approval) {Approval and\\target validation};
+\node[flowstep, left=0.55cm of approval] (run) {Controlled\\execution};
+\node[flowstep, left=0.55cm of run] (verify) {Verification};
+\node[flowstep, left=0.55cm of verify] (archive) {Archive};
+\draw[arrow] (alert) -- (incident);
+\draw[arrow] (incident) -- (invest);
+\draw[arrow] (invest) -- (ai);
+\draw[arrow] (ai) -- (approval);
+\draw[arrow] (approval) -- (run);
+\draw[arrow] (run) -- (verify);
+\draw[arrow] (verify) -- (archive);
+\end{tikzpicture}\end{adjustbox}
+\caption{Detection-to-response lifecycle}
+\end{figure}
+
+The following table consolidates the workflow coverage of the dashboard pages described above.
+
+\begin{table}[H]
+\centering
+\caption{Frontend workflow coverage}
+\begin{tabularx}{\textwidth}{@{}p{0.22\textwidth}Y@{}}
+\toprule
+\textbf{Page or module} & \textbf{Implemented workflow} \\
+\midrule
+Dashboard & Loads summary, quick stats, investigation stats, trends, ARIA alert stats, source breakdown, MITRE coverage, response metrics, and geo threats with partial failure tolerance. \\
+Alerts & Supports source, severity, status, whitelist, MITRE, tactic, time, and asset filters; exposes details, evidence, IOC panel, whitelist action, and manual incident creation. \\
+Incidents & Lists incidents, filters by status/severity/time/asset, shows detail tabs, allows assignment, status update, and manual investigation launch. \\
+Security investigations & Shows workflow stages, AI analysis, evidence, playbook, rollback, post-rollback verification, timeline, and backend-driven actions. \\
+Runtime investigations & Shows runtime stats, decision filters, diagnostic/remediation tabs, available actions, manual remediation editor, approval modal, and admin override panel. \\
+Infrastructure investigations & Shows resource anomalies, gauges, metrics snapshot, top processes, diagnostic findings, suggested actions, acknowledge, escalation, and archive. \\
+Metrics & Shows host metrics, CPU, memory, network, disk, process tabs, history, root-cause information, live refresh, and asset/global banners. \\
+Assistant & Provides conversations, SOC questions, structured sources, action confirmations, timeout handling, and asset context. \\
+Operator & Provides asset-scoped sessions, inventory host discovery, readiness banners, prompt submission, playbook preview, approval, run polling, and result display. \\
+Settings & Provides assets, accounts, data sources, Redis, AI, Ansible, workflow, monitoring, and pipeline configuration with protected changes where required. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Finally, Table~\ref{tab:feature-map} consolidates the whole chapter into a single mapping from each feature to its backing API router, the data source it reads, and where its behaviour is validated in Chapter~6.
+
+\begin{longtable}{@{}p{0.18\textwidth}p{0.22\textwidth}p{0.30\textwidth}p{0.18\textwidth}@{}}
+\caption{Feature to backend module, data source, and validation mapping}\label{tab:feature-map}\\
+\toprule
+\textbf{Feature} & \textbf{Backend router} & \textbf{Primary data source} & \textbf{Validated in} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Feature} & \textbf{Backend router} & \textbf{Primary data source} & \textbf{Validated in} \\
+\midrule
+\endhead
+Dashboard & \codepath{/api/v1/dashboard} & Elasticsearch + SQLite + heartbeats & \S\ref{sec:val-backend} \\
+Alerts & \codepath{/api/v1/alerts} & SQLite \codepath{alerts} (from ES) & \S\ref{sec:val-backend} \\
+Incidents & \codepath{/api/v1/incidents} & SQLite \codepath{incidents} & \S\ref{sec:val-backend} \\
+Investigations & \codepath{/api/v1/investigations} & SQLite investigation entities & \S\ref{sec:val-backend} \\
+Remediation & \codepath{/api/v1/investigations} & SQLite runs + Ansible + ES & \S\ref{sec:val-runtime} \\
+IPS map & \codepath{/api/v1/ips} & GeoIP-enriched alerts & \S\ref{sec:val-backend} \\
+Runtime & \codepath{/api/v1/runtime} & Falco runtime index & \S\ref{sec:val-runtime} \\
+Metrics & \codepath{/api/v1/metrics} & Telegraf indices & \S\ref{sec:val-backend} \\
+Infrastructure & \codepath{/api/v1/infrastructure} & Telegraf + baselines & \S\ref{sec:val-runtime} \\
+Assistant & \codepath{/api/v1/assistant} & Scoped SQLite + ES context & \S\ref{sec:val-backend} \\
+Operator & \codepath{/api/v1/operator} & Assets + Ansible & \S\ref{sec:val-runtime} \\
+Archive & \codepath{/api/v1/archives} & SQLite \codepath{archives} & \S\ref{sec:val-backend} \\
+Assets / Settings & \codepath{/api/v1/assets}, \codepath{/api/v1/settings} & SQLite \codepath{monitored_assets} & \S\ref{sec:val-multi} \\
+\bottomrule
+\end{longtable}
+
+\section{Conclusion}
+
+This chapter walked through the realized ARIA dashboard page by page, showing how each feature works on top of the collected telemetry and the internal logic of Chapter~3. The recurring principle is that the interface never exceeds the backend: actions are state-driven, scoping is enforced, and dangerous operations are gated. With the platform fully realized for a monitored environment, the final technical chapter addresses how new servers are onboarded automatically and how the whole solution is deployed in production.

@@ -1,0 +1,5 @@
+[targets]
+ghazi ansible_host=193.95.30.97 ansible_user=ghazi ansible_port=22
+testvm ansible_host=193.95.30.83 ansible_user=root ansible_port=22
+[targets:vars]
+ansible_ssh_extra_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

@@ -1,0 +1,34 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart LR
+  subgraph SRV["Monitored Server"]
+    OS["OS / auth logs"]
+    NETP["Network packets"]
+    RUN["Runtime syscalls"]
+    MET["System metrics"]
+  end
+  WZ["Wazuh Agent"]
+  SUR["Suricata IDS"]
+  FAL["Falco"]
+  TG["Telegraf"]
+  FB["Filebeat"]
+  FSK["Falcosidekick"]
+  WM["Wazuh Manager"]
+  ES["Elasticsearch indices<br/>wazuh-* suricata-* falco-*<br/>filebeat-* telegraf-*"]
+  KB["Kibana"]
+  ARIA["ARIA ingestion poller"]
+  OS --> WZ
+  NETP --> SUR
+  RUN --> FAL
+  MET --> TG
+  WZ -->|1514| WM --> ES
+  SUR -->|eve.json| FB
+  OS -->|logs| FB
+  FB -->|9200 HTTPS| ES
+  FAL --> FSK -->|2801 to 9200| ES
+  TG -->|9200 HTTPS| ES
+  ES --> KB
+  ES -->|cursor poll| ARIA
+  classDef s fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef e fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  class OS,NETP,RUN,MET s;
+  class ES e;

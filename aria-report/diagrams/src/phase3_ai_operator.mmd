@@ -1,0 +1,37 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 12 - AI Operator"]
+  REQ["Operator Request<br/>natural language"]
+  REASON["Reasoning<br/>intent + confidence + tools"]
+  TEMPLATE["Template Match<br/>or LLM playbook generation"]
+  PENDING["OperatorRun<br/>pending"]
+  GATE["Approval Gate<br/>auto for low-risk read-only<br/>manual for mutating actions"]
+  EXEC["Ansible Execution"]
+  ANALYSIS["Structured Result<br/>markdown analysis"]
+  TITLE --> REQ
+  REQ --> REASON --> TEMPLATE --> PENDING --> GATE --> EXEC --> ANALYSIS
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef decision fill:#F5F3FF,stroke:#7C3AED,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef final fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class REQ input;
+  class REASON,TEMPLATE,PENDING,EXEC process;
+  class GATE decision;
+  class ANALYSIS final;

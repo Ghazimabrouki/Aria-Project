@@ -1,0 +1,19 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant AD as Administrator
+  participant SRC as Source Tree
+  participant BE as FastAPI Backend (8001)
+  participant WK as Background Workers
+  participant FE as Next.js Frontend (3000)
+  participant SYS as systemd / supervisor
+  AD->>SRC: pull release + set .env (secrets masked)
+  AD->>BE: run DB migrations (SQLite)
+  AD->>SYS: enable backend service
+  SYS->>BE: start API + poller + watcher
+  BE->>WK: launch workers (heartbeat registered)
+  AD->>FE: build + start dashboard
+  AD->>SYS: enable frontend service
+  AD->>BE: health checks (services, ES, Redis)
+  BE-->>AD: healthy
+  AD->>AD: harden (firewall, restricted ports, admin secret)

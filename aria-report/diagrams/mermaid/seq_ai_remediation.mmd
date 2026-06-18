@@ -1,0 +1,33 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","actorBkg":"#EFF6FF","actorBorder":"#2563EB","signalColor":"#334155","fontFamily":"Inter, Arial","fontSize":"14px"},"sequence":{"useMaxWidth":true,"mirrorActors":false,"wrap":true,"width":150}}}%%
+sequenceDiagram
+  autonumber
+  participant AN as SOC Analyst
+  participant FE as Next.js Frontend
+  participant BE as FastAPI Backend
+  participant CB as context_builder
+  participant AI as ai_runner / LLM
+  participant SP as safety_policy
+  participant AX as ansible_exec
+  participant SRV as Monitored Server
+  participant FV as fix_verifier
+  participant ES as Elasticsearch
+  participant AR as archiver
+  Note over BE,AI: Automated investigation (watcher)
+  BE->>CB: build incident context (alerts, IOCs, host)
+  CB->>AI: prompt (summary, narrative, risk, playbook)
+  AI-->>BE: ai_summary + ai_risk + playbook_yaml
+  BE->>SP: classify playbook safety tier
+  SP-->>BE: tier + blocked_reasons
+  BE-->>FE: investigation awaiting_approval
+  AN->>FE: review summary + playbook
+  AN->>BE: approve (X-ARIA-Admin-Secret)
+  BE->>AX: execute approved playbook
+  AX->>SRV: SSH run (evidence, containment, hardening)
+  SRV-->>AX: stdout + exit_code
+  AX-->>BE: PlaybookRun completed
+  BE->>FV: verify fix
+  FV->>ES: re-query for recurring alerts
+  ES-->>FV: new_alerts_found
+  FV-->>BE: likely_fixed | not_fixed
+  BE->>AR: archive full context
+  AR-->>FE: case archived

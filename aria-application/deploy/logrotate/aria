@@ -1,0 +1,11 @@
+/var/log/aria/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 dash dash
+    copytruncate
+    sharedscripts
+}

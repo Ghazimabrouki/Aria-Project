@@ -1,0 +1,27 @@
+title: Suricata Protocol Parsing Noise
+description: Filter out protocol parsing artifacts that are not security-relevant
+status: experimental
+logsource:
+  product: suricata
+detection:
+  selection:
+    - signature|contains:
+        - 'packet with invalid timestamp'
+        - 'stream excessive retransmissions'
+        - 'stream suspected rst injection'
+        - 'stream 3way handshake wrong seq'
+        - 'stream established packet out of window'
+        - 'stream reassembly overlap'
+        - 'http unable to match response'
+        - 'http request line incomplete'
+        - 'http host header ambiguous'
+        - 'http host part of uri is invalid'
+        - 'http response buffer too long'
+        - 'http invalid response chunk'
+        - 'ssh invalid banner'
+        - 'applayer wrong direction'
+        - 'applayer detect protocol only one direction'
+        - 'applayer mismatch protocol'
+        - 'tls multiple sni extensions'
+        - 'tls invalid record type'
+  condition: selection

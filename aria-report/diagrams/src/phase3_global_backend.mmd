@@ -1,0 +1,53 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart TB
+  TITLE["Phase 3 - Backend Intelligence Layer<br/><span style='font-size:14px;color:#2563EB'>From raw monitoring data to SOC intelligence</span>"]
+  ES["Elasticsearch<br/>Raw data from Wazuh, Suricata, Falco, Telegraf"]
+  subgraph CORE["Core SOC Workflow"]
+    direction LR
+    ALERT["Alert Pipeline<br/>poll, map, dedup, filter, enrich"]
+    INC["Incident Correlation<br/>group related alerts"]
+    WATCH["Watcher & Investigations<br/>context, timeline, IOCs, risk"]
+    AI["AI Response Engine<br/>summary, narrative, risk, playbook"]
+    APPROVE["Approval & Execution<br/>guardrails, Ansible, verification"]
+  end
+  subgraph OPS["Operational Intelligence Modules"]
+    direction LR
+    PERF["Performance Monitoring<br/>metrics, anomalies, remediation"]
+    IPS["IPS Map<br/>geo attacks, lifecycle, statistics"]
+    ASSIST["AI Assistant<br/>SOC Q&A and actions"]
+    OP["AI Operator<br/>NL-to-Ansible operations"]
+  end
+  UI["Frontend Dashboard<br/>alerts, incidents, investigations, metrics, IPS, assistant, operator"]
+  TITLE --> ES
+  ES --> ALERT --> INC --> WATCH --> AI --> APPROVE --> UI
+  ES --> PERF --> UI
+  ALERT --> IPS --> UI
+  ASSIST --> UI
+  OP --> UI
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2.5px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef core fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef ops fill:#F5F3FF,stroke:#7C3AED,stroke-width:1.5px,color:#0F172A;
+  classDef ui fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class ES input;
+  class ALERT,INC,WATCH,AI,APPROVE core;
+  class PERF,IPS,ASSIST,OP ops;
+  class UI ui;
+  style CORE fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#0F172A
+  style OPS fill:#F5F3FF,stroke:#7C3AED,stroke-width:2px,color:#0F172A

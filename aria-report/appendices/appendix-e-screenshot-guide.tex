@@ -1,0 +1,49 @@
+\chapter{ARIA Screenshot Evidence}
+\label{app:screens}
+
+This appendix collects the supporting ARIA screenshots captured on the running platform but not placed in the main chapters, where a single representative capture per feature was used to keep the narrative readable. The figures are grouped per feature and packed two or four per page; no credential value is exposed in any capture, and secret fields appear only as \texttt{Configured} / \texttt{Replace secret} / \texttt{Password configured} placeholders.
+
+\section{Dashboard and Alerts}
+
+\pairfig{app_dashboard_2.png}{app_dashboard_3.png}{Dashboard: threat-composition and recent-activity panels (left); response metrics and severity breakdown (right)}{fig:app-dash}
+\pairfig{app_alerts_list.png}{app_alert_detail.png}{Alerts: normalized list with source and severity columns (left); per-alert detail panel (right)}{fig:app-alerts}
+\pairfig{app_alerts_2.png}{app_alert_ioc.png}{Alerts: extended list with active filters (left); detail view with indicator-of-compromise context (right)}{fig:app-alerts2}
+
+\section{Incidents and Investigations}
+
+\pairfig{app_incidents_list.png}{app_incident_ai.png}{Incidents: correlated-case list (left); incident detail with AI analysis (right)}{fig:app-inc}
+\pairfig{app_incident_timeline.png}{app_investigations_list.png}{Incident detail: correlated alerts and timeline (left); investigations list with workflow statistics (right)}{fig:app-inc2}
+\quadfig{app_investigation_ai.png}{app_investigation_evidence.png}{app_investigation_3.png}{app_investigation_exec.png}{Investigation detail tabs: AI summary and risk (top-left); evidence and proposed playbook (top-right); workflow stages and actions (bottom-left); remediation execution output (bottom-right)}{fig:app-inv}
+
+\section{Runtime Security}
+
+\pairfig{aria_runtime_list.png}{aria_runtime_evidence.png}{Runtime Security: investigation list with status, severity, and decision badges (left); evidence tab for the \codepath{ghazi} observe case (right)}{fig:app-rt1}
+\quadfig{aria_runtime_diagnostic.png}{aria_runtime_context.png}{aria_runtime_timeline.png}{aria_runtime_raw.png}{Runtime investigation tabs for the observe case: diagnostic result (top-left); context with process, file, and event detail including MITRE T1070 (top-right); timeline (bottom-left); raw investigation data (bottom-right)}{fig:app-rt2}
+
+\section{Remediation Execution}
+
+\pairfig{aria_rem_containment.png}{aria_rem_forensics.png}{Controlled remediation execution phases: containment (left) and forensics (right), each completing with \codepath{exit 0}}{fig:app-rem1}
+\screenshotc{aria_rem_verification.png}{Remediation verification phase: completes with \codepath{exit 0} and confirms reachability while also reporting a resource warning that requires separate operational review}{fig:app-rem2}
+
+\section{Metrics and Infrastructure}
+
+\pairfig{app_metrics_2.png}{app_metrics_3.png}{Metrics: host resource gauges and memory history (left); per-resource detail view (right)}{fig:app-met}
+\pairfig{app_metrics_network.png}{app_metrics_processes.png}{Metrics: network throughput and findings (left); top-process table (right)}{fig:app-met2}
+\quadfig{app_infra_list.png}{app_infra_detail.png}{app_infra_3.png}{app_infra_analysis.png}{Infrastructure investigations: anomaly-case list (top-left); anomaly banner and snapshot (top-right); system-metrics detail (bottom-left); resource analysis and suggested actions (bottom-right)}{fig:app-infra}
+
+\section{Assistant and Operator}
+
+\pairfig{app_assistant_chat.png}{app_operator_exec.png}{Assistant: conversational query with grouped sources (left); Operator: previewed plan and execution result (right)}{fig:app-assist}
+
+\section{Multi-Server Assets and Settings}
+
+\pairfig{aria_editserver_ansible.png}{aria_archive_selector.png}{Edit-server dialog: Telegraf/Filebeat/Suricata patterns and Ansible connection parameters (left); per-server scope selector used across the views (right)}{fig:app-assets-edit}
+\pairfig{app_assets_list.png}{app_add_server_sources.png}{Settings: monitored-server registry (left); add-server dialog with per-source index patterns and inline validation (right)}{fig:app-assets}
+\pairfig{app_archive_detail.png}{app_archive_verification.png}{Archive: closed case with original incident and investigation links (left); verification result and related alerts (right)}{fig:app-archive}
+\quadfig{app_settings_security.png}{app_settings_datasources.png}{app_settings_ai.png}{app_settings_redis.png}{Settings surface: security (top-left); Elasticsearch data sources (top-right); AI/LLM provider (bottom-left); Redis cache and deduplication (bottom-right)}{fig:app-set1}
+\quadfig{app_settings_workflow.png}{app_settings_monitoring.png}{app_settings_pipeline.png}{app_settings_accounts.png}{Settings surface: workflow (top-left); monitoring and per-server health (top-right); pipeline throughput (bottom-left); account management (bottom-right)}{fig:app-set2}
+
+\section{Elasticsearch Telemetry}
+\label{app:cloud-es}
+
+\pairfig{aria_es_indices2.png}{aria_es_indices3.png}{Elasticsearch index management, additional pages: Falco, Telegraf, Wazuh, and Filebeat index families for the central host and the \codepath{vm-test} asset, with document counts, storage sizes, and green/yellow health states}{fig:app-es}

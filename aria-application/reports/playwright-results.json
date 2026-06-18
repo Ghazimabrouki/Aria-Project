@@ -1,0 +1,1397 @@
+{
+  "config": {
+    "configFile": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/playwright.config.ts",
+    "rootDir": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../reports/playwright-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 4,
+    "webServer": {
+      "command": "[ -d .next ] || pnpm build; pnpm start",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 300000
+    }
+  },
+  "suites": [
+    {
+      "title": "runtime-investigations.spec.ts",
+      "file": "runtime-investigations.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Runtime Investigations - List Page",
+          "file": "runtime-investigations.spec.ts",
+          "line": 24,
+          "column": 6,
+          "specs": [
+            {
+              "title": "page loads with header and stats cards",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2485,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:17.250Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-0ca4ed7e2a184a3b9b29",
+              "file": "runtime-investigations.spec.ts",
+              "line": 29,
+              "column": 7
+            },
+            {
+              "title": "stats cards show numbers consistent with API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2643,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:17.302Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-e09e2d248985b3690f94",
+              "file": "runtime-investigations.spec.ts",
+              "line": 41,
+              "column": 7
+            },
+            {
+              "title": "filters render and can be interacted with",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2681,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:17.264Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-b2179045fbb8893a8d69",
+              "file": "runtime-investigations.spec.ts",
+              "line": 48,
+              "column": 7
+            },
+            {
+              "title": "investigations table or empty state renders",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2620,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:17.303Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-c834d2da234b278c2545",
+              "file": "runtime-investigations.spec.ts",
+              "line": 62,
+              "column": 7
+            },
+            {
+              "title": "no console errors on list page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2888,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:19.895Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-5f5d0dbaa08ae4f507b7",
+              "file": "runtime-investigations.spec.ts",
+              "line": 68,
+              "column": 7
+            },
+            {
+              "title": "no broken API calls on list page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3110,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:20.098Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-bc7c36bdb39874c54135",
+              "file": "runtime-investigations.spec.ts",
+              "line": 83,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Detail Page",
+          "file": "runtime-investigations.spec.ts",
+          "line": 95,
+          "column": 6,
+          "specs": [
+            {
+              "title": "open real investigation detail and verify all tabs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 3667,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:20.124Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-d9ee4a061e67b58bc642",
+              "file": "runtime-investigations.spec.ts",
+              "line": 96,
+              "column": 7
+            },
+            {
+              "title": "detail page shows truthful available actions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2625,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:20.142Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-e96b2327cb6e1974cff2",
+              "file": "runtime-investigations.spec.ts",
+              "line": 125,
+              "column": 7
+            },
+            {
+              "title": "acknowledge action shows readable feedback and never [object Object]",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No acknowledgeable investigation available",
+                      "location": {
+                        "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                        "line": 171,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "skipped",
+                      "duration": 2038,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:22.798Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No acknowledgeable investigation available",
+                          "location": {
+                            "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                            "line": 171,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-8c948724b3af3a97e869",
+              "file": "runtime-investigations.spec.ts",
+              "line": 161,
+              "column": 7
+            },
+            {
+              "title": "escalate action shows readable feedback and never [object Object]",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No escalatable investigation available",
+                      "location": {
+                        "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                        "line": 210,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 2014,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:22.866Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No escalatable investigation available",
+                          "location": {
+                            "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                            "line": 210,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-58645caa1db11c76cb69",
+              "file": "runtime-investigations.spec.ts",
+              "line": 200,
+              "column": 7
+            },
+            {
+              "title": "error feedback is visible when action is blocked",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1515,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:23.239Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-7897f023bd7a10dc9ed7",
+              "file": "runtime-investigations.spec.ts",
+              "line": 237,
+              "column": 7
+            },
+            {
+              "title": "detail page shows context sections",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1329,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:23.818Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-1f2e2057a853e01b0123",
+              "file": "runtime-investigations.spec.ts",
+              "line": 253,
+              "column": 7
+            },
+            {
+              "title": "detail page shows decision and next action",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1799,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:24.776Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-10089a4a8622d89603d9",
+              "file": "runtime-investigations.spec.ts",
+              "line": 273,
+              "column": 7
+            },
+            {
+              "title": "detail page distinguishes diagnostic-only vs remediation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1942,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:24.857Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-372d679a3d6ea1a8daeb",
+              "file": "runtime-investigations.spec.ts",
+              "line": 303,
+              "column": 7
+            },
+            {
+              "title": "no console errors on detail page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1918,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:24.911Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-7f901b5125657fb91fe1",
+              "file": "runtime-investigations.spec.ts",
+              "line": 328,
+              "column": 7
+            },
+            {
+              "title": "timeline tab renders events or empty state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1665,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:25.174Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-ca42d2f72962d242011f",
+              "file": "runtime-investigations.spec.ts",
+              "line": 349,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Synthetic UX Assertions",
+          "file": "runtime-investigations.spec.ts",
+          "line": 367,
+          "column": 6,
+          "specs": [
+            {
+              "title": "admin can understand case without reading raw YAML",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 2337,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts:388:34",
+                        "location": {
+                          "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                          "column": 34,
+                          "line": 388
+                        },
+                        "snippet": "  386 |     // Should have at least one badge visible\n  387 |     const badges = page.locator(\"span\").filter({ hasText: /findings ready|observe|manual review/i });\n> 388 |     expect(await badges.count()).toBeGreaterThan(0);\n      |                                  ^\n  389 |   });\n  390 |\n  391 |   test(\"loading and error states are understandable\", async ({ page }) => {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                            "column": 34,
+                            "line": 388
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  386 |     // Should have at least one badge visible\n  387 |     const badges = page.locator(\"span\").filter({ hasText: /findings ready|observe|manual review/i });\n> 388 |     expect(await badges.count()).toBeGreaterThan(0);\n      |                                  ^\n  389 |   });\n  390 |\n  391 |   test(\"loading and error states are understandable\", async ({ page }) => {\n    at /home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts:388:34"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:26.596Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results/runtime-investigations-Run-cd2ee-se-without-reading-raw-YAML-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results/runtime-investigations-Run-cd2ee-se-without-reading-raw-YAML-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results/runtime-investigations-Run-cd2ee-se-without-reading-raw-YAML-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                        "column": 34,
+                        "line": 388
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-c1766b64be586aa01ed1",
+              "file": "runtime-investigations.spec.ts",
+              "line": 368,
+              "column": 7
+            },
+            {
+              "title": "loading and error states are understandable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2776,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:26.818Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-9c57e4f8a1661f517d94",
+              "file": "runtime-investigations.spec.ts",
+              "line": 391,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Diagnostic Tab UX",
+          "file": "runtime-investigations.spec.ts",
+          "line": 404,
+          "column": 6,
+          "specs": [
+            {
+              "title": "diagnostic tab shows human-readable result card",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2525,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:26.861Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-bbb0478ed56ce79a0762",
+              "file": "runtime-investigations.spec.ts",
+              "line": 405,
+              "column": 7
+            },
+            {
+              "title": "diagnostic tab shows what was checked",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2490,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:26.855Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-3b672b4f63efa697aec6",
+              "file": "runtime-investigations.spec.ts",
+              "line": 423,
+              "column": 7
+            },
+            {
+              "title": "diagnostic tab shows gaps when they exist",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2433,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:30.277Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-e31dd92b57794a715d05",
+              "file": "runtime-investigations.spec.ts",
+              "line": 436,
+              "column": 7
+            },
+            {
+              "title": "diagnostic tab shows recommended next steps",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2407,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:29.380Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-f9bce547cfa5cff65d4f",
+              "file": "runtime-investigations.spec.ts",
+              "line": 465,
+              "column": 7
+            },
+            {
+              "title": "raw yaml and output are present but collapsible",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 7963,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"tabpanel\"]:not([hidden])').getByText('Show diagnostic playbook').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"tabpanel\"]:not([hidden])').getByText('Show diagnostic playbook').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"tabpanel\"]:not([hidden])').getByText('Show diagnostic playbook').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"tabpanel\"]:not([hidden])').getByText('Show diagnostic playbook').first()\u001b[22m\n\n    at /home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts:491:77",
+                        "location": {
+                          "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                          "column": 77,
+                          "line": 491
+                        },
+                        "snippet": "  489 |     // Raw output should be behind a collapsible trigger, not immediately visible as primary content\n  490 |     await expect(activePanel.getByText(\"Show raw diagnostic output\").first()).toBeVisible();\n> 491 |     await expect(activePanel.getByText(\"Show diagnostic playbook\").first()).toBeVisible();\n      |                                                                             ^\n  492 |\n  493 |     // The primary visible content should NOT be raw preformatted output\n  494 |     const firstCard = activePanel.locator(\"> div\").first();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                            "column": 77,
+                            "line": 491
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[role=\"tabpanel\"]:not([hidden])').getByText('Show diagnostic playbook').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[role=\"tabpanel\"]:not([hidden])').getByText('Show diagnostic playbook').first()\u001b[22m\n\n\n  489 |     // Raw output should be behind a collapsible trigger, not immediately visible as primary content\n  490 |     await expect(activePanel.getByText(\"Show raw diagnostic output\").first()).toBeVisible();\n> 491 |     await expect(activePanel.getByText(\"Show diagnostic playbook\").first()).toBeVisible();\n      |                                                                             ^\n  492 |\n  493 |     // The primary visible content should NOT be raw preformatted output\n  494 |     const firstCard = activePanel.locator(\"> div\").first();\n    at /home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts:491:77"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:29.408Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results/runtime-investigations-Run-f200b-are-present-but-collapsible-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results/runtime-investigations-Run-f200b-are-present-but-collapsible-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/test-results/runtime-investigations-Run-f200b-are-present-but-collapsible-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                        "column": 77,
+                        "line": 491
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-a0e13612a3bd0b3c7273",
+              "file": "runtime-investigations.spec.ts",
+              "line": 478,
+              "column": 7
+            },
+            {
+              "title": "diagnostic tab does not require reading raw yaml to understand result",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2315,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:29.613Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-43a8f82e119907e799aa",
+              "file": "runtime-investigations.spec.ts",
+              "line": 498,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Data Quality & Edge Cases",
+          "file": "runtime-investigations.spec.ts",
+          "line": 527,
+          "column": 6,
+          "specs": [
+            {
+              "title": "data quality warning visible for corrupted proc_name",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No data quality warnings for this investigation",
+                      "location": {
+                        "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                        "line": 552,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "skipped",
+                      "duration": 2280,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:31.811Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No data quality warnings for this investigation",
+                          "location": {
+                            "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                            "line": 552,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-9989b7d59b1a7cdb9624",
+              "file": "runtime-investigations.spec.ts",
+              "line": 528,
+              "column": 7
+            },
+            {
+              "title": "list page shows explicit error on API failure",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2993,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:31.944Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-7ec571b36aa86e9634cb",
+              "file": "runtime-investigations.spec.ts",
+              "line": 556,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Stats Cards",
+          "file": "runtime-investigations.spec.ts",
+          "line": 572,
+          "column": 6,
+          "specs": [
+            {
+              "title": "stats cards render correct labels",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2703,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:32.941Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-b7b525c3690b09428014",
+              "file": "runtime-investigations.spec.ts",
+              "line": 577,
+              "column": 7
+            },
+            {
+              "title": "stats counts match backend",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2763,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:34.133Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-628c058ba78ce1fb1f19",
+              "file": "runtime-investigations.spec.ts",
+              "line": 595,
+              "column": 7
+            },
+            {
+              "title": "stat cards show tooltips on hover",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2793,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:34.957Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-edcb52b3cbb77e8372bd",
+              "file": "runtime-investigations.spec.ts",
+              "line": 636,
+              "column": 7
+            },
+            {
+              "title": "manual refresh button updates last updated timestamp",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3076,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:35.704Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-0aba07073e7d8a31d0ae",
+              "file": "runtime-investigations.spec.ts",
+              "line": 645,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Stats After Actions",
+          "file": "runtime-investigations.spec.ts",
+          "line": 662,
+          "column": 6,
+          "specs": [
+            {
+              "title": "after acknowledge, stats and list reflect updated state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "No acknowledgeable investigation available",
+                      "location": {
+                        "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                        "line": 671,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "skipped",
+                      "duration": 617,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:36.918Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "No acknowledgeable investigation available",
+                          "location": {
+                            "file": "/home/dash/Desktop/opensoar backend 6 mai/opensoar backend/frontend/e2e/runtime-investigations.spec.ts",
+                            "line": 671,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-c8198728771c319b02d2",
+              "file": "runtime-investigations.spec.ts",
+              "line": 663,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Runtime Investigations - Stats Reconciliation",
+          "file": "runtime-investigations.spec.ts",
+          "line": 706,
+          "column": 6,
+          "specs": [
+            {
+              "title": "visible stats + other count must reconcile with total",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2034,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-16T23:34:38.262Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "45c084b1c580acda4f43-52958cf988f3bc1feb8f",
+              "file": "runtime-investigations.spec.ts",
+              "line": 707,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-16T23:34:16.329Z",
+    "duration": 24073.476,
+    "expected": 26,
+    "skipped": 4,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

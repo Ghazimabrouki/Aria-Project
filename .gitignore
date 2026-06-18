@@ -1,0 +1,97 @@
+# ARIA Project - Root Git Ignore
+# -------------------------------------------------
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.env
+secrets/
+config/keys/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+dist/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data (kept empty with .gitkeep)
+aria-application/data/backups/*
+aria-application/data/evidence/*
+aria-application/data/seen_ids/*
+aria-application/data/playbooks/*
+!aria-application/data/*/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+var/log/
+
+# IDE / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+.dockerignore
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.bcf
+*.toc
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Ansible retry files
+*.retry
+
+# OS files
+Thumbs.db
+*.pem
+*id_rsa*
+*id_ed25519*
+aria-application/config/keys/opensoar_ghazi
+*.tsbuildinfo
+test-results/
+.claude-flow/
+.claude/
+.codex/
+.swarm/
+.agents/
+.systemd/
+*.bak.*

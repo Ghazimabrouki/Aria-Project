@@ -1,0 +1,23 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  S([Run central setup]) --> ROOT{Root + Ubuntu?}
+  ROOT -->|no| FAIL([Abort])
+  ROOT -->|yes| BASE[Fix apt sources + install base utils]
+  BASE --> IP[Detect local IP -> reuse as bind/connect address]
+  IP --> ES[Install Elasticsearch + security + CA]
+  ES --> KB[Install Kibana]
+  KB --> WAZ[Install Wazuh Manager + API]
+  WAZ --> SUR[Install Suricata + EVE]
+  SUR --> FAL[Install Falco + Falcosidekick]
+  FAL --> FB[Install + configure Filebeat]
+  FB --> TG[Install + configure Telegraf]
+  TG --> RDS[Install Redis]
+  RDS --> HARD[Harden: firewall + SSH + restricted ports]
+  HARD --> CHK{All services active?}
+  CHK -->|no| LOGS[Show logs + retry] --> CHK
+  CHK -->|yes| VER[Verify telemetry in Elasticsearch]
+  VER --> SUM([Print setup summary])
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class ROOT,CHK dec;
+  class BASE,IP,ES,KB,WAZ,SUR,FAL,FB,TG,RDS,HARD,VER act;

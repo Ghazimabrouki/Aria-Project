@@ -1,0 +1,12 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart LR
+  ES["Elasticsearch"] --> AGG["/api/v1/dashboard<br/>aggregations"]
+  DB["SQLite<br/>incidents/investigations"] --> AGG
+  HB["worker_heartbeats"] --> AGG
+  AGG --> SCOPE["asset_scope filter"]
+  SCOPE --> CARDS["Dashboard cards:<br/>alert counts, incident status,<br/>investigation pipeline, system health"]
+  CARDS --> UI["Next.js Dashboard"]
+  classDef e fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef a fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class ES,DB,HB e;
+  class AGG,SCOPE,CARDS a;

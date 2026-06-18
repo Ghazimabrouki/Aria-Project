@@ -1,0 +1,38 @@
+\chapter*{General Introduction}
+\addcontentsline{toc}{chapter}{General Introduction}
+
+Organizations increasingly depend on connected information systems, cloud services, containers, remote servers, and continuously deployed applications. This evolution increases operational flexibility, but it also increases the number of alerts that security teams must analyze. A Security Operations Center (SOC) receives telemetry from many sources: host detection tools, network intrusion detection engines, runtime security agents, system metrics, application logs, and manual reports. When these signals remain isolated, the analyst must manually connect events, determine impact, decide whether remediation is safe, and verify whether the corrective action actually worked.
+
+The internship project studied in this report addresses this operational problem through \project{}, also named \projectlong{}. The system is a security automation platform that connects alert ingestion, enrichment, incident correlation, AI-assisted investigation, human approval, Ansible remediation, post-fix verification, archiving, monitoring, and dashboard visualization. The project is positioned in the SOAR domain, where orchestration and automation are used to support incident response while preserving analyst control for risky actions.
+
+\section*{Internship Mission}
+\addcontentsline{toc}{section}{Internship Mission}
+
+The assigned mission was to design, implement, harden, and validate a backend-centered SOC automation platform able to process alerts from Elasticsearch, normalize them, enrich them with security context, correlate them into incidents, generate response intelligence, and expose the results through an operational web dashboard. The mission also included improvements to runtime remediation, infrastructure monitoring, multi-server asset scoping, API hardening, and validation evidence.
+
+\section*{Problem Statement}
+\addcontentsline{toc}{section}{Problem Statement}
+
+The initial problem can be formulated as follows: how can a SOC reduce manual effort and response delay when alerts arrive from heterogeneous sources such as Wazuh, Suricata, Falco, Filebeat, and Telegraf, while still keeping remediation actions controlled, auditable, and verifiable?
+
+Several sub-problems follow from this question. First, raw alert formats differ from one source to another, which makes correlation difficult. Second, repeated or noisy alerts can hide important events. Third, the analyst needs context such as IP information, MITRE ATT\&CK techniques, source history, target host, and related incidents. Fourth, automatic remediation can be dangerous if it executes unvalidated commands or targets the wrong host. Finally, the result of a fix must be verified rather than assumed.
+
+\section*{Objectives}
+\addcontentsline{toc}{section}{Objectives}
+
+The project objectives were:
+
+\begin{itemize}[leftmargin=1cm]
+\item Implement a multi-source alert pipeline that polls Elasticsearch and normalizes alerts from security and observability sources.
+\item Enrich and correlate alerts using GeoIP information, MITRE ATT\&CK mappings, Sigma noise rules, deduplication, and incident grouping.
+\item Provide an AI-assisted response layer able to produce investigation summaries, narratives, risk assessments, and Ansible playbooks.
+\item Add approval, execution, verification, archiving, audit, and safety mechanisms around remediation workflows.
+\item Expose the platform through a FastAPI backend and a Next.js dashboard for SOC analysts and administrators.
+\item Validate the implementation through automated tests, compile/build checks, API checks, and runtime verification reports.
+\end{itemize}
+
+\section*{Report Organization}
+\addcontentsline{toc}{section}{Report Organization}
+
+This report is organized to follow the real engineering story of the project, that is, the order in which the solution was actually built from the ground up. \textbf{Chapter~1} presents the general context and project scope: the host organization, the cybersecurity and SOC background, the study and limits of the existing situation, the problem statement, the objectives, the proposed ARIA solution, and the working methodology and planning. \textbf{Chapter~2} describes the cloud environment and the central monitoring foundation: the Huawei Cloud infrastructure, the preparation of the main server, the network and communication design, and the installation, configuration, automation, and stability of each monitoring and security tool (Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, and Redis) until real telemetry is verified inside Elasticsearch. \textbf{Chapter~3} explains the design and internal logic of the ARIA platform: its global, backend, and frontend architecture, its data model, and the reasoning behind each processing stage, from alert ingestion to normalization, deduplication, correlation, AI-assisted analysis, controlled remediation, verification, and asset scoping. \textbf{Chapter~4} presents the functional realization of ARIA, showing how each operational feature of the dashboard works on top of the collected data. \textbf{Chapter~5} covers multi-server onboarding and production deployment: how a new server is automatically prepared to send its data to the central stack, becomes a scoped asset inside ARIA, and how the whole solution is deployed and hardened for production. \textbf{Chapter~6} presents the validation and evaluation of the solution in the same build order: it validates the cloud environment and central monitoring stack first, confirms that real telemetry reaches Elasticsearch, and then validates the ARIA backend, frontend, individual features, multi-server scoping, runtime and remediation workflows, automated tests, and end-to-end scenarios, before listing the remaining limitations. The report ends with a general conclusion and appendices containing technical inventories, configuration extracts, and validation evidence.
+

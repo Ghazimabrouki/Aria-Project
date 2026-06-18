@@ -1,0 +1,708 @@
+.
+├── AGENTS.md
+├── api
+│   ├── app.py
+│   ├── __init__.py
+│   ├── routes
+│   │   ├── accounts.py
+│   │   ├── adaptive.py
+│   │   ├── alerts.py
+│   │   ├── approval_ui.py
+│   │   ├── archives.py
+│   │   ├── aria_alerts.py
+│   │   ├── assets.py
+│   │   ├── assistant.py
+│   │   ├── auth.py
+│   │   ├── dashboard.py
+│   │   ├── incidents.py
+│   │   ├── infrastructure.py
+│   │   ├── __init__.py
+│   │   ├── investigations.py
+│   │   ├── ips.py
+│   │   ├── monitoring.py
+│   │   ├── operator.py
+│   │   ├── _performance
+│   │   │   ├── helpers.py
+│   │   │   └── __init__.py
+│   │   ├── performance.py
+│   │   ├── pipeline.py
+│   │   ├── reports.py
+│   │   ├── runtime.py
+│   │   ├── search.py
+│   │   ├── settings.py
+│   │   ├── _shared.py
+│   │   └── whitelist.py
+│   ├── templates
+│   │   └── dashboard.html
+│   └── websocket.py
+├── CLAUDE.md
+├── config
+│   ├── ansible_inventory
+│   ├── __init__.py
+│   ├── keys
+│   │   ├── ghazi_vm.pub
+│   │   ├── opensoar_ghazi
+│   │   └── opensoar_ghazi.pub
+│   ├── settings.py
+│   ├── sigma_rules
+│   │   ├── noise_falco_container.yml
+│   │   ├── noise_falco_low_severity.yml
+│   │   ├── noise_falco.yml
+│   │   ├── noise_suricata_dns.yml
+│   │   ├── noise_suricata_http.yml
+│   │   ├── noise_suricata_icmp.yml
+│   │   ├── noise_suricata_info.yml
+│   │   ├── noise_suricata_protocol.yml
+│   │   ├── noise_suricata_threat_intel.yml
+│   │   ├── noise_wazuh_auth.yml
+│   │   └── noise_wazuh_system.yml
+│   └── telegraf_procstat.conf
+├── core
+│   ├── asset_scope.py
+│   ├── circuit_breaker.py
+│   ├── elasticsearch.py
+│   ├── geoip.py
+│   ├── __init__.py
+│   ├── redis_performance.py
+│   ├── redis.py
+│   └── whitelist.py
+├── deploy
+│   └── logrotate
+│       └── aria
+├── docs
+│   ├── api
+│   │   ├── COMPLETE_FRONTEND_API_COPY.md
+│   │   ├── COMPLETE_FRONTEND_API.md
+│   │   └── CONSOLIDATED_API.md
+│   ├── architecture
+│   │   ├── ARCHITECTURE.md
+│   │   └── CONSOLIDATED_ARCHITECTURE.md
+│   ├── archive
+│   │   └── project-history
+│   │       ├── ARIA_FRONTEND_BACKEND_IMPROVEMENT_PLAN.md
+│   │       ├── COMPLETE_FRONTEND_API_COPY.md
+│   │       ├── CONSOLIDATED_INDEX.md
+│   │       ├── FINAL_ACCEPTANCE_SUMMARY_17_MAI.md
+│   │       ├── FIX_REPORT_17_MAI.md
+│   │       ├── NEW_VM_ONBOARDING_REPORT.md
+│   │       ├── PRODUCTION_READINESS_REPORT.md
+│   │       ├── REVIEW_REPORT_17_MAI.md
+│   │       ├── ristutition.md
+│   │       ├── session-ses_2a4e.md
+│   │       ├── VERIFICATION_REPORT_17_MAI.md
+│   │       ├── Weekly_Report_April_14-18_2026.md
+│   │       └── Weekly_Report_HUAWEI_PFE_Ghazi_Mabrouki_15 avril 2026.xlsx
+│   ├── features
+│   │   ├── ARIA_FRONTEND_BACKEND_IMPROVEMENT_PLAN.md
+│   │   ├── CONSOLIDATED_FEATURES.md
+│   │   └── MULTI_SERVER_FEATURE_MATRIX.md
+│   ├── PROJECT_STRUCTURE.md
+│   ├── runbooks
+│   │   ├── runtime_qa_watchdog.md
+│   │   └── runtime_remediation_demo.md
+│   ├── technical
+│   │   ├── ai_assistant.md
+│   │   ├── ai_operator.md
+│   │   ├── AUDIT_REPORT_28_AVRIL.md
+│   │   ├── BACKEND_PROCESSES.md
+│   │   ├── COMPLETE_ARCHITECTURAL_REFERENCE.md
+│   │   ├── core_ai_response.md
+│   │   ├── core_alert_pipeline.md
+│   │   ├── core_incidents.md
+│   │   ├── core_watcher.md
+│   │   ├── FRONTEND_DESIGN.md
+│   │   ├── INDEX.md
+│   │   ├── ips_map.md
+│   │   ├── performance_monitoring.md
+│   │   ├── pipelines
+│   │   │   ├── architecture.md
+│   │   │   ├── falco_pipeline.md
+│   │   │   ├── logic.md
+│   │   │   ├── presentation.md
+│   │   │   ├── report.md
+│   │   │   ├── suricata_pipeline.md
+│   │   │   ├── telegraf_pipeline.md
+│   │   │   └── wazuh_pipeline.md
+│   │   └── TECHNICAL_REFERENCE.md
+│   └── validation
+│       ├── ADMIN_SECRET_AND_MULTI_SERVER_VERIFICATION_REPORT.md
+│       ├── API_TEST_RESULTS.md
+│       ├── MULTI_SERVER_ACTIVATION_REPORT.md
+│       ├── MULTI_SERVER_IMPLEMENTATION_REPORT.md
+│       └── QA_VALIDATION_RUNTIME_INVESTIGATIONS.md
+├── frontend
+│   ├── app
+│   │   ├── (dashboard)
+│   │   │   ├── alerts
+│   │   │   │   └── page.tsx
+│   │   │   ├── archives
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── assistant
+│   │   │   │   └── page.tsx
+│   │   │   ├── error.tsx
+│   │   │   ├── incidents
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── infrastructure
+│   │   │   │   ├── investigations
+│   │   │   │   │   ├── [id]
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── layout.tsx
+│   │   │   ├── investigations
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── ips
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── loading.tsx
+│   │   │   ├── metrics
+│   │   │   │   └── page.tsx
+│   │   │   ├── monitoring
+│   │   │   │   └── page.tsx
+│   │   │   ├── operator
+│   │   │   │   └── page.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── pipeline
+│   │   │   │   └── page.tsx
+│   │   │   ├── runtime
+│   │   │   │   └── investigations
+│   │   │   │       ├── [id]
+│   │   │   │       │   └── page.tsx
+│   │   │   │       └── page.tsx
+│   │   │   ├── search
+│   │   │   │   └── page.tsx
+│   │   │   ├── settings
+│   │   │   │   ├── accounts
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── ai
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── ansible
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── assets
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── admin-secret-modal.tsx
+│   │   │   │   │   ├── preview-modal.tsx
+│   │   │   │   │   └── use-settings.ts
+│   │   │   │   ├── data-sources
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── monitoring
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── pipeline
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── redis
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── security
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── workflow
+│   │   │   │       └── page.tsx
+│   │   │   └── whitelist
+│   │   │       └── page.tsx
+│   │   ├── globals.css
+│   │   ├── icon.png
+│   │   ├── layout.tsx
+│   │   └── login
+│   │       └── page.tsx
+│   ├── components
+│   │   ├── admin-secret-dialog.tsx
+│   │   ├── alert-ioc-panel.tsx
+│   │   ├── alerts
+│   │   │   ├── alert-ioc-panel.tsx
+│   │   │   └── rich-alert-evidence.tsx
+│   │   ├── animated-counter.tsx
+│   │   ├── app-sidebar.tsx
+│   │   ├── aria-loading.tsx
+│   │   ├── aria-logo.tsx
+│   │   ├── assets
+│   │   │   └── selected-asset-banner.tsx
+│   │   ├── attack-narrative-card.tsx
+│   │   ├── auth-guard.tsx
+│   │   ├── back-button.tsx
+│   │   ├── common
+│   │   │   ├── animated-counter.tsx
+│   │   │   ├── aria-loading.tsx
+│   │   │   ├── aria-logo.tsx
+│   │   │   ├── auth-guard.tsx
+│   │   │   ├── back-button.tsx
+│   │   │   ├── badges
+│   │   │   │   ├── fix-status-badge.tsx
+│   │   │   │   ├── severity-badge.tsx
+│   │   │   │   ├── status-badge.tsx
+│   │   │   │   └── whitelist-badge.tsx
+│   │   │   ├── data-table.tsx
+│   │   │   ├── empty-state.tsx
+│   │   │   ├── error-boundary.tsx
+│   │   │   ├── error-state.tsx
+│   │   │   ├── ip-whitelist-indicator.tsx
+│   │   │   ├── live-indicator.tsx
+│   │   │   ├── page-header.tsx
+│   │   │   ├── page-skeletons.tsx
+│   │   │   ├── page-transition.tsx
+│   │   │   ├── playbook-viewer.tsx
+│   │   │   ├── section-header.tsx
+│   │   │   ├── theme-provider.tsx
+│   │   │   ├── time-filter.tsx
+│   │   │   └── yaml-viewer.tsx
+│   │   ├── dashboard
+│   │   │   ├── activity-feed.tsx
+│   │   │   ├── alerts-chart.tsx
+│   │   │   ├── aria-health-widget.tsx
+│   │   │   ├── geo-threats.tsx
+│   │   │   ├── mitre-coverage.tsx
+│   │   │   ├── quick-actions.tsx
+│   │   │   ├── response-metrics.tsx
+│   │   │   ├── severity-chart.tsx
+│   │   │   ├── source-breakdown.tsx
+│   │   │   └── stat-card.tsx
+│   │   ├── data-table.tsx
+│   │   ├── empty-state.tsx
+│   │   ├── error-boundary.tsx
+│   │   ├── error-state.tsx
+│   │   ├── fix-status-badge.tsx
+│   │   ├── global-admin-secret-dialog.tsx
+│   │   ├── global-command-menu.tsx
+│   │   ├── infrastructure
+│   │   │   ├── action-cards.tsx
+│   │   │   ├── activity-timeline.tsx
+│   │   │   ├── approval-dialogs.tsx
+│   │   │   ├── diagnostic-findings.tsx
+│   │   │   ├── diagnostic-output.tsx
+│   │   │   ├── playbook-viewer.tsx
+│   │   │   ├── process-table.tsx
+│   │   │   ├── resource-gauge.tsx
+│   │   │   └── stats-overview.tsx
+│   │   ├── investigations
+│   │   │   ├── attack-narrative-card.tsx
+│   │   │   └── risk-assessment-card.tsx
+│   │   ├── ip-whitelist-indicator.tsx
+│   │   ├── layout
+│   │   │   ├── app-sidebar.tsx
+│   │   │   ├── global-admin-secret-dialog.tsx
+│   │   │   └── global-command-menu.tsx
+│   │   ├── live-indicator.tsx
+│   │   ├── operator
+│   │   │   └── asset-readiness-banner.tsx
+│   │   ├── page-header.tsx
+│   │   ├── page-skeletons.tsx
+│   │   ├── page-transition.tsx
+│   │   ├── playbook-viewer.tsx
+│   │   ├── rich-alert-evidence.tsx
+│   │   ├── risk-assessment-card.tsx
+│   │   ├── runtime
+│   │   │   ├── admin-override-panel.tsx
+│   │   │   ├── manual-remediation-approve-modal.tsx
+│   │   │   └── manual-remediation-editor.tsx
+│   │   ├── section-header.tsx
+│   │   ├── security
+│   │   │   ├── admin-secret-dialog.tsx
+│   │   │   └── global-admin-secret-dialog.tsx
+│   │   ├── selected-asset-banner.tsx
+│   │   ├── settings
+│   │   │   └── settings-forms.tsx
+│   │   ├── settings-forms.tsx
+│   │   ├── severity-badge.tsx
+│   │   ├── status-badge.tsx
+│   │   ├── theme-provider.tsx
+│   │   ├── time-filter.tsx
+│   │   ├── ui
+│   │   │   ├── accordion.tsx
+│   │   │   ├── ai-chat-input.tsx
+│   │   │   ├── alert-dialog.tsx
+│   │   │   ├── alert.tsx
+│   │   │   ├── animated-text-cycle.tsx
+│   │   │   ├── aspect-ratio.tsx
+│   │   │   ├── avatar.tsx
+│   │   │   ├── badge.tsx
+│   │   │   ├── breadcrumb.tsx
+│   │   │   ├── button-group.tsx
+│   │   │   ├── button.tsx
+│   │   │   ├── calendar.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── carousel.tsx
+│   │   │   ├── chart.tsx
+│   │   │   ├── checkbox.tsx
+│   │   │   ├── collapsible.tsx
+│   │   │   ├── command.tsx
+│   │   │   ├── context-menu.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── drawer.tsx
+│   │   │   ├── dropdown-menu.tsx
+│   │   │   ├── empty.tsx
+│   │   │   ├── field.tsx
+│   │   │   ├── form.tsx
+│   │   │   ├── hover-card.tsx
+│   │   │   ├── input-group.tsx
+│   │   │   ├── input-otp.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── item.tsx
+│   │   │   ├── kbd.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── mapcn-map-arc.tsx
+│   │   │   ├── menubar.tsx
+│   │   │   ├── navigation-menu.tsx
+│   │   │   ├── pagination.tsx
+│   │   │   ├── popover.tsx
+│   │   │   ├── progress.tsx
+│   │   │   ├── radio-group.tsx
+│   │   │   ├── resizable.tsx
+│   │   │   ├── scroll-area.tsx
+│   │   │   ├── select.tsx
+│   │   │   ├── separator.tsx
+│   │   │   ├── shader-background.tsx
+│   │   │   ├── sheet.tsx
+│   │   │   ├── sidebar.tsx
+│   │   │   ├── skeleton.tsx
+│   │   │   ├── slider.tsx
+│   │   │   ├── sonner.tsx
+│   │   │   ├── spinner.tsx
+│   │   │   ├── switch.tsx
+│   │   │   ├── table.tsx
+│   │   │   ├── tabs.tsx
+│   │   │   ├── textarea.tsx
+│   │   │   ├── toaster.tsx
+│   │   │   ├── toast.tsx
+│   │   │   ├── toggle-group.tsx
+│   │   │   ├── toggle.tsx
+│   │   │   ├── tooltip.tsx
+│   │   │   ├── use-mobile.tsx
+│   │   │   └── use-toast.ts
+│   │   ├── whitelist-badge.tsx
+│   │   └── yaml-viewer.tsx
+│   ├── components.json
+│   ├── constants
+│   ├── e2e
+│   │   └── runtime-investigations.spec.ts
+│   ├── eslint.config.mjs
+│   ├── features
+│   │   ├── alerts
+│   │   ├── assets
+│   │   ├── assistant
+│   │   ├── incidents
+│   │   ├── infrastructure
+│   │   ├── investigations
+│   │   ├── metrics
+│   │   ├── operator
+│   │   ├── runtime
+│   │   └── settings
+│   ├── hooks
+│   │   ├── use-mobile.ts
+│   │   ├── use-runtime-investigation.ts
+│   │   └── use-toast.ts
+│   ├── lib
+│   │   ├── admin-secret.ts
+│   │   ├── api.ts
+│   │   ├── asset-context.tsx
+│   │   ├── auth
+│   │   ├── auth-context.tsx
+│   │   ├── time.ts
+│   │   ├── ui-status.ts
+│   │   ├── utils
+│   │   ├── utils.ts
+│   │   ├── websocket
+│   │   └── websocket.tsx
+│   ├── next.config.mjs
+│   ├── next-env.d.ts
+│   ├── package.json
+│   ├── playwright.config.ts
+│   ├── pnpm-lock.yaml
+│   ├── postcss.config.mjs
+│   ├── public
+│   │   ├── apple-icon.png
+│   │   ├── aria-logo-icon.png
+│   │   ├── aria-logo.png
+│   │   ├── icon-dark-32x32.png
+│   │   ├── icon-light-32x32.png
+│   │   ├── icon.svg
+│   │   ├── placeholder.jpg
+│   │   ├── placeholder-logo.png
+│   │   ├── placeholder-logo.svg
+│   │   ├── placeholder.svg
+│   │   └── placeholder-user.jpg
+│   ├── README.md
+│   ├── styles
+│   │   └── globals.css
+│   ├── test_conditional.tsx
+│   ├── test_fragment.tsx
+│   ├── test-pages.mjs
+│   ├── test-results
+│   │   ├── runtime-investigations-Run-cd2ee-se-without-reading-raw-YAML-chromium
+│   │   │   ├── error-context.md
+│   │   │   ├── test-failed-1.png
+│   │   │   └── video.webm
+│   │   └── runtime-investigations-Run-f200b-are-present-but-collapsible-chromium
+│   │       ├── error-context.md
+│   │       ├── test-failed-1.png
+│   │       └── video.webm
+│   ├── test_swr_rt.tsx
+│   ├── tsconfig.json
+│   ├── tsconfig.tsbuildinfo
+│   └── types
+│       └── react-simple-maps.d.ts
+├── main.py
+├── opensoar-backend.service
+├── pipeline
+│   ├── alerts
+│   │   └── performance_alert.py
+│   ├── correlators
+│   ├── datausage
+│   │   ├── action_executor.py
+│   │   ├── ai_pipeline.py
+│   │   ├── alert_manager.py
+│   │   ├── apikey_manager.py
+│   │   ├── auth_manager.py
+│   │   ├── dashboard_monitor.py
+│   │   ├── health_monitor.py
+│   │   ├── incident_manager.py
+│   │   ├── __init__.py
+│   │   ├── integration_manager.py
+│   │   ├── local_incident_manager.py
+│   │   ├── observable_manager.py
+│   │   ├── orchestrator.py
+│   │   ├── performance_orchestrator.py
+│   │   ├── performance_watcher.py
+│   │   ├── playbook_runner.py
+│   │   ├── runtime_orchestrator.py
+│   │   └── ticketing
+│   │       ├── __init__.py
+│   │       ├── lifecycle.py
+│   │       ├── models.py
+│   │       ├── routing_rules.py
+│   │       └── store.py
+│   ├── enrichment
+│   │   ├── anomaly_detector.py
+│   │   ├── geoip.py
+│   │   ├── __init__.py
+│   │   ├── mitre.py
+│   │   ├── root_cause.py
+│   │   └── sigma.py
+│   ├── __init__.py
+│   ├── mappers
+│   │   ├── falco.py
+│   │   ├── falco_runtime.py
+│   │   ├── filebeat.py
+│   │   ├── generic.py
+│   │   ├── __init__.py
+│   │   ├── ip_extractor.py
+│   │   ├── severity.py
+│   │   ├── suricata.py
+│   │   └── wazuh.py
+│   ├── notifications
+│   │   └── performance_notification.py
+│   ├── performance_poller.py
+│   ├── poller
+│   │   ├── alert_processor.py
+│   │   ├── cursor_manager.py
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── pattern_tracker.py
+│   │   └── seen_ids.py
+│   ├── response
+│   │   ├── dynamic_playbook.py
+│   │   ├── performance_auto_approve.py
+│   │   └── performance_playbook.py
+│   ├── retry_queue.py
+│   ├── sender.py
+│   ├── services
+│   │   ├── correlator.py
+│   │   ├── dedup.py
+│   │   ├── __init__.py
+│   │   └── noise_learner.py
+│   └── ticketing
+├── PLAN.md
+├── pytest.ini
+├── reports
+│   ├── archive
+│   │   └── validation-history
+│   ├── playwright-results.json
+│   ├── runtime_qa_watchdog_latest.json
+│   └── runtime_qa_watchdog_latest.md
+├── response
+│   ├── adaptive.py
+│   ├── ai_engine
+│   │   ├── __init__.py
+│   │   ├── llm_clients.py
+│   │   ├── main.py
+│   │   ├── playbook_splitter.py
+│   │   ├── prompt_builder.py
+│   │   └── response_parser.py
+│   ├── ansible_exec.py
+│   ├── archiver.py
+│   ├── aria_alerts.py
+│   ├── assistant.py
+│   ├── audit_events.py
+│   ├── auth.py
+│   ├── auto_approve.py
+│   ├── confidence_tracker.py
+│   ├── db.py
+│   ├── decision_logger.py
+│   ├── fix_verifier.py
+│   ├── infrastructure_ai_engine
+│   │   ├── context_builder.py
+│   │   ├── diagnostic_interpreter.py
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── playbook_generator.py
+│   │   ├── prompt_builder.py
+│   │   └── response_parser.py
+│   ├── __init__.py
+│   ├── models.py
+│   ├── notification.py
+│   ├── playbook_safety.py
+│   ├── remediation_planner.py
+│   ├── runtime_ai_engine
+│   │   ├── context_builder.py
+│   │   ├── diagnostic_interpreter.py
+│   │   ├── __init__.py
+│   │   ├── playbook_generator.py
+│   │   ├── remediation_planner.py
+│   │   └── remediation_playbook_generator.py
+│   ├── safety_policy.py
+│   ├── scripts
+│   │   ├── aria_health_check.py
+│   │   ├── aria_remote_preflight.py
+│   │   └── audit_legacy_investigations.py
+│   ├── search_fts.py
+│   ├── watcher
+│   │   ├── ai_runner.py
+│   │   ├── context_builder.py
+│   │   ├── __init__.py
+│   │   ├── investigation_db.py
+│   │   ├── main.py
+│   │   └── stuck_recovery.py
+│   ├── worker_heartbeat.py
+│   └── workflow_summary.py
+├── run_api.sh
+├── run_backend.sh
+├── run_daemon.py
+├── run_e2e_tests.sh
+├── scripts
+│   ├── backfill
+│   │   ├── backfill_falco_runtime.py
+│   │   ├── backfill_runtime_diagnostics.py
+│   │   └── backfill_suricata.py
+│   ├── demo
+│   │   ├── demo_safe_remediation.py
+│   │   ├── seed_accounts.py
+│   │   └── seed_runtime_remediation_demo.py
+│   ├── maintenance
+│   │   ├── backup_db.sh
+│   │   ├── cleanup_falco_from_generic.py
+│   │   ├── generate_tree.sh
+│   │   └── restore_db.sh
+│   ├── migration
+│   │   └── migrate_operator_metadata.py
+│   ├── validation
+│   │   ├── cron-runtime-qa-watchdog
+│   │   ├── runtime_qa_watchdog.py
+│   │   ├── test_live_apis.py
+│   │   ├── test_operator_scenarios.py
+│   │   ├── validate_runtime_feature.sh
+│   │   └── verify_whitelist.py
+│   └── vm-onboarding
+│       ├── bootstrap_monitored_vm.sh
+│       └── monitored-vms
+│           └── test
+│               ├── logs
+│               └── tmp-root
+│                   ├── etc
+│                   │   ├── apt
+│                   │   │   ├── keyrings
+│                   │   │   └── sources.list.d
+│                   │   ├── default
+│                   │   └── systemd
+│                   │       └── system
+│                   ├── tmp
+│                   ├── usr
+│                   │   ├── local
+│                   │   │   └── bin
+│                   │   └── share
+│                   │       └── keyrings
+│                   └── var
+│                       └── log
+├── start.sh
+├── supervisor.sh
+├── tests
+│   ├── conftest.py
+│   ├── e2e
+│   │   ├── conftest.py
+│   │   ├── __init__.py
+│   │   ├── test_01_connectivity.py
+│   │   ├── test_02_elasticsearch.py
+│   │   ├── test_03_opensoar_api.py
+│   │   ├── test_04_pipeline_cycle.py
+│   │   ├── test_05_response_layer.py
+│   │   ├── test_06_ai_assistant.py
+│   │   ├── test_07_full_flow.py
+│   │   ├── test_08_performance_monitoring.py
+│   │   ├── test_09_search.py
+│   │   └── test_10_manual_workflow.py
+│   ├── __init__.py
+│   ├── test_action_invariants.py
+│   ├── test_admin_override.py
+│   ├── test_ai_accuracy_invariants.py
+│   ├── test_ai_engine.py
+│   ├── test_analyst_control.py
+│   ├── test_ansible_secret_handling.py
+│   ├── test_api_filters.py
+│   ├── test_aria_alerts.py
+│   ├── test_assistant.py
+│   ├── test_audit_persistence.py
+│   ├── test_auto_approve_manual_review.py
+│   ├── test_client.py
+│   ├── test_context_builder.py
+│   ├── test_controlled_remediation.py
+│   ├── test_dashboard_phase3.py
+│   ├── test_dashboard_priority3.py
+│   ├── test_dashboard_whitelist.py
+│   ├── test_datausage.py
+│   ├── test_deterministic_remediation.py
+│   ├── test_execution_reliability.py
+│   ├── test_falco_separation.py
+│   ├── test_fix_verification_queue.py
+│   ├── test_forwarder.py
+│   ├── test_infrastructure_api.py
+│   ├── test_infrastructure_integration.py
+│   ├── test_internal_trusted_admin_secret.py
+│   ├── test_ip_extractor.py
+│   ├── test_manual_workflow.py
+│   ├── test_mappers.py
+│   ├── test_metrics_api.py
+│   ├── test_operational_readiness.py
+│   ├── test_operator_advanced.py
+│   ├── test_operator_edge_cases.py
+│   ├── test_operator_integration.py
+│   ├── test_operator.py
+│   ├── test_operator_scenarios.py
+│   ├── test_pipeline_settings.py
+│   ├── test_playbook_safety.py
+│   ├── test_playbook_splitter.py
+│   ├── test_runtime_admin_override.py
+│   ├── test_safe_tar_extract.py
+│   ├── test_safety_invariants.py
+│   ├── test_safety_policy_crud.py
+│   ├── test_safety_tiers.py
+│   ├── test_scenario_matrix.py
+│   ├── test_search.py
+│   ├── test_settings_api.py
+│   ├── test_severity.py
+│   ├── test_soc_workflow_contract.py
+│   ├── test_staged_remediation.py
+│   ├── test_truth_report_evidence.py
+│   ├── test_verifier_recurrence.py
+│   ├── test_watcher.py
+│   ├── test_whitelist_integration.py
+│   └── test_workflow_evidence_stage.py
+├── Tool of set up new vm
+│   └── monitored-Vms.sh
+├── tree.txt
+└── var
+    └── log
+
+148 directories, 558 files

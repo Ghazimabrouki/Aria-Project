@@ -1,0 +1,40 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 5 - Incident Correlation"]
+  A1["Alert 1<br/>Wazuh SSH brute-force"]
+  A2["Alert 2<br/>Suricata port scan"]
+  A3["Alert 3<br/>Falco runtime event"]
+  OBS["Observable Extraction<br/>IP, host, container, MITRE"]
+  CORR["Correlation Engine<br/>time window + IOC + MITRE overlap"]
+  INC["Incident<br/>single security case"]
+  LINK["AlertIncidentLink<br/>correlation confidence"]
+  TITLE --> A1
+  TITLE --> A2
+  TITLE --> A3
+  A1 --> OBS
+  A2 --> OBS
+  A3 --> OBS
+  OBS --> CORR --> INC --> LINK
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef alert fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef corr fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef incident fill:#ECFDF5,stroke:#16A34A,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class A1,A2,A3 alert;
+  class OBS,CORR corr;
+  class INC,LINK incident;

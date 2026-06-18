@@ -1,0 +1,79 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart TB
+  subgraph TOP["Deployment Context"]
+    direction LR
+    subgraph EXT["External Access & Inputs"]
+      direction TB
+      AGT["Wazuh Agents<br/>/ Endpoints"]
+      USER["SOC Analyst"]
+    end
+    subgraph REF["Technical Reference"]
+      direction LR
+      subgraph CONFIG["Main Configuration Files"]
+        direction TB
+        C1["Elasticsearch<br/>/etc/elasticsearch/*"]
+        C2["Kibana<br/>/etc/kibana/kibana.yml"]
+        C3["Filebeat<br/>/etc/filebeat/filebeat.yml<br/>/etc/filebeat/modules.d/*"]
+        C4["Suricata<br/>/etc/suricata/suricata.yaml"]
+        C5["Wazuh<br/>/var/ossec/*"]
+        C6["Falco / Falcosidekick<br/>docker-compose.yml / .env"]
+        C7["Telegraf<br/>/etc/telegraf/telegraf.conf"]
+      end
+      subgraph REQ["Hardware Requirements"]
+        direction TB
+        R1["Minimum Lab Setup<br/>CPU: 4 cores<br/>RAM: 8 GB<br/>Disk: 50 GB"]
+        R2["Recommended Setup<br/>CPU: 8 cores<br/>RAM: 16 GB<br/>Disk: 100 GB"]
+        R3["OS Requirement<br/>Ubuntu 20.04+<br/>Internet connectivity required"]
+      end
+    end
+  end
+  subgraph HOST["Single Ubuntu Host"]
+    direction LR
+    subgraph SYSTEMD["Native / System Services"]
+      direction TB
+      ES["Elasticsearch<br/>9200 HTTPS"]
+      KB["Kibana<br/>5601 HTTPS"]
+      FB["Filebeat<br/>Log Shipper"]
+      SUR["Suricata<br/>Network IDS"]
+      WAZ["Wazuh Manager<br/>1514 Events<br/>1515 Registration"]
+      TEG["Telegraf<br/>Metrics Agent"]
+    end
+    subgraph DOCKER["Docker Services"]
+      direction TB
+      FAL["Falco<br/>Runtime Detection"]
+      FSK["Falcosidekick<br/>2801 HTTP"]
+    end
+  end
+  TOP -->|"deployed and operated on"| HOST
+  AGT -->|"1514 / 1515 TCP"| WAZ
+  USER -->|"HTTPS 5601"| KB
+  SUR -->|"eve.json"| FB
+  WAZ -->|"alerts"| FB
+  FB -->|"logs"| ES
+  FAL -->|"runtime alerts"| FSK
+  FSK -->|"falco-events"| ES
+  TEG -->|"metrics"| ES
+  ES -->|"dashboards data"| KB
+  style TOP fill:#FFFFFF,stroke:#94A3B8,stroke-width:1.5px,color:#0F172A
+  style EXT fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A
+  style REF fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A
+  style CONFIG fill:#FFFFFF,stroke:#EA580C,stroke-width:1px,color:#0F172A
+  style REQ fill:#FFFFFF,stroke:#EA580C,stroke-width:1px,color:#0F172A
+  style HOST fill:#EFF6FF,stroke:#1D4ED8,stroke-width:2px,color:#0F172A
+  style SYSTEMD fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A
+  style DOCKER fill:#F0FDFA,stroke:#0891B2,stroke-width:1.5px,color:#0F172A

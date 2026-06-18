@@ -1,0 +1,18 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":48,"curve":"basis"}}}%%
+flowchart TB
+  A([Investigation awaiting_approval]) --> Q{AI quality<br/>acceptable?}
+  Q -->|no| MR[manual_review_required] --> RG{Regenerate?}
+  RG -->|yes| GEN[regeneration_requested] --> A
+  RG -->|no| NOACT([reviewed_no_action])
+  Q -->|yes| T{Safety tier?}
+  T -->|safe / low| PA[Present for approval]
+  T -->|risky / high| BLK{Admin override<br/>with secret?}
+  BLK -->|no| HOLD([Blocked - declined])
+  BLK -->|yes| PA
+  PA --> DEC{Analyst decision}
+  DEC -->|decline| DCL([declined -> archived])
+  DEC -->|approve| RUN[approved -> running]
+  classDef dec fill:#FEF3C7,stroke:#D97706,color:#0F172A;
+  classDef act fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  class Q,RG,T,BLK,DEC dec;
+  class MR,GEN,PA,RUN act;

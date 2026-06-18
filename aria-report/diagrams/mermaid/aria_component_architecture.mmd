@@ -1,0 +1,51 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":55,"curve":"basis"}}}%%
+flowchart TB
+  subgraph CLIENT["Presentation Tier"]
+    UI["Next.js Dashboard<br/>SOC analyst UI"]
+  end
+  subgraph BACKEND["FastAPI Backend (port 8001)"]
+    direction TB
+    ROUTERS["API Routers<br/>/api/v1/* (alerts, incidents,<br/>investigations, assets, operator, ...)"]
+    INGEST["Ingestion Services<br/>poller, mappers, enrichment"]
+    AISVC["AI Services<br/>watcher, ai_engine,<br/>infrastructure_ai_engine"]
+    REMED["Remediation Services<br/>remediation_planner, safety_policy,<br/>ansible_exec, fix_verifier"]
+    ASSETSVC["Asset Services<br/>asset_scope, monitored assets"]
+  end
+  subgraph DATA["Data + Integration Tier"]
+    ES["Elasticsearch<br/>:9200"]
+    REDIS["Redis<br/>cursors / cache"]
+    SQLITE["SQLite<br/>data/investigations.db"]
+    ANSIBLE["Ansible Executor<br/>SSH :22"]
+  end
+  subgraph EXT["Monitored Estate"]
+    TOOLS["Monitoring Tools<br/>Wazuh / Suricata / Falco /<br/>Filebeat / Telegraf"]
+    SERVERS["Monitored Servers"]
+    LLM["AI Provider / LLM"]
+  end
+
+  UI -->|HTTPS REST + WS| ROUTERS
+  ROUTERS --> INGEST
+  ROUTERS --> AISVC
+  ROUTERS --> REMED
+  ROUTERS --> ASSETSVC
+  INGEST -->|poll alerts| ES
+  INGEST -->|cursors| REDIS
+  INGEST -->|persist| SQLITE
+  AISVC -->|prompt| LLM
+  AISVC --> SQLITE
+  REMED -->|run playbook| ANSIBLE
+  REMED -->|verify| ES
+  REMED --> SQLITE
+  ASSETSVC --> SQLITE
+  ANSIBLE -->|SSH| SERVERS
+  TOOLS -->|telemetry| ES
+  SERVERS -.->|run agents| TOOLS
+
+  classDef pres fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef be fill:#ECFDF5,stroke:#16A34A,color:#0F172A;
+  classDef da fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef ex fill:#F5F3FF,stroke:#7C3AED,color:#0F172A;
+  class UI pres;
+  class ROUTERS,INGEST,AISVC,REMED,ASSETSVC be;
+  class ES,REDIS,SQLITE,ANSIBLE da;
+  class TOOLS,SERVERS,LLM ex;

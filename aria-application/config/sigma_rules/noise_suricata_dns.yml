@@ -1,0 +1,18 @@
+title: Suricata DNS Reconnaissance Noise
+description: Filter out DNS reconnaissance attempts that are low-value
+status: experimental
+logsource:
+  product: suricata
+detection:
+  selection:
+    - signature|contains:
+        - 'dns named version'
+        - 'dns zone transfer'
+        - 'dns query for'
+        - 'dns response for'
+        - 'dns query with high entropy'
+        - 'dns response with high entropy'
+        - 'dns tunnel'
+    - category|contains:
+        - 'Generic Protocol Command Decode'
+  condition: selection

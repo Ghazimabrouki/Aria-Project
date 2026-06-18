@@ -1,0 +1,57 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart TB
+  TITLE["Phase 2 - Huawei Cloud Infrastructure<br/><span style='font-size:14px;color:#2563EB'>Cloud foundation for hosting the SOC platform</span>"]
+  TITLE --> CLOUD
+  subgraph CLOUD["Huawei Cloud Environment"]
+    direction LR
+    subgraph NETWORK["Network & Access Layer"]
+      direction TB
+      VPC["VPC / Private Network<br/>Isolated cloud network"]
+      SUBNET["Private Subnet<br/>Internal communication zone"]
+      SG["Security Group<br/>Controlled firewall rules"]
+      EIP["Elastic IP<br/>193.95.30.97"]
+    end
+    subgraph COMPUTE["Compute & Storage Layer"]
+      direction TB
+      VM["ECS Virtual Machine<br/><b>Ubuntu Server</b>"]
+      RES["Allocated Resources<br/>64 vCPU · 128 GB RAM · 100 GB Storage"]
+    end
+  end
+  subgraph PLATFORM["Hosted Platform"]
+    direction TB
+    STACK["SOC Monitoring Stack<br/>Elasticsearch · Kibana · Wazuh · Suricata<br/>Falco · Telegraf · Filebeat"]
+  end
+  SUBNET --> VM
+  SG -->|"filters access"| VM
+  EIP -->|"public access point"| VM
+  VM --> RES
+  RES --> STACK
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef cloud fill:#FFFFFF,stroke:#2563EB,stroke-width:2px,color:#0F172A;
+  classDef network fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef compute fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A;
+  classDef platform fill:#F5F3FF,stroke:#7C3AED,stroke-width:1.5px,color:#0F172A;
+  class TITLE title;
+  class CLOUD cloud;
+  class NETWORK,VPC,SUBNET,SG,EIP network;
+  class COMPUTE,VM,RES compute;
+  class PLATFORM,STACK platform;
+  style CLOUD fill:#FFFFFF,stroke:#2563EB,stroke-width:2px,color:#0F172A
+  style NETWORK fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A
+  style COMPUTE fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A
+  style PLATFORM fill:#F5F3FF,stroke:#7C3AED,stroke-width:1.5px,color:#0F172A

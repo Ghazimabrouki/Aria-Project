@@ -1,0 +1,822 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Light theme - Clean, professional security dashboard */
+  --background: oklch(0.98 0.005 260);
+  --foreground: oklch(0.12 0.01 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.01 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.01 260);
+  --primary: oklch(0.55 0.22 260);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.005 260);
+  --secondary-foreground: oklch(0.2 0.01 260);
+  --muted: oklch(0.94 0.005 260);
+  --muted-foreground: oklch(0.45 0.01 260);
+  --accent: oklch(0.55 0.22 260);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.55 0.25 25);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.6 0.2 145);
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.75 0.18 75);
+  --warning-foreground: oklch(0.15 0.01 75);
+  --border: oklch(0.9 0.005 260);
+  --input: oklch(0.9 0.005 260);
+  --ring: oklch(0.55 0.22 260);
+  --chart-1: oklch(0.55 0.22 260);
+  --chart-2: oklch(0.6 0.2 145);
+  --chart-3: oklch(0.75 0.18 75);
+  --chart-4: oklch(0.55 0.25 25);
+  --chart-5: oklch(0.6 0.18 300);
+  --severity-critical: oklch(0.55 0.25 25);
+  --severity-high: oklch(0.7 0.2 55);
+  --severity-medium: oklch(0.75 0.18 75);
+  --severity-low: oklch(0.55 0.22 260);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.98 0.005 260);
+  --sidebar-foreground: oklch(0.12 0.01 260);
+  --sidebar-primary: oklch(0.55 0.22 260);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.94 0.015 260);
+  --sidebar-accent-foreground: oklch(0.12 0.01 260);
+  --sidebar-border: oklch(0.9 0.005 260);
+  --sidebar-ring: oklch(0.55 0.22 260);
+}
+
+.dark {
+  /* Dark theme - High-tech SOC command center with cyan/blue accent */
+  --background: oklch(0.1 0.015 260);
+  --foreground: oklch(0.95 0.005 260);
+  --card: oklch(0.165 0.016 260);
+  --card-foreground: oklch(0.95 0.005 260);
+  --popover: oklch(0.165 0.016 260);
+  --popover-foreground: oklch(0.95 0.005 260);
+  --primary: oklch(0.72 0.2 200);
+  --primary-foreground: oklch(0.1 0.015 260);
+  --secondary: oklch(0.2 0.015 260);
+  --secondary-foreground: oklch(0.95 0.005 260);
+  --muted: oklch(0.2 0.015 260);
+  --muted-foreground: oklch(0.6 0.01 260);
+  --accent: oklch(0.72 0.2 200);
+  --accent-foreground: oklch(0.1 0.015 260);
+  --destructive: oklch(0.6 0.25 25);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.65 0.22 145);
+  --success-foreground: oklch(0.1 0.015 260);
+  --warning: oklch(0.8 0.18 75);
+  --warning-foreground: oklch(0.1 0.015 260);
+  --border: oklch(0.27 0.016 260);
+  --input: oklch(0.22 0.015 260);
+  --ring: oklch(0.72 0.2 200);
+  --chart-1: oklch(0.72 0.2 200);
+  --chart-2: oklch(0.65 0.22 145);
+  --chart-3: oklch(0.8 0.18 75);
+  --chart-4: oklch(0.6 0.25 25);
+  --chart-5: oklch(0.65 0.2 300);
+  --severity-critical: oklch(0.6 0.25 25);
+  --severity-high: oklch(0.75 0.2 55);
+  --severity-medium: oklch(0.8 0.18 75);
+  --severity-low: oklch(0.65 0.22 260);
+  --sidebar: oklch(0.08 0.015 260);
+  --sidebar-foreground: oklch(0.95 0.005 260);
+  --sidebar-primary: oklch(0.72 0.2 200);
+  --sidebar-primary-foreground: oklch(0.1 0.015 260);
+  --sidebar-accent: oklch(0.16 0.02 200);
+  --sidebar-accent-foreground: oklch(0.95 0.005 260);
+  --sidebar-border: oklch(0.2 0.015 260);
+  --sidebar-ring: oklch(0.72 0.2 200);
+}
+
+@theme inline {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-severity-critical: var(--severity-critical);
+  --color-severity-high: var(--severity-high);
+  --color-severity-medium: var(--severity-medium);
+  --color-severity-low: var(--severity-low);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: oklch(0.72 0.2 200 / 0.25);
+  }
+  .dark ::selection {
+    background: oklch(0.72 0.2 200 / 0.35);
+  }
+  input, textarea {
+    caret-color: var(--primary);
+  }
+}
+
+/* Accessibility — respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Smooth page-content enter transition (keyed per route) */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.5 0.01 260 / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0.01 260 / 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.4 0.01 260 / 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0.01 260 / 0.7);
+}
+
+/* Animation keyframes */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animation utility classes */
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.7 0.2 200 / 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-scan-line {
+  animation: scan-line 2s linear infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+.animate-count-up {
+  animation: count-up 0.5s ease-out forwards;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  opacity: 0;
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Glow effects */
+.glow-critical {
+  box-shadow: 0 0 25px oklch(0.6 0.25 25 / 0.4),
+              0 0 50px oklch(0.6 0.25 25 / 0.2);
+}
+
+.glow-warning {
+  box-shadow: 0 0 25px oklch(0.8 0.18 75 / 0.4),
+              0 0 50px oklch(0.8 0.18 75 / 0.2);
+}
+
+.glow-success {
+  box-shadow: 0 0 25px oklch(0.65 0.22 145 / 0.4),
+              0 0 50px oklch(0.65 0.22 145 / 0.2);
+}
+
+.glow-primary {
+  box-shadow: 0 0 25px oklch(0.72 0.2 200 / 0.4),
+              0 0 50px oklch(0.72 0.2 200 / 0.2);
+}
+
+/* Gradient border effect */
+.gradient-border {
+  position: relative;
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: calc(var(--radius) + 1px);
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    oklch(0.72 0.2 200 / 0.5),
+    oklch(0.65 0.22 145 / 0.5),
+    oklch(0.72 0.2 200 / 0.5)
+  );
+  background-size: 200% 200%;
+  animation: border-flow 3s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: oklch(1 0 0 / 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid oklch(1 0 0 / 0.1);
+}
+
+.dark .glass {
+  background: oklch(0.2 0.015 260 / 0.5);
+  border-color: oklch(1 0 0 / 0.05);
+}
+
+/* Code/YAML syntax highlighting */
+.yaml-viewer {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.yaml-viewer .yaml-key {
+  color: oklch(0.72 0.2 200);
+}
+
+.yaml-viewer .yaml-value {
+  color: oklch(0.65 0.22 145);
+}
+
+.yaml-viewer .yaml-string {
+  color: oklch(0.8 0.18 75);
+}
+
+.yaml-viewer .yaml-comment {
+  color: oklch(0.5 0.01 260);
+  font-style: italic;
+}
+
+.yaml-viewer .yaml-number {
+  color: oklch(0.7 0.2 300);
+}
+
+/* Live indicator */
+.live-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(0.65 0.22 145);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.live-indicator::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(0.65 0.22 145);
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hover card effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px oklch(0 0 0 / 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 10px 40px oklch(0 0 0 / 0.3);
+}
+
+/* Ambient background glow for dark mode */
+.dark .ambient-glow {
+  position: relative;
+}
+
+.dark .ambient-glow::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  right: -10%;
+  bottom: -20%;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    oklch(0.72 0.2 200 / 0.08) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Card hover glow */
+.card-glow {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-glow:hover {
+  border-color: oklch(0.72 0.2 200 / 0.3);
+  box-shadow: 0 0 0 1px oklch(0.72 0.2 200 / 0.1);
+}
+
+.dark .card-glow:hover {
+  border-color: oklch(0.72 0.2 200 / 0.4);
+  box-shadow: 0 0 20px oklch(0.72 0.2 200 / 0.08), 0 0 0 1px oklch(0.72 0.2 200 / 0.15);
+}
+
+/* Table row hover */
+.table-row-hover {
+  transition: background-color 0.15s ease;
+}
+
+.table-row-hover:hover {
+  background-color: oklch(0.5 0.01 260 / 0.05);
+}
+
+.dark .table-row-hover:hover {
+  background-color: oklch(0.7 0.2 200 / 0.05);
+}
+
+/* Number ticker animation */
+.number-ticker {
+  display: inline-block;
+  min-width: 1ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    oklch(0.5 0.01 260 / 0.1) 25%,
+    oklch(0.5 0.01 260 / 0.2) 50%,
+    oklch(0.5 0.01 260 / 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Progress bar animation */
+.progress-animated {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-animated::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(1 0 0 / 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Status dot pulse */
+.status-dot {
+  position: relative;
+}
+
+.status-dot.critical::after,
+.status-dot.running::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  animation: pulse-ring 1.5s infinite;
+}
+
+.status-dot.critical::after {
+  background: oklch(0.6 0.25 25 / 0.5);
+}
+
+.status-dot.running::after {
+  background: oklch(0.72 0.2 200 / 0.5);
+}
+
+/* IPS Attack Map Animations */
+@keyframes attack-dash {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes marker-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes marker-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+}
+
+@keyframes attack-path-flow {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.4;
+  }
+}
+
+@keyframes particle-travel {
+  0% {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0.3;
+  }
+}
+
+.animate-attack-dash {
+  animation: attack-dash 1.5s linear infinite;
+}
+
+.animate-marker-pulse {
+  animation: marker-pulse 2s ease-out infinite;
+}
+
+.animate-marker-glow {
+  animation: marker-glow 2s ease-in-out infinite;
+}
+
+.animate-attack-path-flow {
+  animation: attack-path-flow 3s ease-out forwards;
+}
+
+/* Severity-specific glows for map markers */
+.glow-critical-marker {
+  filter: drop-shadow(0 0 6px #ef4444) drop-shadow(0 0 12px #ef444480);
+}
+
+.glow-high-marker {
+  filter: drop-shadow(0 0 5px #f97316) drop-shadow(0 0 10px #f9731680);
+}
+
+.glow-medium-marker {
+  filter: drop-shadow(0 0 4px #eab308) drop-shadow(0 0 8px #eab30880);
+}
+
+.glow-low-marker {
+  filter: drop-shadow(0 0 3px #3b82f6) drop-shadow(0 0 6px #3b82f680);
+}
+
+/* Table row new event animation */
+@keyframes new-event-highlight {
+  0% {
+    background-color: oklch(0.72 0.2 200 / 0.2);
+    border-color: oklch(0.72 0.2 200 / 0.5);
+  }
+  100% {
+    background-color: transparent;
+    border-color: var(--border);
+  }
+}
+
+.animate-new-event {
+  animation: new-event-highlight 2s ease-out forwards;
+}
+
+/* Stat card number bounce */
+@keyframes stat-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+  75% {
+    transform: translateY(2px);
+  }
+}
+
+.animate-stat-bounce {
+  animation: stat-bounce 0.5s ease-out;
+}
+
+/* Map container scan effect */
+@keyframes map-scan {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+.map-scan-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    oklch(0.72 0.2 200 / 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 100% 200%;
+  animation: map-scan 4s linear infinite;
+  pointer-events: none;
+}
+
+/* Radar sweep effect for destination */
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 0.6;
+  }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 4s linear infinite;
+}
+
+/* Connection line drawing animation */
+@keyframes draw-line {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-draw-line {
+  stroke-dasharray: 1000;
+  animation: draw-line 2s ease-out forwards;
+}

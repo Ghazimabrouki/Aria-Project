@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  redis:
+    image: ghaziiii/aria_project:redis-latest
+    container_name: aria-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ghaziiii/aria_project:backend-latest
+    container_name: aria-api
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    environment:
+      - REDIS_HOST=redis
+      - BACKEND_PORT=8001
+      - RATE_LIMIT_ENABLED=false
+      - SEARCH_RATE_LIMIT_ENABLED=false
+      - CORS_ORIGINS=http://localhost:3001
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    command: >
+      python3 -m uvicorn api.app:app --host 0.0.0.0 --port 8001 --log-level warning
+
+  worker:
+    image: ghaziiii/aria_project:worker-latest
+    container_name: aria-worker
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    environment:
+      - REDIS_HOST=redis
+      - BACKEND_PORT=8001
+      - SKIP_RESPONSE_API=1
+    depends_on:
+      - api
+      - redis
+    restart: unless-stopped
+    command: python3 main.py
+
+  frontend:
+    image: ghaziiii/aria_project:frontend-latest
+    container_name: aria-frontend
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  redis-data:

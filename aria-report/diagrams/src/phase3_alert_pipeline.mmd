@@ -1,0 +1,39 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart LR
+  TITLE["Step 1 - Alert Ingestion & Enrichment Pipeline"]
+  ES["Elasticsearch<br/>wazuh-* · suricata-* · falco-* · filebeat-*"]
+  POLL["Poller<br/>parallel polling<br/>cursor management"]
+  MAP["Source Mappers<br/>Wazuh · Suricata · Falco · Filebeat · Generic"]
+  DEDUP["Deduplication<br/>Redis + memory + DB"]
+  FILTER["Filtering<br/>noise rules + severity threshold"]
+  ENRICH["Enrichment<br/>GeoIP + MITRE + cloud provider"]
+  CAMP["Campaign Tracking<br/>related alert grouping"]
+  WHITE["Whitelist Check<br/>trusted IP / hash / domain"]
+  STORE["SQLite Alert<br/>local persistence + _geo"]
+  OUT["Visible in<br/>/alerts and /ips"]
+  TITLE --> ES --> POLL --> MAP --> DEDUP --> FILTER --> ENRICH --> CAMP --> WHITE --> STORE --> OUT
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#FFF7ED,stroke:#EA580C,stroke-width:1.5px,color:#0F172A;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef enrich fill:#ECFDF5,stroke:#16A34A,stroke-width:1.5px,color:#0F172A;
+  classDef output fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class ES input;
+  class POLL,MAP,DEDUP,FILTER,CAMP,WHITE process;
+  class ENRICH enrich;
+  class STORE,OUT output;

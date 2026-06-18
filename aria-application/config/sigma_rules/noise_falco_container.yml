@@ -1,0 +1,11 @@
+title: Falco Container Expected Behavior
+description: Filter out expected container behavior that is not security-relevant
+status: experimental
+logsource:
+  product: falco
+detection:
+  selection:
+    - rule|contains:
+        - 'Launch Sensitive Mount Container'
+        - 'Launch Excessively Capable Container'
+  condition: selection

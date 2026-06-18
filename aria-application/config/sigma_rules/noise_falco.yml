@@ -1,0 +1,10 @@
+title: Falco Expected Behavior Noise
+description: Filter out expected container behavior that is not security-relevant
+status: experimental
+logsource:
+  product: falco
+detection:
+  selection:
+    - rule|contains:
+        - 'Unexpected UDP Traffic'
+  condition: selection

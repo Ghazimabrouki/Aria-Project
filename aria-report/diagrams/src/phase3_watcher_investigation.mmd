@@ -1,0 +1,49 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryTextColor": "#0F172A",
+    "lineColor": "#475569",
+    "fontFamily": "Inter, Arial"
+  },
+  "flowchart": {
+    "useMaxWidth": true,
+    "htmlLabels": true,
+    "nodeSpacing": 35,
+    "rankSpacing": 45,
+    "curve": "basis"
+  }
+}}%%
+flowchart TB
+  TITLE["Step 6 - Watcher and Investigation Creation"]
+  INC["Open Incident"]
+  WATCH["Incident Watcher<br/>fast scan + full scan"]
+  SKIP["Whitelist Check"]
+  INV["Create Investigation<br/>status = pending"]
+  CTX["Context Builder"]
+  T1["Timeline"]
+  T2["IOCs"]
+  T3["MITRE"]
+  T4["Behavioral Indicators"]
+  T5["Auth Pattern"]
+  T6["Risk Score"]
+  AI["Trigger AI Engine"]
+  TITLE --> INC
+  INC --> WATCH --> SKIP --> INV --> CTX
+  CTX --> T1
+  CTX --> T2
+  CTX --> T3
+  CTX --> T4
+  CTX --> T5
+  CTX --> T6
+  CTX --> AI
+  classDef title fill:#E0F2FE,stroke:#2563EB,stroke-width:2px,color:#0F172A,font-weight:bold;
+  classDef input fill:#ECFDF5,stroke:#16A34A,stroke-width:1.8px,color:#0F172A,font-weight:bold;
+  classDef process fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#0F172A;
+  classDef context fill:#FFFFFF,stroke:#94A3B8,stroke-width:1px,color:#0F172A;
+  classDef final fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#0F172A,font-weight:bold;
+  class TITLE title;
+  class INC input;
+  class WATCH,SKIP,INV,CTX process;
+  class T1,T2,T3,T4,T5,T6 context;
+  class AI final;

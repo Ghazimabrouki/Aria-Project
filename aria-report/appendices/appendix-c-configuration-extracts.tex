@@ -1,0 +1,41 @@
+\chapter{Configuration Extracts}
+
+This appendix gives non-secret examples of configuration categories used by the project. Real credentials, IP addresses, passwords, private keys, and tokens must never be printed in the final report.
+
+\section{Backend Runtime}
+
+\begin{verbatim}
+BACKEND_PORT=8001
+REDIS_HOST=localhost
+REDIS_PORT=6379
+ELASTICSEARCH_URL=https://<elasticsearch-host>:9200
+UPSTREAM_ENABLED=false
+MULTI_SERVER_ENABLED=true
+\end{verbatim}
+
+\section{Security}
+
+\begin{verbatim}
+ARIA_ADMIN_SECRET=<strong-random-secret>
+RATE_LIMIT_ENABLED=true
+CORS_ORIGINS=http://localhost:3000
+\end{verbatim}
+
+\section{Ansible}
+
+\begin{verbatim}
+ANSIBLE_ENABLED=true
+ANSIBLE_REMOTE_USER=<remote-user>
+ANSIBLE_PRIVATE_KEY_PATH=<path-to-private-key>
+\end{verbatim}
+
+\section{LLM Provider}
+
+\begin{verbatim}
+LLM_PROVIDER=<provider-name>
+LLM_MODEL=<model-name>
+LLM_API_KEY=<secret-reference>
+\end{verbatim}
+
+These examples are intentionally generic. The production environment must use secret management and should avoid placing sensitive values in report screenshots or appendices.
+

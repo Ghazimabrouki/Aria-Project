@@ -1,0 +1,66 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"},"flowchart":{"useMaxWidth":true,"htmlLabels":true,"nodeSpacing":40,"rankSpacing":50,"curve":"basis"}}}%%
+flowchart LR
+  ANALYST(["SOC Analyst"])
+  ADMIN(["Administrator"])
+  SERVER(["Monitored Server"])
+  ES(["Elasticsearch"])
+  LLM(["AI Provider / LLM"])
+  ANS(["Ansible Executor"])
+  TOOLS(["Monitoring Tools"])
+
+  subgraph ARIA["ARIA Platform"]
+    direction TB
+    subgraph G1["Monitoring & Triage"]
+      UC1(["View dashboard"])
+      UC2(["Analyze alerts"])
+      UC3(["Manage incidents"])
+      UC9(["View IPS map"])
+      UC10(["Analyze runtime events"])
+      UC11(["Analyze infrastructure metrics"])
+    end
+    subgraph G2["Investigation & Remediation"]
+      UC4(["Launch investigation"])
+      UC5(["Generate AI summary"])
+      UC6(["Approve remediation"])
+      UC7(["Execute Ansible playbook"])
+      UC8(["Verify remediation"])
+      UC17(["Archive cases"])
+    end
+    subgraph G3["AI Interaction"]
+      UC12(["Use assistant"])
+      UC13(["Use operator"])
+    end
+    subgraph G4["Administration"]
+      UC14(["Manage assets"])
+      UC15(["Configure Ansible"])
+      UC16(["Onboard monitored server"])
+    end
+  end
+
+  ANALYST --- UC1
+  ANALYST --- UC2
+  ANALYST --- UC3
+  ANALYST --- UC4
+  ANALYST --- UC6
+  ANALYST --- UC9
+  ANALYST --- UC10
+  ANALYST --- UC11
+  ANALYST --- UC12
+  ANALYST --- UC13
+  ADMIN --- UC14
+  ADMIN --- UC15
+  ADMIN --- UC16
+  ADMIN --- UC6
+  UC2 -. uses .- ES
+  UC5 -. uses .- LLM
+  UC13 -. uses .- LLM
+  UC7 -. uses .- ANS
+  UC8 -. uses .- ES
+  UC16 --- SERVER
+  TOOLS -. feed .- UC2
+  SERVER -. telemetry .- TOOLS
+
+  classDef grp fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef uc fill:#F8FAFC,stroke:#64748B,color:#0F172A;
+  class G1,G2,G3,G4 grp;
+  class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17 uc;

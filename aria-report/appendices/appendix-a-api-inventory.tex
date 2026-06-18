@@ -1,0 +1,35 @@
+\chapter{API Endpoint Inventory}
+\label{app:api}
+
+This appendix summarizes the main API groups found in the FastAPI application and local documentation. The exact list should be refreshed before final submission if routes change.
+
+\begin{longtable}{@{}p{0.28\textwidth}p{0.60\textwidth}@{}}
+\caption{API groups}\\
+\toprule
+\textbf{Group} & \textbf{Purpose} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Group} & \textbf{Purpose} \\
+\midrule
+\endhead
+\codepath{/health} & Service health check. \\
+\codepath{/api/v1/alerts} & Alert list, detail, relationships, and alert data operations. \\
+\codepath{/api/v1/incidents} & Incident list, detail, timeline, alert relationships, and investigation relationships. \\
+\codepath{/api/v1/investigations} & Investigation lifecycle, details, playbook YAML, timeline, approval, decline, execution, archive. \\
+\codepath{/api/v1/archives} & Archived cases and archive statistics. \\
+\codepath{/api/v1/search} & Global search, IP lookup, domain lookup. \\
+\codepath{/api/v1/ips} & Geospatial attack map, events, countries, filters, statistics, summary. \\
+\codepath{/api/v1/dashboard} & Dashboard summary and quick statistics. \\
+\codepath{/api/v1/pipeline} & Pipeline status, sources, cursors, and trace data. \\
+\codepath{/api/v1/metrics} & Performance dashboard, hosts, history, thresholds, alerts. \\
+\codepath{/monitor} & Monitoring health, logs, services, auto-approve stats, stuck investigations. \\
+\codepath{/api/v1/assistant} & AI assistant context, query, source statistics, and health. \\
+\codepath{/api/v1/operator} & Operator sessions and controlled actions. \\
+\codepath{/api/v1/assets} & Monitored asset registry and source/Ansible checks. \\
+\codepath{/api/v1/settings} & Runtime settings and protected configuration updates. \\
+\codepath{/api/v1/whitelist} & Global whitelist management. \\
+\codepath{/ws} & WebSocket channels for real-time dashboard updates. \\
+\bottomrule
+\end{longtable}
+

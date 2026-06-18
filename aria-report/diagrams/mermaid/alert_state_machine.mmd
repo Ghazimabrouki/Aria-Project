@@ -1,0 +1,16 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#FFFFFF","primaryTextColor":"#0F172A","lineColor":"#475569","fontFamily":"Inter, Arial","fontSize":"15px"}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> raw : ES document polled
+  raw --> normalized : source mapper
+  normalized --> enriched : GeoIP + MITRE + cloud
+  enriched --> deduplicated : dedup_key match?
+  deduplicated --> whitelisted : trusted IP/domain
+  deduplicated --> active : new alert stored
+  whitelisted --> [*] : suppressed
+  active --> processed : correlated into incident
+  processed --> archived : incident resolved
+  archived --> [*]
+  note right of active
+    status field: active | processed | archived
+  end note
