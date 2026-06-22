@@ -1,0 +1,1254 @@
+You are working on the FINAL DEFENSE-READY VERSION of my ARIA final-year engineering report.
+
+This is a high-priority academic deliverable. Work carefully, inspect everything, preserve all valuable engineering content, and produce the strongest possible final report.
+
+======================================================================
+
+1. PROJECT AND REPORT LOCATIONS
+   ======================================================================
+
+Locate the ARIA repository and report project.
+
+Likely report location:
+
+Rapports PFE/aria-pfe-report/
+
+or:
+
+report/aria-report/
+
+Locate:
+
+* main.tex
+* all chapter files
+* appendices
+* diagrams/mermaid/
+* assets/diagrams/
+* figures/
+* the current main.pdf
+* the directory named:
+
+ARIA Screenshots/
+
+The `ARIA Screenshots/` directory contains the real screenshots that must be inspected, sanitized, renamed, organized, and inserted into the report.
+
+Do not assume filenames describe the screenshot correctly. Open and inspect every image visually.
+
+======================================================================
+2. NON-NEGOTIABLE RULES
+=======================
+
+The project name is only:
+
+ARIA
+
+Remove every remaining project-name reference to:
+
+* OpenSOAR
+* Open SOAR
+* opensoar
+* ARIA / OpenSOAR
+
+The cybersecurity concept “SOAR” remains valid and must not be removed.
+
+Do not remove:
+
+* architecture diagrams;
+* UML diagrams;
+* class diagrams;
+* object diagrams;
+* sequence diagrams;
+* use-case diagrams;
+* activity diagrams;
+* state diagrams;
+* ER diagrams;
+* data-flow diagrams;
+* deployment diagrams;
+* component diagrams;
+* backend logic;
+* frontend logic;
+* alert-processing logic;
+* incident-correlation logic;
+* investigation logic;
+* remediation logic;
+* asset-scoping logic;
+* multi-server onboarding logic;
+* production deployment logic.
+
+Do not restart or restructure the report from zero.
+
+Preserve the six-chapter engineering story:
+
+Cloud environment
+→ monitoring foundation
+→ Elasticsearch telemetry
+→ ARIA architecture and internal logic
+→ ARIA features
+→ multi-server onboarding and production deployment
+→ validation and evaluation
+
+======================================================================
+3. STRICT PAGE-LIMIT OBJECTIVE
+==============================
+
+The FINAL COMPILED PDF MUST NOT EXCEED:
+
+130 PDF pages total, including:
+
+* front matter;
+* chapters;
+* conclusion;
+* appendices.
+
+Preferred target:
+
+125–130 PDF pages.
+
+The current report is longer, so reduce its size intelligently.
+
+Do not reach the limit by deleting architecture, UML, diagrams, technical logic, or essential validation.
+
+Reduce pages using these methods:
+
+1. Remove duplicate screenshots.
+2. Keep only the strongest screenshot of each feature in the main chapters.
+3. Move secondary screenshots to a compact evidence appendix.
+4. Use two screenshots per page with `subfigure` where readable.
+5. Use four screenshots per page only for detailed tab evidence where text remains readable.
+6. Crop unnecessary browser borders, empty whitespace, taskbars, and duplicate menus.
+7. Remove outdated screenshot placeholders after evidence is inserted.
+8. Replace long screenshot lists with compact evidence matrices.
+9. Replace large terminal screenshots with formatted `lstlisting` blocks.
+10. Merge short related validation subsections where appropriate.
+11. Remove repeated explanations that already exist in another chapter.
+12. Shorten figure captions without losing technical meaning.
+13. Keep diagrams but optimize whitespace around them.
+14. Put wide diagrams in landscape only when necessary.
+15. Do not give every appendix screenshot its own full page.
+16. Do not reproduce the same screenshot in both Chapter 4 and Appendix E unless the appendix version provides additional detail.
+
+Suggested page budget:
+
+* Front matter: 15–17 pages
+* General introduction: 3 pages
+* Chapter 1: 10–11 pages
+* Chapter 2: 13–14 pages
+* Chapter 3: 27–29 pages
+* Chapter 4: 21–23 pages
+* Chapter 5: 9–10 pages
+* Chapter 6: 13–15 pages
+* General conclusion: 3–4 pages
+* Appendices: 10–13 pages
+
+Do not reduce readability merely to hit the page limit.
+
+======================================================================
+4. EVIDENCE INTEGRITY POLICY
+============================
+
+Use three evidence categories.
+
+CATEGORY A — REAL EXECUTED EVIDENCE
+
+Use this label when a command was actually executed during this task or a supplied screenshot proves the real result.
+
+Examples:
+
+* real ARIA screenshots;
+* real Elasticsearch/Kibana screenshots;
+* actual HTTP 200 API responses;
+* actual TypeScript check;
+* actual frontend production build;
+* actual backend tests;
+* actual compile checks.
+
+CATEGORY B — CONTROLLED SIMULATION
+
+Use this only when the real infrastructure is unavailable but the workflow can be safely reconstructed from the project scripts and configuration.
+
+Examples:
+
+* central setup-script dry run;
+* expected systemd validation sequence;
+* configuration-derived port checks;
+* monitored-server bootstrap dry run;
+* disposable-container installation simulation.
+
+Every simulated artifact must be clearly labeled:
+
+“Controlled simulation”
+
+or:
+
+“Representative execution trace generated from the implemented script and configuration; not a live production capture.”
+
+Never present simulated evidence as a real production execution.
+
+CATEGORY C — DESIGN OR CONFIGURATION EVIDENCE
+
+Use for:
+
+* port matrices;
+* architecture diagrams;
+* configuration excerpts;
+* workflow diagrams;
+* script input/output tables.
+
+Do not call design evidence “live validation”.
+
+======================================================================
+5. VALIDATION EXECUTION STRATEGY
+================================
+
+Before simulating anything, try to produce REAL evidence safely.
+
+Priority order:
+
+1. Execute the real command locally if safe.
+2. Use application test clients or local services.
+3. Use dry-run/check mode.
+4. Use a disposable Docker container or temporary environment.
+5. Only then create a controlled simulation based on the real project files.
+
+Do not modify production application logic merely to make tests pass.
+Do not hardcode fake successful results.
+Do not invent test counts.
+Do not invent HTTP responses.
+Do not invent services or ports.
+
+======================================================================
+6. CENTRAL SETUP-SCRIPT EXECUTION EVIDENCE
+==========================================
+
+Locate all central setup scripts.
+
+Possible examples:
+
+* setup.sh
+* install.sh
+* central_setup.sh
+* deploy.sh
+* docker-compose setup scripts
+* environment bootstrap scripts
+
+Inspect the scripts completely.
+
+Determine:
+
+* inputs requested;
+* prerequisites;
+* packages installed;
+* repositories configured;
+* files generated;
+* services enabled;
+* containers started;
+* connectivity checks;
+* final validation steps;
+* error handling;
+* final summary.
+
+Preferred evidence method:
+
+A. Run a safe native dry-run/check mode if supported.
+
+Examples:
+
+```bash
+./setup.sh --dry-run
+./setup.sh --check
+ARIA_DRY_RUN=true ./setup.sh
+```
+
+B. If no dry-run exists, execute the non-destructive parts in a disposable Ubuntu container.
+
+C. If execution is impossible, generate a controlled simulation directly from the real script logic.
+
+The report output must resemble a professional terminal trace but remain explicitly labeled.
+
+Example style:
+
+```text
+ARIA Central Environment Setup
+Execution mode: Controlled simulation
+Source: setup.sh and current deployment configuration
+
+[01/10] Validating operating system ................ PASS
+[02/10] Checking required privileges ............... PASS
+[03/10] Preparing package repositories ............. PASS
+[04/10] Configuring Elasticsearch .................. PASS
+[05/10] Configuring Kibana ......................... PASS
+[06/10] Configuring Redis .......................... PASS
+[07/10] Preparing ARIA backend ..................... PASS
+[08/10] Preparing ARIA frontend .................... PASS
+[09/10] Validating generated configuration ......... PASS
+[10/10] Producing deployment summary ............... PASS
+
+Result: Central environment workflow validated in controlled simulation.
+```
+
+Do not claim that services are live unless they were actually started.
+
+Replace the current Chapter 6 central setup placeholder with:
+
+* one compact formatted terminal block;
+* one short explanatory paragraph;
+* one reference to the script activity diagram already present.
+
+Do not dedicate a full page to the terminal output.
+
+======================================================================
+7. CENTRAL SERVICES STATUS EVIDENCE
+===================================
+
+Locate the exact service/container names used by the project.
+
+Potential components:
+
+* Elasticsearch
+* Kibana
+* Wazuh Manager
+* Filebeat
+* Suricata
+* Falco
+* Falcosidekick
+* Telegraf
+* Redis
+* ARIA backend
+* ARIA frontend
+
+First attempt real checks:
+
+```bash
+systemctl is-active elasticsearch
+systemctl is-active kibana
+systemctl is-active wazuh-manager
+systemctl is-active filebeat
+systemctl is-active suricata
+systemctl is-active falco
+systemctl is-active falcosidekick
+systemctl is-active telegraf
+systemctl is-active redis-server
+```
+
+For containers:
+
+```bash
+docker compose ps
+docker ps
+```
+
+If those services are not installed in the Claude execution environment:
+
+* do not fabricate a live `systemctl` result;
+* generate a configuration-derived controlled validation table;
+* label it as a controlled simulation.
+
+Use a compact table such as:
+
+| Component | Runtime type | Validation command | Expected/observed state | Evidence type |
+| --------- | ------------ | ------------------ | ----------------------- | ------------- |
+
+Where real Kibana/Elasticsearch screenshots prove active telemetry, mark that as real evidence.
+
+The existing Kibana Discover and index-management screenshots provide real proof that:
+
+* Elasticsearch is operational;
+* Kibana can query it;
+* Filebeat/Suricata data is arriving;
+* Wazuh indices exist;
+* Falco indices exist;
+* Telegraf indices exist.
+
+Do not repeat all index screenshots in this section.
+
+======================================================================
+8. PORTS AND COMMUNICATION VALIDATION
+=====================================
+
+Inspect:
+
+* environment files;
+* Docker Compose files;
+* backend settings;
+* frontend configuration;
+* Elasticsearch configuration;
+* Filebeat configuration;
+* Telegraf configuration;
+* Falcosidekick configuration;
+* Wazuh configuration;
+* Ansible settings;
+* security-group evidence.
+
+Extract only confirmed ports.
+
+Possible confirmed examples may include:
+
+* SSH: 22
+* HTTP: 80
+* ARIA frontend: 3000 or configured value
+* ARIA backend: 8000/8001 or configured value
+* Elasticsearch: 9200
+* Kibana: 5601
+* Redis: 6379
+* Wazuh: configured manager/API ports
+
+Do not guess.
+
+Run real checks where possible:
+
+```bash
+ss -lntup
+curl -k -I https://localhost:9200
+curl -I http://localhost:8001
+curl -I http://localhost:3000
+nc -zv <host> <port>
+```
+
+If live services are unavailable:
+
+* create a configuration-derived communication validation;
+* label it “Controlled communication validation”;
+* show source, destination, protocol, port, expected result, and configuration source.
+
+The report should contain:
+
+1. one compact port/flow matrix;
+2. one short terminal-style check;
+3. a reference to the existing communication architecture diagram.
+
+Do not use a full-page fake `ss` screenshot.
+
+Also document honestly that some cloud security-group rules were broadly exposed during internship testing and should be restricted in production.
+
+======================================================================
+9. STRONGER API VALIDATION WITH REAL HTTP 200 RESPONSES
+=======================================================
+
+This evidence should be REAL whenever the backend can run locally.
+
+Use one of these approaches:
+
+A. Start the FastAPI backend and call it with `curl`.
+
+B. Use FastAPI `TestClient` if the full infrastructure is unavailable.
+
+C. Use existing backend API tests.
+
+Validate representative endpoint groups:
+
+* root or service information;
+* health;
+* alerts;
+* incidents;
+* investigations;
+* pipeline/status;
+* dashboard summary;
+* metrics;
+* assets;
+* runtime investigations;
+* archives;
+* search.
+
+Do not expose tokens or secrets.
+
+Capture or generate a compact real output such as:
+
+```text
+GET / ........................................ 200 OK
+GET /health .................................. 200 OK
+GET /api/v1/pipeline/status .................. 200 OK
+GET /api/v1/alerts ........................... 200 OK
+GET /api/v1/incidents ........................ 200 OK
+GET /api/v1/investigations ................... 200 OK
+GET /api/v1/assets ........................... 200 OK
+```
+
+Include short sanitized JSON extracts for two or three endpoints only.
+
+Do not paste large API bodies.
+
+If an endpoint requires authentication:
+
+* use the existing project test/authentication mechanism;
+* sanitize tokens;
+* document the expected access control.
+
+The existing backend endpoint-inventory screenshot may be used as supporting evidence, but HTTP 200 validation must be based on actual execution or TestClient output.
+
+======================================================================
+10. FRONTEND TYPESCRIPT AND PRODUCTION BUILD
+============================================
+
+Locate the actual package manager and scripts.
+
+Run the appropriate commands, for example:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+```
+
+or the repository-equivalent commands.
+
+Do not modify dependencies unnecessarily.
+
+Use actual results.
+
+Record:
+
+* TypeScript result;
+* lint result if configured;
+* production build result;
+* generated route count if available;
+* warnings;
+* failures/skips if any.
+
+Do not invent “Passed”.
+
+If the build fails:
+
+1. identify whether it is an environment issue or code issue;
+2. fix report-independent build issues only when safe;
+3. do not make broad application changes without justification;
+4. report the real outcome.
+
+Insert a compact terminal block and a summary table in Chapter 6.
+
+Do not use a large terminal screenshot.
+
+======================================================================
+11. MONITORED-SERVER BOOTSTRAP OUTPUT
+=====================================
+
+Locate the monitored-server onboarding/bootstrap script.
+
+Inspect its real logic.
+
+Document:
+
+* input prompts;
+* server identity;
+* environment label;
+* Elasticsearch endpoint;
+* credentials handling;
+* selected components;
+* Wazuh Agent setup;
+* Filebeat setup;
+* Suricata setup;
+* Telegraf setup;
+* Falco/Falcosidekick setup;
+* service enablement;
+* connectivity checks;
+* expected index patterns;
+* final ARIA asset payload.
+
+Preferred execution:
+
+1. real dry-run mode;
+2. disposable Ubuntu container;
+3. safe sandbox simulation;
+4. controlled simulation based directly on script branches.
+
+Produce a concise output such as:
+
+```text
+ARIA Monitored Server Bootstrap
+Mode: Controlled simulation
+Asset: vm-test
+Environment: test
+Central Elasticsearch: https://<CENTRAL_ES>:9200
+
+[PASS] Operating system supported
+[PASS] Elasticsearch endpoint syntax validated
+[PASS] Wazuh Agent configuration prepared
+[PASS] Filebeat configuration prepared
+[PASS] Telegraf configuration prepared
+[PASS] Falco/Falcosidekick configuration prepared
+[PASS] Suricata configuration prepared
+[PASS] Expected index patterns generated
+[PASS] ARIA asset-registration payload generated
+
+No production host was modified during this controlled simulation.
+```
+
+Then include a sanitized example ARIA asset payload based on the real script fields.
+
+Do not call the output a real production run unless it was executed on an actual monitored server.
+
+The real ARIA screenshots already prove:
+
+* `vm-test` exists;
+* its source patterns are configured;
+* its Wazuh identity is configured;
+* Falco/Filebeat/Telegraf/Suricata mappings exist;
+* remediation is enabled;
+* Ansible credentials are configured;
+* the asset state is healthy.
+
+Use those screenshots as real supporting evidence.
+
+======================================================================
+12. AUTOMATED BACKEND TESTS
+===========================
+
+Inspect the actual backend test framework and commands.
+
+Possible commands:
+
+```bash
+pytest -q
+python -m pytest -q
+python -m compileall backend
+ruff check .
+mypy .
+```
+
+Use only commands configured in the repository.
+
+Run the real test suite where feasible.
+
+Record:
+
+* passed;
+* failed;
+* skipped;
+* execution duration;
+* test groups;
+* compile result.
+
+Do not invent counts.
+
+If the complete suite requires unavailable external infrastructure:
+
+* run the isolated/unit tests;
+* run syntax/compile validation;
+* state which integration tests were not executed;
+* do not fabricate success.
+
+Present results in:
+
+1. one compact terminal block;
+2. one validation summary table.
+
+======================================================================
+13. AUTOMATED FRONTEND TESTS
+============================
+
+Inspect configured frontend scripts.
+
+Possible checks:
+
+```bash
+pnpm lint
+pnpm exec tsc --noEmit
+pnpm build
+pnpm test
+pnpm exec playwright test
+```
+
+Run only existing/configured commands.
+
+Record real results.
+
+If browser E2E tests are unavailable:
+
+* do not invent passed E2E results;
+* use existing ARIA screenshots as feature evidence;
+* clearly state that the visual workflows were validated through supplied captures;
+* leave E2E as a future final rerun only when necessary.
+
+======================================================================
+14. SCREENSHOTS TO INTEGRATE
+============================
+
+Inspect every image in:
+
+ARIA Screenshots/
+
+Create or update:
+
+docs/screenshot_inventory.md
+
+For every image record:
+
+* original filename;
+* content;
+* destination;
+* main chapter or appendix;
+* crop/sanitize action;
+* inserted/ignored/duplicate;
+* final report filename.
+
+Use the real screenshots supplied for these evidence groups.
+
+---
+
+## A. ELASTICSEARCH AND KIBANA
+
+Use:
+
+* Kibana Discover showing live Filebeat/Suricata events;
+* Elasticsearch Index Management screenshots showing:
+
+  * Wazuh;
+  * Filebeat;
+  * Falco;
+  * Telegraf;
+  * central-host and `vm-test` index families;
+  * real document counts;
+  * storage sizes;
+  * green/yellow states.
+
+Main chapter:
+
+* one Kibana Discover screenshot;
+* one representative index-management screenshot.
+
+Appendix:
+
+* remaining index pages, combined as subfigures.
+
+Explain yellow indices honestly:
+
+A yellow state in a single-node Elasticsearch deployment usually indicates that primary shards are available while configured replicas cannot be allocated to another node.
+
+Do not call these failed indices.
+
+---
+
+## B. RUNTIME INVESTIGATIONS
+
+Use real screenshots showing:
+
+* runtime-investigations list;
+* overview;
+* evidence;
+* diagnostic;
+* remediation decision;
+* verification state;
+* context;
+* timeline;
+* raw output.
+
+Main Chapter 4:
+
+* runtime list;
+* one overview or diagnostic screenshot.
+
+Chapter 6:
+
+* one evidence/diagnostic screenshot;
+* one observe/no-remediation safety screenshot.
+
+Appendix:
+
+* detailed tabs.
+
+Do not insert the screenshot containing the visible ChatGPT/browser overlay unless it is cropped.
+
+---
+
+## C. SUCCESSFUL REMEDIATION WORKFLOW
+
+Use real screenshots showing the completed nine-stage workflow:
+
+Incident selected
+→ Evidence collection
+→ AI/root-cause analysis
+→ Remediation planning
+→ Approval
+→ Execution
+→ Verification
+→ Completed
+→ Archived
+
+Use the phase captures:
+
+* Evidence
+* Dry Run
+* Containment
+* Hardening
+* Forensics
+* Verification
+
+Main Chapter 4:
+
+* one containment screenshot.
+
+Chapter 6:
+
+* dry run;
+* containment;
+* verification.
+
+Appendix:
+
+* all phase details arranged two per page.
+
+Explain the verification warning honestly.
+
+The verification completed with `exit 0`, but its output also includes:
+
+* a high CPU warning;
+* a shell-expression warning.
+
+Do not say that every operational check was healthy.
+
+Use wording such as:
+
+“The verification playbook completed and confirmed target reachability, while also reporting a resource warning that requires separate operational review.”
+
+Also inspect and mention the dry-run message:
+
+“No config file found; using defaults”
+
+Do not hide it.
+Explain it as a consistency improvement point if necessary.
+
+---
+
+## D. MULTI-SERVER ASSET MANAGEMENT
+
+Use real screenshots showing:
+
+* Assets registry;
+* `ghazi`;
+* `vm-test`;
+* disabled legacy asset;
+* source labels;
+* healthy/error status;
+* edit-server identity;
+* Wazuh agent mapping;
+* Falco pattern;
+* Telegraf pattern;
+* Filebeat pattern;
+* Suricata pattern;
+* asset selector;
+* Ansible/remediation settings;
+* remediation-ready state;
+* masked credentials.
+
+Main Chapter 4:
+
+* assets registry;
+* Ansible remediation-ready view.
+
+Chapter 5:
+
+* `vm-test` source mapping.
+
+Chapter 6:
+
+* assets registry plus selector or source validation.
+
+Appendix:
+
+* detailed edit dialogs.
+
+Use accurate credential wording:
+
+“Credential values are referenced by the backend and are not exposed to the frontend in clear text.”
+
+Do not claim `.env` storage alone is production-grade secret management.
+
+Mention managed secrets as future hardening.
+
+---
+
+## E. HUAWEI CLOUD EVIDENCE
+
+Reuse the existing cloud evidence.
+
+Available real evidence includes:
+
+* running `ecs-ghazi` instance;
+* VPC `vpc-Smart_Edu`;
+* subnet `Smart_edu`;
+* CIDR `10.175.1.0/24`;
+* activated NIC;
+* private IP;
+* bound EIP;
+* security-group rules;
+* ECS disk;
+* snapshot/rollback evidence.
+
+Correct the existing Appendix F inconsistency:
+
+The screenshot showing:
+
+* `vpc-rds`;
+* `subnet-rds`;
+* `10.50.42.0/25`
+
+must not be captioned as the ARIA hosting subnet.
+
+The actual ARIA hosting network is shown by:
+
+* `vpc-Smart_Edu`;
+* `Smart_edu`;
+* `10.175.1.0/24`;
+* the ECS NIC.
+
+Replace the incorrect hosting-subnet evidence.
+
+Remove the “Cloud environment validation — pending live capture” placeholder.
+
+Use cross-references to Chapter 2 and Appendix F instead.
+
+Sanitize:
+
+* console URL parameters;
+* agency IDs;
+* unnecessary UUIDs;
+* sensitive identifiers.
+
+======================================================================
+15. SCREENSHOT LAYOUT AND PAGE REDUCTION
+========================================
+
+Do not add every screenshot as a full-page figure.
+
+Apply this selection rule.
+
+MAIN CHAPTERS:
+
+Maximum:
+
+* one primary screenshot per major feature;
+* two screenshots only for complex workflows such as remediation.
+
+CHAPTER 6:
+
+Use:
+
+* evidence triptychs;
+* subfigures;
+* compact terminal listings;
+* validation tables.
+
+APPENDIX E:
+
+Create compact groups:
+
+E.1 Dashboard and alerts
+E.2 Incidents and investigations
+E.3 Runtime security
+E.4 Remediation execution
+E.5 Metrics and infrastructure
+E.6 Assistant and operator
+E.7 Multi-server assets and settings
+
+Use two screenshots per page by default.
+
+Use four screenshots per page only when still readable.
+
+Remove:
+
+* exact duplicates;
+* screenshots showing the same state with only a different scroll position;
+* low-quality images;
+* screenshots with overlays;
+* screenshots that provide no additional proof.
+
+Do not remove any unique architecture or UML figure.
+
+======================================================================
+16. CHAPTER 6 RECONSTRUCTION
+============================
+
+Rebuild Chapter 6 into a concise validation chapter.
+
+Recommended structure:
+
+6.1 Validation Strategy
+
+6.2 Infrastructure and Monitoring Foundation
+
+* Huawei Cloud evidence cross-reference
+* controlled central setup simulation
+* compact service validation matrix
+* compact ports/communication matrix
+* real Elasticsearch/Kibana evidence
+
+6.3 ARIA Backend and API Validation
+
+* actual HTTP 200 summary
+* backend compile/tests
+* short endpoint evidence
+
+6.4 ARIA Frontend Validation
+
+* TypeScript
+* lint
+* production build
+* reference to functional screenshots
+
+6.5 Multi-Server Validation
+
+* assets registry
+* per-source mapping
+* selector
+* Ansible readiness
+
+6.6 Runtime and Remediation Validation
+
+* observe/no-action safety case
+* completed corrective-remediation case
+* dry run
+* containment
+* verification
+
+6.7 Automated Validation Summary
+
+* compact backend/frontend table
+
+6.8 Scenario-Based Evaluation
+
+6.9 Limitations
+
+6.10 Conclusion
+
+Avoid eleven separate placeholder figures.
+Use a small number of strong evidence panels.
+
+======================================================================
+17. LANGUAGE AND ACADEMIC QUALITY
+=================================
+
+Read the entire report.
+
+Correct:
+
+* grammar;
+* spelling;
+* punctuation;
+* inconsistent tense;
+* awkward phrasing;
+* repeated paragraphs;
+* marketing language;
+* exaggerated claims;
+* captions that do not explain evidence;
+* figures introduced without context;
+* code blocks inserted without explanation.
+
+Maintain:
+
+* academic tone;
+* engineering clarity;
+* honest limitation reporting;
+* human-readable explanations.
+
+Do not repeatedly say “the screenshot proves”.
+
+Prefer:
+
+* “Figure X confirms...”
+* “The observed result indicates...”
+* “This evidence validates...”
+* “Within the controlled internship environment...”
+* “For production deployment, additional hardening is required...”
+
+======================================================================
+18. TECHNICAL CONSISTENCY REVIEW
+================================
+
+Check consistency across the entire report:
+
+* project name ARIA;
+* FastAPI backend;
+* Next.js frontend;
+* Elasticsearch;
+* Kibana;
+* Redis;
+* SQLite;
+* Ansible;
+* Wazuh;
+* Suricata;
+* Filebeat;
+* Falco;
+* Falcosidekick;
+* Telegraf;
+* actual server/asset names;
+* actual ports;
+* index patterns;
+* workflow statuses;
+* asset-validation statuses;
+* single-node deployment limitations;
+* security controls;
+* screenshots;
+* diagrams;
+* tables;
+* test results.
+
+Do not introduce:
+
+* PostgreSQL if not used;
+* Kubernetes if ARIA is not deployed on Kubernetes;
+* production HA if not implemented;
+* enterprise secret management if still future work.
+
+======================================================================
+19. SECURITY REVIEW
+===================
+
+Inspect report text, screenshots, configs, and outputs for:
+
+* passwords;
+* tokens;
+* API keys;
+* SSH private keys;
+* authorization headers;
+* cookies;
+* admin secrets;
+* cleartext credentials.
+
+Mask as:
+
+* `<PASSWORD>`
+* `<TOKEN>`
+* `<SECRET>`
+* `********`
+
+Preserve technical usefulness.
+
+Public IP addresses may remain only if allowed by project confidentiality requirements.
+Otherwise mask the last octet.
+
+======================================================================
+20. LATEX AND PDF QUALITY
+=========================
+
+Compile repeatedly using:
+
+```bash
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+```
+
+Verify:
+
+* no fatal errors;
+* no missing images;
+* no broken references;
+* no `??`;
+* unique labels;
+* readable captions;
+* no cropped screenshots;
+* no oversized tables;
+* no blank diagram pages;
+* no duplicated figures;
+* correct list of figures;
+* correct list of tables;
+* correct table of contents;
+* correct appendix references;
+* no outdated “pending live capture” captions where evidence now exists.
+
+Inspect the final PDF visually page by page.
+
+Check especially:
+
+* diagram readability;
+* screenshot readability;
+* page balance;
+* landscape pages;
+* captions;
+* large empty spaces;
+* orphan headings;
+* overfull boxes;
+* terminal blocks.
+
+The final PDF must be at most 130 pages.
+
+If the first final build exceeds 130 pages:
+
+1. reduce screenshot duplication;
+2. combine appendix images;
+3. shorten repetitive validation text;
+4. convert terminal screenshots to listings;
+5. reduce unnecessary page breaks;
+6. tighten figure spacing carefully;
+7. shorten appendix inventories.
+
+Do not remove architecture, UML, diagrams, data-flow logic, or core engineering explanation.
+
+======================================================================
+21. FINAL SEARCHES
+==================
+
+Search the report project for:
+
+```bash
+grep -RniE \
+"OpenSOAR|Open SOAR|opensoar|TODO|FIXME|pending live capture|insertion point|placeholder|representative|replace with real|screenshot insertion|output insertion|undefined reference|\?\?" \
+.
+```
+
+Review every occurrence manually.
+
+Keep TODOs only for:
+
+* academic supervisor name;
+* signed validation form;
+* evidence that genuinely cannot be produced.
+
+Do not leave outdated screenshot placeholders.
+
+======================================================================
+22. FINAL DELIVERABLE
+=====================
+
+At completion, provide a structured final report containing:
+
+1. Final PDF path.
+2. Final total PDF page count.
+3. Confirmation that it does not exceed 130 pages.
+4. LaTeX compilation status.
+5. Remaining warnings.
+6. Files modified.
+7. Files created.
+8. Screenshots found in `ARIA Screenshots/`.
+9. Screenshots inserted in main chapters.
+10. Screenshots inserted in appendices.
+11. Screenshots ignored as duplicates and why.
+12. Screenshots sanitized.
+13. Real validation commands executed.
+14. Real API HTTP 200 results.
+15. Real frontend TypeScript/build results.
+16. Real backend/frontend test results.
+17. Controlled simulations created.
+18. Clear confirmation that simulations are labeled honestly.
+19. Huawei Cloud evidence corrections.
+20. Diagrams verified.
+21. Remaining TODOs.
+22. Confirmation that all OpenSOAR project-name references were removed.
+23. Any technical inconsistency discovered.
+24. Any evidence that could not be validated.
+
+======================================================================
+23. FINAL QUALITY STANDARD
+==========================
+
+The final report must not feel like:
+
+* a generated text dump;
+* a screenshot gallery;
+* an API inventory;
+* a diagram gallery;
+* a collection of fake terminal outputs;
+* an unfinished report.
+
+It must feel like:
+
+* a complete final-year engineering thesis;
+* technically rigorous;
+* visually balanced;
+* honest about real versus simulated validation;
+* supported by real ARIA screenshots;
+* supported by real Elasticsearch telemetry;
+* supported by real remediation evidence;
+* supported by actual build/test/API checks where possible;
+* complete from cloud infrastructure to monitored-server onboarding;
+* ready for academic defense;
+* no longer than 130 PDF pages.
+

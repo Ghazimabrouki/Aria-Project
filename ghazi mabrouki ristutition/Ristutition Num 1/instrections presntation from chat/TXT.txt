@@ -1,0 +1,323 @@
+You are right — now we should rebuild Phase 3 based on the developer package, not only on the older general reference.
+
+Your developer gave a clean technical documentation set with these modules:
+
+Feature	Backend entry	Frontend page	Status
+Performance Monitoring	api/routes/performance.py	/metrics	API Part B incomplete
+IPS Map	api/routes/ips.py	/ips	Complete
+AI Assistant	api/routes/assistant.py	/assistant	Frontend not verified
+AI Operator	api/routes/operator.py	/operator	Frontend not verified
+Alert Pipeline	pipeline/poller/main.py	/alerts	Complete
+Incidents & Correlation	pipeline/datausage/incident_manager.py	/incidents	API truncated
+Watcher & Investigations	response/watcher/main.py	/investigations	Complete
+AI Response Engine	response/ai_engine/main.py	/investigations	Complete
+
+So the correct Phase 3 is not only alert → incident → investigation.
+It is a full backend intelligence layer made of 8 backend capabilities.
+
+Phase 3 — Backend Intelligence Layer
+Main idea
+
+After Phase 1 and Phase 2, the platform already has:
+
+Security tools → Elasticsearch → Kibana
+
+But this is still mostly raw monitoring and security data.
+
+Phase 3 transforms that raw data into SOC intelligence:
+
+Raw Elasticsearch data
+→ clean alerts
+→ correlated incidents
+→ investigations
+→ AI summaries and playbooks
+→ approval
+→ execution
+→ verification
+→ archive
+→ dashboards, IPS map, assistant, operator, performance monitoring
+
+Strong presentation sentence:
+
+Phase 3 is where the platform moves from passive monitoring to intelligent SOC operations.
+
+Global Phase 3 Diagram
+Step 1 — Alert Ingestion & Enrichment Pipeline
+Goal
+
+This is the entry point of Phase 3.
+
+The backend polls Elasticsearch indices for Wazuh, Suricata, Falco, Filebeat, and generic alerts. It then normalizes, deduplicates, filters noise, enriches, checks whitelist, tracks campaigns, and persists alerts locally or forwards them upstream.
+
+Inputs
+wazuh-*
+suricata-*
+falco-*
+filebeat-*
+custom index patterns
+Processing logic
+Poll Elasticsearch
+→ map source-specific fields
+→ deduplicate
+→ filter noise
+→ apply severity threshold
+→ enrich with GeoIP and MITRE
+→ track campaign
+→ check whitelist
+→ persist local Alert
+→ optionally forward upstream
+Main files
+File	Role
+pipeline/poller/main.py	Forwarder loop and cursor management
+pipeline/poller/alert_processor.py	process_single_alert() pipeline
+pipeline/mappers/wazuh.py	Wazuh normalization
+pipeline/mappers/suricata.py	Suricata normalization
+pipeline/mappers/falco.py	Falco normalization
+pipeline/mappers/filebeat.py	Filebeat normalization
+pipeline/enrichment/geoip.py	GeoIP enrichment
+pipeline/enrichment/mitrecraft.py	MITRE mapping
+pipeline/dedup.py	Deduplication engine
+pipeline/noise_learner.py	Auto-learned noise rules
+Diagram
+Example
+
+A Wazuh SSH brute-force alert is mapped to severity high, enriched with MITRE T1110, GeoIP resolves the attacker IP, campaign tracking groups it as SSH brute-force, then the alert becomes visible in /alerts and /ips.
+
+Step 2 — Incidents & Correlation
+Goal
+
+An alert alone is often not enough. The backend correlates related alerts into incidents using attack patterns, kill-chain progression, shared observables, and time windows.
+
+Processing logic
+Normalized alerts
+→ evaluate incident creation
+→ calculate severity
+→ generate title
+→ create local Incident
+→ create AlertIncidentLink
+→ correlate by IOC, time, MITRE overlap
+Creation rules
+
+Incidents are created when:
+
+alert is critical,
+attack pattern is detected, such as ssh_brute_force, port_scan, malware, c2,
+kill chain has two or more MITRE phases,
+medium severity alert appears with two or more recent alerts in 15 minutes.
+Main files
+File	Role
+pipeline/datausage/incident_manager.py	Creation logic, severity, titles
+pipeline/datausage/local_incident_manager.py	Local SQLite shadow incidents
+pipeline/correlators/correlator.py	IOC + time + MITRE correlation
+pipeline/correlators/observable_manager.py	Extract and track observables
+api/routes/incidents.py	CRUD/list/manual create, but API delivery was truncated
+Diagram
+Example
+
+Three Wazuh SSH brute-force alerts plus one Suricata port scan from the same source IP within 10 minutes can create a critical incident titled like:
+
+SSH Brute Force & Port Scan Campaign from 185.220.101.4
+
+This is explicitly the example given by the developer.
+
+Step 3 — Incident Watcher & Investigation Lifecycle
+Goal
+
+The watcher continuously looks for open incidents that do not yet have investigations. It creates investigation rows, builds rich context, and triggers the AI engine.
+
+Processing logic
+Open incident
+→ watcher scan
+→ skip whitelist
+→ create Investigation
+→ build context
+→ trigger AI engine
+Context includes
+alert timeline,
+IOCs: IPs, ports, services, domains, hashes, usernames, file paths,
+MITRE tactics and techniques,
+behavioral indicators,
+authentication pattern analysis,
+attack type,
+dynamic risk score.
+Main files
+File	Role
+response/watcher/main.py	Polling loop and investigation creation
+response/watcher/context_builder.py	Context assembly
+response/db.py	Async SQLite session
+response/models.py	Investigation, InvestigationAlert
+Diagram
+Example
+
+An open incident with 5 linked alerts becomes an investigation. The context builder finds 2 source IPs, MITRE T1110 and T1078, failed-to-successful authentication pattern, and risk score 78.
+
+Step 4 — AI Response Engine
+Goal
+
+The AI Response Engine generates investigation summaries, narratives, risk assessments, and Ansible remediation playbooks. It supports multi-provider LLM routing, circuit breaker protection, fallback generation, and structured parsing.
+
+Processing logic
+Investigation context
+→ circuit breaker check
+→ prompt building
+→ call LLM provider
+→ parse structured response
+→ store summary/narrative/risk/playbook
+→ auto-approval check
+→ approval notification
+Main files
+File	Role
+response/ai_engine/main.py	Orchestration, parsing, storage
+response/ai_engine/prompt_builder.py	Context to LLM prompt
+response/ai_engine/llm_clients.py	Ollama, Gemini, OpenRouter, NVIDIA NIM clients
+response/auto_approve.py	4-layer approval
+response/confidence_tracker.py	Adaptive threshold learning
+response/decision_logger.py	Audit trail
+Diagram
+Output
+Investigation.summary
+Investigation.narrative
+Investigation.risk_score
+Investigation.playbook_yaml
+possible PlaybookApproval row
+WebSocket investigation update
+Step 5 — Approval, Execution, Verification, Archive
+Goal
+
+The backend must never blindly execute generated remediation. It requires approval, executes through Ansible, verifies the result, and archives the evidence.
+
+This logic is spread across AI response, auto-approval, Ansible execution, and fix verification. The AI response documentation says the auto-approve check uses a 4-layer evaluation; the performance workflow and AI response workflow both rely on approval, Ansible execution, and verification.
+
+Processing logic
+Generated playbook
+→ auto-approval / human approval
+→ Ansible execution
+→ fix verification
+→ archive
+Diagram
+Step 6 — Performance Monitoring & Remediation
+Goal
+
+Performance monitoring continuously polls host metrics from Elasticsearch telegraf-*, detects anomalies using thresholds and statistical baselines, creates performance investigations, generates remediation playbooks, and verifies fixes.
+
+Inputs
+
+The performance module reads metrics such as:
+
+CPU: cpu.usage_iowait, cpu.usage_user, cpu.usage_system
+memory: mem.used_percent
+disk: disk.used_percent
+network: net.bytes_recv, net.bytes_sent
+load: system.load1
+processes: procstat.cpu_usage, procstat.memory_rss
+netstat: netstat.tcp_established
+Main files
+File	Role
+pipeline/performance_poller.py	ES polling and HostMetrics aggregation
+pipeline/datausage/performance_orchestrator.py	Anomaly to investigation bridge
+core/redis_performance.py	Redis time-series, baselines, cooldowns, alerts
+api/routes/performance.py	Dashboard, host detail, health endpoints
+pipeline/response/dynamic_playbook.py	Dynamic playbook generation
+response/ansible_exec.py	Execution engine
+response/fix_verifier.py	Post-remediation verification
+Diagram
+Known gaps
+
+Your developer marked api/routes/performance.py Part B as incomplete, especially disk-analysis, history, and root-cause endpoint bodies. The /metrics frontend page also needs repository verification.
+
+Step 7 — IPS Attack Visualization
+Goal
+
+The IPS Map merges upstream alerts and local SQLite alerts into geo-enriched attack events. It renders a world map with attack paths, lifecycle status, live events, and statistics.
+
+Processing logic
+alerts
+→ deduplicate
+→ geolocate IP
+→ categorize attack
+→ derive lifecycle
+→ filter and serve map data
+Main files
+File	Role
+api/routes/ips.py	Merge, dedup, geo-enrich, lifecycle, endpoints
+core/geoip.py	MaxMind + ipapi.co + ip-api.com resolver
+pipeline/enrichment/geoip.py	Cloud provider enrichment via ASN
+frontend/app/(dashboard)/ips/page.tsx	World map UI
+Diagram
+Important constraints
+private RFC-1918 IPs are filtered out,
+coordinates (0,0) are rejected,
+lifecycle is derived from investigation, approval, run, and verification chain.
+Step 8 — AI Assistant
+Goal
+
+The AI Assistant gives operators a conversational interface to query SOC data, receive contextual answers with sources, and execute approved actions such as approving, declining, executing, or archiving investigations.
+
+Processing logic
+question
+→ keyword extraction
+→ deep entity fetch
+→ relevance ranking
+→ prompt building
+→ LLM or fallback answer
+→ action suggestions
+→ persist conversation
+Main files
+File	Role
+response/assistant.py	Core logic: answer_question(), execute_action()
+api/routes/assistant.py	Query, actions, context, sources
+response/models.py	AssistantConversation, AssistantMessage
+Diagram
+Known gaps
+
+The frontend /assistant page was not returned in the source exploration and should be verified.
+
+Step 9 — AI Operator
+Goal
+
+The AI Operator translates natural-language operational requests into Ansible playbooks, executes them against target hosts with approval when needed, and returns structured analysis.
+
+Processing logic
+natural-language request
+→ reason about intent
+→ match template or generate playbook
+→ store pending run
+→ auto-execute read-only if safe
+→ approval gate for mutating actions
+→ execute Ansible
+→ parse output
+→ return analysis
+Built-in templates
+
+Examples include:
+
+RAM usage,
+disk usage,
+CPU processes,
+open ports,
+SSH failures,
+service status,
+firewall rules,
+Docker containers,
+file read,
+package check.
+Main files
+File	Role
+api/routes/operator.py	Sessions, messages, approval, status
+response/ansible_exec.py	Shared Ansible execution engine
+response/models.py	OperatorRun, OperatorSession, OperatorMessage
+config/ansible_inventory	Target host inventory
+Diagram
+Known gaps
+
+The frontend /operator page source was not delivered and should be verified. The documentation also says there are no concrete DB examples for result_json or playbook_yaml.
+
+Final Phase 3 Presentation Summary
+
+Use this as the closing paragraph:
+
+Phase 3 is the backend intelligence layer of the SOC platform. It starts with the Alert Pipeline, which pulls raw documents from Elasticsearch and transforms them into normalized, enriched alerts. These alerts are correlated into incidents, watched by the Investigation Lifecycle module, and analyzed by the AI Response Engine to produce summaries, risks, narratives, and remediation playbooks. The platform then controls actions through approval, Ansible execution, verification, and archiving. In parallel, Performance Monitoring detects infrastructure anomalies, IPS Map visualizes attacks geographically, AI Assistant supports analysts with contextual SOC answers, and AI Operator converts natural-language operational requests into controlled Ansible actions.
+
+Strong final sentence:
+
+Phase 3 transforms raw monitoring data into actionable SOC intelligence, operational visibility, and controlled response workflows.

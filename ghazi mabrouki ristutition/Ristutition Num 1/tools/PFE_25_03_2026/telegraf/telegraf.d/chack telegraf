@@ -1,0 +1,18 @@
+install -d -o root -g telegraf -m 750 /etc/telegraf/certs
+install -o root -g telegraf -m 640 /etc/elasticsearch/certs/ca/ca.crt /etc/telegraf/certs/elasticsearch-ca.crt
+sed -i 's#tls_ca = ".*"#tls_ca = "/etc/telegraf/certs/elasticsearch-ca.crt"#' /etc/telegraf/telegraf.conf
+chown root:telegraf /etc/telegraf/telegraf.conf
+chmod 640 /etc/telegraf/telegraf.conf
+systemctl reset-failed telegraf
+systemctl restart telegraf
+systemctl status telegraf --no-pager -l
+
+
+
+
+
+
+
+
+journalctl -u telegraf -n 50 --no-pager
+curl -k -u elastic:YOUR_PASSWORD "https://ELASTICSEARCH_HOST:9200/_cat/indices/telegraf-*?v"
