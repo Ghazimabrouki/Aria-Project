@@ -32,6 +32,22 @@ The following must be prepared separately:
 
 *Not confirmed from repository.*
 
+## Deployment sequence
+
+```mermaid
+flowchart TB
+    A([Prepare Brain VM host, network, firewall, SSH]) --> B[Configure ARIA .env outside git]
+    B --> C[Review scripts/install_brain_vm.sh]
+    C --> D[Run as root with explicit approval]
+    D --> E[Existing tools runner installs native services]
+    E --> F[Validate central native services]
+    F --> G[Validate readable .env exists]
+    G --> H[docker compose pull]
+    H --> I[docker compose up -d]
+    I --> J[Validate ARIA containers, Redis, API, frontend]
+    J --> K[Ready for monitored VM onboarding]
+```
+
 ## Prerequisites
 
 - **Linux/Debian/Ubuntu assumptions** where source supports them. The current scripts use `apt-get`, `dpkg`, `add-apt-repository`, and `systemd`. *Confirmed from current source.*
@@ -39,27 +55,6 @@ The following must be prepared separately:
 - **Network access** to package repositories (Elastic, Wazuh, Falco, InfluxData, GitHub releases) and the monitored network.
 - **Docker and Docker Compose** already available. The wrapper checks for `docker` and `docker compose`; it does not install a separate Docker method.
 - **ARIA `.env` prepared** beside the canonical Compose file. The installer requires it to exist and be readable but does not read, source, print, copy, or modify it.
-
-## Deployment sequence
-
-1. Prepare the Brain VM host, network, firewall rules, and SSH access.
-2. Copy or create the ARIA `.env` file next to `aria-application/docker-compose.yml` (or the legacy fallback `Front_end + back_end/docker-compose.yml`).
-3. Review `scripts/install_brain_vm.sh` and the scripts it calls.
-4. Run the installer as root:
-
-   ```bash
-   sudo bash scripts/install_brain_vm.sh
-   ```
-
-5. The installer:
-   - validates the host environment;
-   - requires a typed confirmation;
-   - calls the existing maintained runner `aria-tools-setup/tools/setup_script_telegraf.sh`;
-   - validates native services;
-   - runs `docker compose pull` and `docker compose up -d` from the Compose directory;
-   - validates ARIA containers, Redis, API health, and frontend response.
-
-6. Validate the deployment using the checks in [Validation and troubleshooting](../operations/VALIDATION_AND_TROUBLESHOOTING.md).
 
 ## What `scripts/install_brain_vm.sh` does
 

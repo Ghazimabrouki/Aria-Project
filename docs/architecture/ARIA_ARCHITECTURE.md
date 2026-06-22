@@ -83,66 +83,100 @@ These are systemd services installed by `aria-tools-setup/tools/setup_script_tel
 | Ansible | Worker/API image | Execute approved playbooks over SSH. | Automated response unavailable; monitoring remains. |
 | LLM provider | External or Ollama | AI-assisted analysis/playbook generation. | AI features degrade; rule-based fallback may continue. |
 
-## Architecture diagram
+## High-level architecture diagram
 
-```text
-                                Trusted network / VPC
+```mermaid
+flowchart TB
+    subgraph Brain["Brain VM / central platform"]
+        direction TB
+        subgraph Native["Native monitoring & security services"]
+            ES["Elasticsearch :9200"]
+            KB["Kibana :5601"]
+            WZ["Wazuh Manager :1514/1515"]
+            SUR["Suricata"]
+            FAL["Falco"]
+            FSK["Falcosidekick :2801"]
+            FB["Filebeat"]
+            TG["Telegraf"]
+            F2["Fail2Ban / UFW / SSH hardening"]
+        end
+        subgraph Compose["ARIA Docker Compose"]
+            API["ARIA API :8001"]
+            WRK["ARIA worker"]
+            RDS["Redis :6380"]
+            FE["Next.js frontend :3001"]
+        end
+        DB[(SQLite investigations.db)]
+    end
 
-  +--------------------------- Monitored VM -----------------------------+
-  | Wazuh Agent ─────1514/1515───> central Wazuh Manager                 |
-  | system/auth logs ─────+                                              |
-  | Suricata EVE ─────────+──> Filebeat ─────HTTPS 9200───────────────┐  |
-  | Falco -> Falcosidekick localhost:2801 ───HTTPS 9200──────────────┐|  |
-  | Telegraf ────────────────────────────────HTTPS 9200─────────────┐||  |
-  | optional SSH target <────────────────────── Brain VM :22        |||  |
-  +-----------------------------------------------------------------|||-+
-                                                                   |||
-  +--------------------------- Brain VM ----------------------------|||-+
-  | Native monitoring foundation                                    vvv |
-  | Wazuh Manager -> Filebeat ────┐      +--------------------------+ | |
-  | Suricata -> Filebeat ─────────┼─────>| Elasticsearch 7.17 :9200 | | |
-  | Falco -> Falcosidekick ───────┤      | wazuh-alerts-*           | | |
-  | Telegraf ─────────────────────┘      | filebeat-<asset>-*       | | |
-  |                                      | falco-<asset>-*          | | |
-  | Kibana :5601 <───────────────────────| telegraf-<asset>-*       | | |
-  |                                      +------------+-------------+ | |
-  |                                                   | poll/query    | |
-  | Docker Compose network                            v               | |
-  | +-------------+  +-------------+  +--------------------------+   | |
-  | | Redis :6379 |<->| ARIA API    |<->| SQLite /app/data       |   | |
-  | | host :6380  |  | :8001       |  | investigations.db      |   | |
-  | +------+------+  +------+------+  +--------------------------+   | |
-  |        ^                ^                 ^                       | |
-  |        |                | REST/WebSocket  |                       | |
-  | +------+-------+        |            +----+------------------+    | |
-  | | ARIA worker  |<-------+------------| Ansible -> SSH :22     |    | |
-  | | poll/enrich/ |                     | LLM provider optional  |    | |
-  | | correlate/AI |                     +-----------------------+    | |
-  | +--------------+                                                  | |
-  |                          +---------------------------+            | |
-  | analyst browser ────────>| Next.js host :3001/:3000 |            | |
-  |                          +---------------------------+            | |
-  +-------------------------------------------------------------------+
+    subgraph Monitored["Monitored VM / server"]
+        AGT["Wazuh Agent"]
+        MSUR["Suricata"]
+        MFAL["Falco + Falcosidekick"]
+        MFB["Filebeat"]
+        MTG["Telegraf"]
+    end
+
+    Analyst["SOC Analyst"] --> FE
+    FE --> API
+    API --> DB
+    API --> RDS
+    WRK --> ES
+    WRK --> DB
+    WRK --> RDS
+    WRK -.->|SSH :22| Monitored
+    ES --> KB
+    AGT --> WZ
+    MSUR --> MFB --> ES
+    MFAL --> ES
+    MTG --> ES
+    FB --> ES
+    TG --> ES
+    FAL --> FSK --> ES
+    SUR --> FB
+    WZ -.-> FB
 ```
 
-*Diagram aligned with current source.*
+*Confirmed from current source.*
 
 ## Actual data flow
 
-```text
-Monitored/central agents
-→ Elasticsearch 7.17
-→ ARIA worker polls ES indices (wazuh-alerts-*, falco-*, filebeat-*, suricata-*)
-→ source-specific mapper normalizes raw events into alerts
-→ enrichment (GeoIP, MITRE ATT&CK, Sigma noise filtering, anomaly, root cause)
-→ deduplication (Redis-first, SQLite fallback)
-→ correlation into incidents
-→ SQLite alerts/incidents + Redis operational state
-→ investigation watcher / optional LLM analysis
-→ approval-gated Ansible playbook execution over SSH
-→ Elasticsearch re-query verification
-→ archive
-→ FastAPI REST/WebSocket :8001 → Next.js dashboard :3001
+```mermaid
+flowchart LR
+    A[Monitored/central agents] --> B[Elasticsearch 7.17]
+    B --> C[ARIA worker polls ES indices]
+    C --> D[source-specific mapper normalizes alerts]
+    D --> E[enrichment GeoIP/MITRE/Sigma/anomaly]
+    E --> F[deduplication Redis-first SQLite fallback]
+    F --> G[correlation into incidents]
+    G --> H[(SQLite alerts/incidents)]
+    H --> I[optional LLM investigation]
+    I --> J{approval-gated Ansible}
+    J --> K[SSH remediation]
+    K --> L[Elasticsearch re-query verification]
+    L --> M[archive]
+    M --> N[FastAPI REST/WebSocket :8001]
+    N --> O[Next.js dashboard :3001]
+```
+
+*Confirmed from current source.*
+
+## Alert processing pipeline
+
+```mermaid
+flowchart TB
+    S([Raw ES document]) --> N[Normalize via source mapper]
+    N --> E[Enrich GeoIP + MITRE + context]
+    E --> D{Duplicate? dedup_key match}
+    D -->|yes| INC[Increment occurrence_count] --> STOP1([Suppress new row])
+    D -->|no| W{Whitelisted?}
+    W -->|yes| MARK[Mark whitelisted] --> STOP2([Not actionable])
+    W -->|no| SG{Sigma noise rule?}
+    SG -->|yes| STOP3([Drop as noise])
+    SG -->|no| SEV{Severity above threshold?}
+    SEV -->|no| LOW[Store low-priority alert]
+    SEV -->|yes| STORE[Store active alert + asset_id]
+    STORE --> CORR[Hand to correlation]
 ```
 
 *Confirmed from current source.*

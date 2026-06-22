@@ -39,6 +39,22 @@ The following ARIA and central components stay on the Brain VM only. *Confirmed 
 
 *Confirmed from current source.*
 
+## Onboarding flow
+
+```mermaid
+flowchart TB
+    A([Choose reviewed bootstrap variant]) --> B[Run bootstrap on monitored VM as root]
+    B --> C[Install Wazuh Agent, Filebeat, Suricata, Falco, Telegraf]
+    C --> D[Verify services active]
+    D --> E[Collect printed ARIA asset payload]
+    E --> F[POST /api/v1/assets with remediation_enabled=false]
+    F --> G[Validate asset in dashboard]
+    G --> H[Validate telemetry indices in Elasticsearch]
+    H --> I{Ansible/SSH validated?}
+    I -->|no| J[Keep remediation disabled]
+    I -->|yes| K[Enable remediation per asset deliberately]
+```
+
 ## Current bootstrap locations and canonical ambiguity
 
 Several copies of the monitored-VM bootstrap script exist. *Confirmed from current source.*
