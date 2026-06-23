@@ -2,7 +2,17 @@
 
 \section{Introduction}
 
-The previous chapter ended with real telemetry sitting in Elasticsearch. On its own, that telemetry is still a stream of heterogeneous technical documents. ARIA is the platform that gives this data operational meaning. This chapter explains how ARIA is designed and, more importantly, the \emph{logic} behind each of its internal stages, that is, why each transformation exists and what problem it solves, rather than only listing the modules involved. It first describes the global, backend, and frontend architecture and the persistence model, then follows the data through ingestion, normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping, and finally presents the security and control mechanisms that hold the whole workflow together.
+The previous chapter ended with real telemetry sitting in Elasticsearch. On its own, that telemetry is still a stream of heterogeneous technical documents. ARIA is the platform that gives this data operational meaning.
+
+This chapter explains how ARIA is designed and, more importantly, the \emph{logic} behind each transformation. The goal is to show \emph{why} each stage exists and what problem it solves, not merely to list the modules involved. The discussion is organized in three layers:
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Architecture:} global, backend, frontend, and persistence views of the platform.
+\item \textbf{Pipeline:} the path from alert ingestion through normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping.
+\item \textbf{Controls:} the security mechanisms and approval boundaries that keep the analyst in control of risky actions.
+\end{enumerate}
+
+For each stage we explain not only what happens, but why it is necessary.
 
 \section{Twelve-Step Intelligence Pipeline}
 
@@ -389,7 +399,15 @@ To make this concrete, Figure~\ref{fig:object-case} is an object diagram of a si
 
 \section{AI-Assisted Analysis Logic}
 
-The response layer (\sourcefile{response/ai_engine/}, \sourcefile{response/runtime_ai_engine/}, \sourcefile{response/infrastructure_ai_engine/}) turns an incident into actionable investigation material. Its logic has three parts. First, \textbf{context building}: before any model is called, ARIA assembles a structured context with the alert timeline, source and destination indicators, MITRE information, behavioral history, risk score, and host information, because output quality depends almost entirely on input quality. Second, \textbf{provider routing}: prompt-builder modules and multi-provider client support let the system route calls to a configured LLM and fall back gracefully when no provider is reachable, so the workflow never blocks on an external dependency. Third, \textbf{structured output parsing}: the response is expected to contain a summary, a narrative, a risk assessment, and a playbook; the parser extracts these into the \codepath{Investigation} model, and because LLM output can be malformed, it includes fallback parsing and rule-based generation. The consistent theme is that AI is treated as a fallible assistant whose output is always parsed, validated, and constrained, never trusted blindly.
+The response layer (\sourcefile{response/ai_engine/}, \sourcefile{response/runtime_ai_engine/}, \sourcefile{response/infrastructure_ai_engine/}) turns an incident into actionable investigation material. Its logic has three parts:
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Context building.} Before any model is called, ARIA assembles a structured context with the alert timeline, source and destination indicators, MITRE information, behavioral history, risk score, and host information. Output quality depends almost entirely on input quality.
+\item \textbf{Provider routing.} Prompt-builder modules and a multi-provider client route calls to the configured LLM and fall back gracefully when no provider is reachable, so the workflow never blocks on an external dependency.
+\item \textbf{Structured output parsing.} The response is expected to contain a summary, a narrative, a risk assessment, and a playbook. The parser extracts these into the \codepath{Investigation} model, and fallback parsing plus rule-based generation handle malformed LLM output.
+\end{enumerate}
+
+The consistent theme is that AI is treated as a fallible assistant whose output is always parsed, validated, and constrained, never trusted blindly.
 
 \diagramimagecompact{phase3_ai_response.png}{AI response engine from restitution diagrams}
 
@@ -444,35 +462,42 @@ A command that returns success is not the same as a problem that is solved. Afte
 \centering
 \begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[
-  block/.style={draw, rounded corners, align=center, minimum width=2.7cm, minimum height=1.4cm, fill=gray!8},
-  flow/.style={-Latex, line width=1.1pt},
-  feedback/.style={-Latex, line width=1.1pt, dashed},
-  label/.style={font=\fontsize{13}{15}\selectfont, align=center, fill=white, inner sep=2pt}
+  block/.style={draw, rounded corners, align=center, minimum width=2.8cm, minimum height=1.4cm, fill=gray!8, font=\fontsize{17}{19}\selectfont},
+  label/.style={align=center, font=\fontsize{13}{15}\selectfont},
+  flow/.style={-Latex, line width=1.2pt},
+  feedback/.style={-Latex, line width=1.2pt, dashed}
 ]
-% Main components
+% Main components (equally sized boxes, generous spacing)
 \node[block] (analyst) {\textbf{Analyst}};
-\node[block, right=3.6cm of analyst] (api) {\textbf{FastAPI}};
-\node[block, right=3.6cm of api] (ai) {\textbf{AI Engine}};
-\node[block, right=3.6cm of ai] (ansible) {\textbf{Ansible}};
-\node[block, right=3.6cm of ansible] (verifier) {\textbf{Verifier}};
+\node[block, right=4.2cm of analyst] (api) {\textbf{FastAPI}};
+\node[block, right=4.2cm of api] (ai) {\textbf{AI Engine}};
+\node[block, right=4.2cm of ai] (ansible) {\textbf{Ansible}};
+\node[block, right=4.2cm of ansible] (verifier) {\textbf{Verifier}};
 
-% Primary workflow (solid arrows, centered)
-\draw[flow] (analyst.20) -- node[label, above]{Open investigation} (api.160);
-\draw[flow] (api.20) -- node[label, above]{Operation summary} (ai.160);
-\draw[flow] (ai.20) -- node[label, above]{Generated playbook} (ansible.160);
-\draw[flow] (ansible.20) -- node[label, above]{Execution result} (verifier.160);
+% Primary workflow arrows (solid, horizontal, through box centers)
+\draw[flow, <->] (analyst.east) -- (api.west);
+\draw[flow] (api.east) -- (ai.west);
+\draw[flow] (ai.east) -- (ansible.west);
+\draw[flow] (ansible.east) -- (verifier.west);
 
-% Analyst <-> FastAPI approval loop
-\draw[flow] (api.200) -- node[label, below]{Approve / edit} (analyst.340);
+% Labels in reserved spaces above the main arrows (never on the arrows)
+\node[label, above=0.55cm] at ($(api.east)!0.5!(ai.west)$) {Operation summary};
+\node[label, above=0.55cm] at ($(ai.east)!0.5!(ansible.west)$) {Generated playbook};
+\node[label, above=0.55cm] at ($(ansible.east)!0.5!(verifier.west)$) {Execution result};
 
-% Return / feedback flows underneath (dashed)
-\coordinate (ai-return) at ($(ai.south)+(0,-0.9)$);
-\coordinate (api-ai-return) at ($(api.south |- ai-return)$);
-\draw[feedback] (ai.south) -- (ai-return) -- node[label, below, pos=0.5]{Summary + playbook} (api-ai-return) -- (api.south);
+% Analyst <-> FastAPI bidirectional label (below the main arrow)
+\node[label, below=0.55cm] at ($(analyst.east)!0.5!(api.west)$) {Approve / edit};
 
-\coordinate (verifier-return) at ($(verifier.south)+(0,-1.7)$);
-\coordinate (api-verifier-return) at ($(api.south |- verifier-return)$);
-\draw[feedback] (verifier.south) -- (verifier-return) -- node[label, below, pos=0.5]{Failure / unresolved state / retry feedback} (api-verifier-return) -- (api.south);
+% Feedback / return flows underneath the main flow (dashed, non-overlapping)
+\coordinate (ai-fb) at ($(ai.south)+(0,-1.1)$);
+\coordinate (api-fb-ai) at ($(api.south |- ai-fb)$);
+\draw[feedback] (ai.south) -- (ai-fb) -- (api-fb-ai) -- (api.south);
+\node[label, below=0.35cm] at ($(ai.south)!0.5!(api.south |- ai-fb)$) {Summary + playbook};
+
+\coordinate (verifier-fb) at ($(verifier.south)+(0,-2.5)$);
+\coordinate (api-fb-v) at ($(api.south |- verifier-fb)$);
+\draw[feedback] (verifier.south) -- (verifier-fb) -- (api-fb-v) -- (api.south);
+\node[label, below=0.35cm] at ($(verifier.south)!0.5!(api.south |- verifier-fb)$) {Failure / unresolved state /\\retry feedback};
 \end{tikzpicture}
 \end{adjustbox}
 \caption{AI investigation and remediation sequence (simplified)}

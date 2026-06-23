@@ -220,6 +220,30 @@ Frontend build & Project records & 28/28 pages built in earlier validation runs.
 
 The project records also note that some full-suite \codepath{pytest} runs were affected by a pre-existing SQLite write-ahead-lock issue during database initialization in the local environment. This is a real limitation of the test environment, not of the implemented features, and is listed in Section~\ref{sec:val-limits}.
 
+Table~\ref{tab:fr-matrix} maps each high-level functional requirement from Chapter~1 to the validation evidence that supports it.
+
+\begin{table}[H]
+\centering
+\caption{Functional requirement to validation evidence matrix}
+\label{tab:fr-matrix}
+\begin{tabularx}{\textwidth}{@{}p{0.10\textwidth}p{0.40\textwidth}X@{}}
+\toprule
+\textbf{FR} & \textbf{Requirement} & \textbf{Evidence} \\
+\midrule
+FR-01 & Poll multi-source alerts from Elasticsearch & Live ES indices (Fig.~\ref{fig:val-discover}, \ref{fig:ch2-es-idx}) \\
+FR-02 & Normalize alerts into a common model & Chapter~3 pipeline diagrams and API alert records \\
+FR-03 & Enrich with GeoIP and MITRE ATT\&CK & Chapter~4 IPS map and alert detail screenshots \\
+FR-04 & Deduplicate and filter noise & Chapter~3 dedup/filter logic, project test records \\
+FR-05 & Correlate alerts into incidents & Chapter~4 incident screenshots, API records \\
+FR-06 & Generate AI investigations and playbooks & Chapter~4 investigation AI result, Listing~\ref{lst:ai-schema} \\
+FR-07 & Approval workflow with admin-secret gate & Chapter~3 controls, Fig.~\ref{fig:val-rem} \\
+FR-08 & Execute Ansible playbooks safely & Fig.~\ref{fig:val-rem} dry-run and hardening phases \\
+FR-09 & Verify fixes and archive cases & Fig.~\ref{fig:val-rem} verification stage, archive screenshots \\
+FR-10 & Multi-server asset scoping & Fig.~\ref{fig:val-assets}--\ref{fig:val-sources} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \section{Scenario-Based Evaluation}
 
 The individual checks above also compose into the end-to-end flows defined in Chapter~4, each mapped to its strongest available evidence. Telemetry reaching Elasticsearch is shown live (Figures~\ref{fig:val-discover} and~\ref{fig:ch2-es-idx}); the alert-to-incident-to-investigation chain is evidenced by the live API root (Figure~\ref{fig:val-api}), the Chapter~4 captures, and the project API records; AI-assisted analysis is demonstrated in Chapter~4 with the documented provider dependency; the approval-gated Ansible run, the diagnostic-first runtime case, and multi-server scoping are confirmed respectively by Figures~\ref{fig:val-rem}, \ref{fig:val-runtime}, and~\ref{fig:val-assets}--\ref{fig:val-sources}; and monitored-VM onboarding is covered by the bootstrap controlled simulation (Chapter~5) together with the live \codepath{vm-test} indices (Figure~\ref{fig:ch2-es-idx}).
@@ -242,4 +266,25 @@ The main limitations of the current validation and of the platform are:
 
 \section{Conclusion}
 
-The validation evidence shows that \project{} reached its main technical objectives in the order in which the solution was built. The cloud environment and central monitoring stack are documented by real console evidence; live Kibana and Elasticsearch captures confirm that genuine telemetry is indexed; the backend compiles and answers with HTTP~200; multi-server scoping, the runtime observe-case, and a complete controlled-remediation workflow are all captured on the running platform. Where the live infrastructure could not be exercised safely, the central setup and monitored-VM bootstrap are reproduced as clearly labelled controlled simulations. The project also documents its remaining risks honestly --- authentication and RBAC, production persistence and secret management, frontend type cleanup, and network exposure --- which define the future work described in the general conclusion.
+The validation evidence shows that \project{} reached its main technical objectives in the order in which the solution was built. Key quantitative results are summarized in Table~\ref{tab:val-summary}.
+
+\begin{table}[H]
+\centering
+\caption{Validation result summary}
+\label{tab:val-summary}
+\begin{tabularx}{\textwidth}{@{}p{0.46\textwidth}X@{}}
+\toprule
+\textbf{Item} & \textbf{Result} \\
+\midrule
+Backend Python modules compiled & 146 modules, no syntax error \\
+Automated tests reported passing & 910 core tests \\
+API service root & HTTP~200 with endpoint inventory \\
+Frontend build & 28/28 pages built in earlier validation runs \\
+Elasticsearch telemetry & Live index families with non-zero counts \\
+Multi-server asset scoping & Asset registry and per-source mapping validated \\
+Controlled remediation workflow & Nine-stage workflow completed and archived \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Live Kibana and Elasticsearch captures confirm that genuine telemetry is indexed; the backend compiles and answers with HTTP~200; multi-server scoping, the runtime observe-case, and a complete controlled-remediation workflow are all captured on the running platform. Where the live infrastructure could not be exercised safely, the central setup and monitored-VM bootstrap are reproduced as clearly labelled controlled simulations. The remaining risks --- authentication and RBAC, production persistence and secret management, frontend type cleanup, and network exposure --- define the future work described in the general conclusion.

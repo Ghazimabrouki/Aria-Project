@@ -4,6 +4,15 @@
 
 The previous chapter described the internal logic of ARIA. This chapter shows how that logic becomes a working product: the Next.js dashboard and the features an analyst actually uses. The platform is presented page by page, because each page realizes a part of the functional requirements catalogued below and works directly on top of the data collected in Chapter~2 and transformed in Chapter~3. For each feature, the goal is to explain what it does and why it behaves the way it does, not only to enumerate its controls. Access to all of these pages begins at the authenticated entry point shown in Figure~\ref{fig:ss-login}.
 
+The chapter is organized around the analyst workflow:
+
+\begin{itemize}[leftmargin=1cm]
+\item \textbf{Triage:} dashboard overview, alerts, incidents, and search.
+\item \textbf{Investigate:} incident detail, AI-assisted investigations, runtime and infrastructure analysis, IPS map.
+\item \textbf{Remediate:} approval, Ansible execution, verification, and archives.
+\item \textbf{Operate and administer:} AI assistant, AI operator, assets, settings, and onboarding.
+\end{itemize}
+
 \screenshot{aria_login.png}{ARIA authenticated entry point to the security operations platform}{fig:ss-login}
 
 \begin{longtable}{@{}p{0.14\textwidth}p{0.25\textwidth}p{0.52\textwidth}@{}}
