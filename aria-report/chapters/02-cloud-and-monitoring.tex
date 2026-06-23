@@ -91,21 +91,38 @@ The central stack is a layered pipeline. Detection and collection tools run on m
 \centering
 \begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
   font=\small,
-  src/.style={draw, rounded corners, align=center, text width=2.3cm, minimum height=0.85cm, fill=gray!8},
-  fwd/.style={draw, rounded corners, align=center, text width=2.2cm, minimum height=0.85cm, fill=teal!10},
-  store/.style={draw, cylinder, shape border rotate=90, aspect=0.25, align=center, text width=2.25cm, minimum height=1.1cm, fill=blue!6},
-  app/.style={draw, rounded corners, align=center, text width=2.3cm, minimum height=0.85cm, fill=orange!10},
-  arrow/.style={-Latex, thick}
+  src/.style={draw, rounded corners, align=center, text width=2.4cm, minimum height=1.25cm, fill=gray!8, font=\fontsize{10}{12}\selectfont},
+  fwd/.style={draw, rounded corners, align=center, text width=2.3cm, minimum height=1.25cm, fill=teal!10, font=\fontsize{10}{12}\selectfont},
+  store/.style={draw, cylinder, shape border rotate=90, aspect=0.25, align=center, text width=2.5cm, minimum height=1.5cm, fill=blue!8, font=\fontsize{10}{12}\selectfont},
+  app/.style={draw, rounded corners, align=center, text width=2.4cm, minimum height=1.25cm, fill=orange!10, font=\fontsize{10}{12}\selectfont},
+  group/.style={draw=none, rounded corners=4pt, inner sep=10pt, opacity=0.25},
+  arrow/.style={-Latex, line width=1.1pt},
+  logopic/.style={inner sep=0pt}
 ]
-\node[src] (wazuh) {Wazuh\\(host security)};
-\node[src, below=0.3cm of wazuh] (suricata) {Suricata\\(network IDS)};
-\node[src, below=0.3cm of suricata] (falco) {Falco\\(runtime)};
-\node[src, below=0.3cm of falco] (telegraf) {Telegraf\\(metrics)};
-\node[fwd, right=1.0cm of suricata] (filebeat) {Filebeat /\\Falcosidekick};
-\node[store, right=1.0cm of filebeat, yshift=-0.5cm] (es) {Elasticsearch\\indices};
-\node[app, above=0.8cm of es] (kibana) {Kibana\\(explore)};
-\node[app, right=1.0cm of es] (aria) {ARIA\\backend};
-\node[store, below=0.8cm of aria] (redis) {Redis\\(cache,cursors)};
+% Source nodes
+\node[src] (wazuh) {\includegraphics[width=0.5cm]{assets/logos/wazuh.png}\\[2pt]\textbf{Wazuh}\\host security};
+\node[src, below=0.35cm of wazuh] (suricata) {\includegraphics[width=0.5cm]{assets/logos/suricata.png}\\[2pt]\textbf{Suricata}\\network IDS};
+\node[src, below=0.35cm of suricata] (falco) {\includegraphics[width=0.5cm]{assets/logos/falco.png}\\[2pt]\textbf{Falco}\\runtime security};
+\node[src, below=0.35cm of falco] (telegraf) {\includegraphics[width=0.5cm]{assets/logos/influxdb.png}\\[2pt]\textbf{Telegraf}\\metrics};
+
+% Forwarder
+\node[fwd, right=1.2cm of suricata] (filebeat) {\includegraphics[width=0.5cm]{assets/logos/filebeat.png}\\[2pt]\textbf{Filebeat}\\+ Falcosidekick};
+
+% Store
+\node[store, right=1.2cm of filebeat, yshift=-0.5cm] (es) {\includegraphics[width=0.5cm]{assets/logos/elasticsearch.png}\\[2pt]\textbf{Elasticsearch}\\indices};
+
+% App nodes
+\node[app, above=0.9cm of es] (kibana) {\includegraphics[width=0.5cm]{assets/logos/elasticstack.png}\\[2pt]\textbf{Kibana}\\explore};
+\node[app, right=1.2cm of es] (aria) {\includegraphics[width=0.5cm]{assets/logos/aria-logo.png}\\[2pt]\textbf{ARIA}\\backend};
+\node[store, below=0.9cm of aria] (redis) {\includegraphics[width=0.5cm]{assets/logos/redis.png}\\[2pt]\textbf{Redis}\\cache/cursors};
+
+% Group backgrounds (after nodes exist)
+\node[group, fill=gray!30, fit={(wazuh) (telegraf)}] (gsrc) {};
+\node[group, fill=teal!30, fit={(filebeat)}] (gfwd) {};
+\node[group, fill=blue!30, fit={(es)}] (gstore) {};
+\node[group, fill=orange!30, fit={(kibana) (aria) (redis)}] (gapp) {};
+
+% Arrows
 \draw[arrow] (wazuh) -- (filebeat);
 \draw[arrow] (suricata) -- (filebeat);
 \draw[arrow] (falco) -- (filebeat);
@@ -114,6 +131,12 @@ The central stack is a layered pipeline. Detection and collection tools run on m
 \draw[arrow] (es) -- (kibana);
 \draw[arrow] (es) -- (aria);
 \draw[arrow] (redis) -- (aria);
+
+% Group labels
+\node[font=\fontsize{11}{13}\selectfont\bfseries, text=gray!70!black, above=0.2cm of gsrc.north west, anchor=west] {Sources};
+\node[font=\fontsize{11}{13}\selectfont\bfseries, text=teal!70!black, above=0.2cm of gfwd.north west, anchor=west] {Forwarders};
+\node[font=\fontsize{11}{13}\selectfont\bfseries, text=blue!70!black, above=0.2cm of gstore.north west, anchor=west] {Store};
+\node[font=\fontsize{11}{13}\selectfont\bfseries, text=orange!70!black, above=0.2cm of gapp.north west, anchor=west] {Consumers};
 \end{tikzpicture}\end{adjustbox}
 \caption{Central monitoring stack architecture and ingestion path}
 \label{fig:central-stack}
@@ -153,25 +176,25 @@ Kibana is configured to reach Elasticsearch over HTTPS using the generated certi
 
 \section{Wazuh}
 
-Wazuh provides host and endpoint security monitoring: it analyzes authentication events, file integrity, rootcheck results, and system activity, and raises rule-based security alerts. On the central server, \sourcefile{wazuh_setup.sh} installs the \textbf{Wazuh Manager} from the Wazuh 4.x APT repository at the pinned version \codepath{wazuh-manager=4.5.4-1}, then enables and starts it through \codepath{systemd}.
+\raisebox{-0.18cm}{\includegraphics[width=0.8cm]{assets/logos/wazuh.png}}\hspace{0.15cm}Wazuh provides host and endpoint security monitoring: it analyzes authentication events, file integrity, rootcheck results, and system activity, and raises rule-based security alerts. On the central server, \sourcefile{wazuh_setup.sh} installs the \textbf{Wazuh Manager} from the Wazuh 4.x APT repository at the pinned version \codepath{wazuh-manager=4.5.4-1}, then enables and starts it through \codepath{systemd}.
 
 The important integration step is connecting Wazuh to the rest of the stack. The script appends a Wazuh module block to the Filebeat configuration so that Wazuh alerts are read and shipped into Elasticsearch under the \codepath{wazuh-alerts-*} index family. This is the bridge that turns Wazuh from a stand-alone manager into a source that ARIA can poll: every security alert the manager produces becomes a document in a predictable index pattern. The manager also exposes its API on port~55000 and receives agent events on ports~1514/1515, which become relevant in Chapter~5 when monitored servers enroll their Wazuh Agents.
 
 \section{Suricata}
 
-Suricata is the network intrusion detection engine. It inspects traffic on a network interface and emits structured security events. On the central host, \sourcefile{suricata_setup.sh} installs Suricata from the official OISF stable PPA together with its capture dependencies, then performs a key piece of automation: it detects the active network interface from the default route (\codepath{ip route show default}) and writes it into both \codepath{/etc/default/suricata} and the rendered configuration. This avoids the most common Suricata misconfiguration, which is listening on the wrong interface and therefore seeing no traffic.
+\raisebox{-0.18cm}{\includegraphics[width=0.8cm]{assets/logos/suricata.png}}\hspace{0.15cm}Suricata is the network intrusion detection engine. It inspects traffic on a network interface and emits structured security events. On the central host, \sourcefile{suricata_setup.sh} installs Suricata from the official OISF stable PPA together with its capture dependencies, then performs a key piece of automation: it detects the active network interface from the default route (\codepath{ip route show default}) and writes it into both \codepath{/etc/default/suricata} and the rendered configuration. This avoids the most common Suricata misconfiguration, which is listening on the wrong interface and therefore seeing no traffic.
 
 The configuration itself is rendered from the \sourcefile{suricata_temp.yaml} template. The template defines the protected network ranges through \codepath{HOME_NET} (the RFC~1918 private ranges) versus \codepath{EXTERNAL_NET}, and enables the \codepath{eve-log} output that writes events as JSON to \codepath{eve.json}. The EVE JSON output is what makes Suricata consumable downstream: Filebeat ships these JSON events into Elasticsearch, where ARIA's Suricata mapper interprets them as network alerts. After the configuration is applied, the service is restarted and the script confirms startup by checking for the ``Engine started'' marker in the Suricata log.
 
 \section{Falco and Falcosidekick}
 
-Falco provides runtime security: it watches system calls and container behavior and raises events when something abnormal happens, such as a shell launched inside a container or a sensitive file being read. On the central server, \sourcefile{setup-falco-server-elastic.sh} installs Falco from the official Falco security APT repository and selects the modern eBPF driver service (\codepath{falco-modern-bpf.service}) so that Falco works on a current kernel without building a kernel module.
+\raisebox{-0.18cm}{\includegraphics[width=0.8cm]{assets/logos/falco.png}}\hspace{0.15cm}Falco provides runtime security: it watches system calls and container behavior and raises events when something abnormal happens, such as a shell launched inside a container or a sensitive file being read. On the central server, \sourcefile{setup-falco-server-elastic.sh} installs Falco from the official Falco security APT repository and selects the modern eBPF driver service (\codepath{falco-modern-bpf.service}) so that Falco works on a current kernel without building a kernel module.
 
 Falco on its own only prints events; the forwarding to Elasticsearch is performed by \textbf{Falcosidekick}. The script configures Falcosidekick with the central Elasticsearch URL (\codepath{https://<host>:9200}), the \codepath{elastic} credentials, and a target index prefix (\codepath{falco-events-server} on the central node, and a per-server prefix on monitored hosts). Before reconfiguring anything, the script backs up and removes any previous Docker-based Falco deployment so that the new server-side forwarding configuration is authoritative. It also validates the Elasticsearch endpoint before continuing, which prevents Falcosidekick from being started against an unreachable or misauthenticated target. The result is a runtime-event index family that ARIA's runtime investigation engine consumes in Chapter~4.
 
 \section{Filebeat}
 
-Filebeat is the log-forwarding layer of the stack. It is installed together with Elasticsearch and Kibana by \sourcefile{siem_setup.sh}, shares the same certificate authority, and ships system and authentication logs into Elasticsearch. Two roles make Filebeat central to the architecture. First, it carries Wazuh alerts through the Wazuh module added during the Wazuh setup, producing the \codepath{wazuh-alerts-*} indices. Second, on monitored servers it carries Suricata EVE JSON and system logs into per-server \codepath{filebeat-<asset>-*} indices. Because so many sources travel through Filebeat, its TLS configuration and index naming directly determine what ARIA can later query and how it scopes data by server. Listing~\ref{lst:filebeat} shows the essential output block: Filebeat ships over HTTPS to Elasticsearch on port~9200, authenticates as a beats user, and trusts the locally generated cluster CA, with the password masked.
+\raisebox{-0.18cm}{\includegraphics[width=0.8cm]{assets/logos/filebeat.png}}\hspace{0.15cm}Filebeat is the log-forwarding layer of the stack. It is installed together with Elasticsearch and Kibana by \sourcefile{siem_setup.sh}, shares the same certificate authority, and ships system and authentication logs into Elasticsearch. Two roles make Filebeat central to the architecture. First, it carries Wazuh alerts through the Wazuh module added during the Wazuh setup, producing the \codepath{wazuh-alerts-*} indices. Second, on monitored servers it carries Suricata EVE JSON and system logs into per-server \codepath{filebeat-<asset>-*} indices. Because so many sources travel through Filebeat, its TLS configuration and index naming directly determine what ARIA can later query and how it scopes data by server. Listing~\ref{lst:filebeat} shows the essential output block: Filebeat ships over HTTPS to Elasticsearch on port~9200, authenticates as a beats user, and trusts the locally generated cluster CA, with the password masked.
 
 \begin{lstlisting}[style=aria,language=yaml,caption={Filebeat Elasticsearch output (sanitized excerpt)},label={lst:filebeat}]
 output.elasticsearch:
@@ -185,7 +208,7 @@ output.elasticsearch:
 
 \section{Telegraf}
 
-Telegraf is the metrics agent. It collects infrastructure metrics such as CPU, memory, disk, network, load, processes, and sockets, and writes them to Elasticsearch. On the central host, \sourcefile{telegraf_setup.sh} installs Telegraf from the InfluxData repository and configures an Elasticsearch output rather than the default InfluxDB output, because in this project Elasticsearch is the single shared store for both security events and metrics.
+\raisebox{-0.18cm}{\includegraphics[width=0.8cm]{assets/logos/influxdb.png}}\hspace{0.15cm}Telegraf is the metrics agent. It collects infrastructure metrics such as CPU, memory, disk, network, load, processes, and sockets, and writes them to Elasticsearch. On the central host, \sourcefile{telegraf_setup.sh} installs Telegraf from the InfluxData repository and configures an Elasticsearch output rather than the default InfluxDB output, because in this project Elasticsearch is the single shared store for both security events and metrics.
 
 The configuration logic is careful about two practical issues. First, Telegraf must trust the Elasticsearch certificate authority, so the script installs the cluster CA into a dedicated, group-readable \codepath{certs} directory owned by the \codepath{telegraf} user. Second, it detects the Elasticsearch version before writing the output block, because the Elasticsearch output behaves differently across versions; if the version cannot be detected, the script stops rather than producing a silently broken metrics pipeline. A small custom input is also added to report the size of selected directories, which complements the standard host metrics. Telegraf writes into \codepath{telegraf-*} indices, which feed the metrics dashboard and the infrastructure investigations described in Chapter~4. Listing~\ref{lst:telegraf} shows the Elasticsearch output that replaces the default InfluxDB sink.
 
