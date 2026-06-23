@@ -96,8 +96,8 @@ Kibana $\rightarrow$ Elasticsearch & 9200 & HTTPS & Kibana configuration \\
 Analyst $\rightarrow$ Kibana & 5601 & HTTP & central host / security group \\
 Wazuh agents $\rightarrow$ Manager & 1514--1515 & TCP & Wazuh agent configuration \\
 Wazuh API & 55000 & HTTPS & bootstrap agent-id lookup \\
-ARIA backend & 8000/8001 & HTTP & \codepath{API_PORT}/\codepath{BACKEND_PORT} \\
-ARIA frontend (dashboard) & 3000 & HTTP & Next.js dashboard (Ch.~5) \\
+ARIA backend & 8001 & HTTP & \codepath{BACKEND_PORT} (\codepath{.env}) \\
+ARIA frontend (dashboard) & 3001 & HTTP & Next.js dashboard (Ch.~5) \\
 Backend $\rightarrow$ Redis & 6379 & TCP & \codepath{REDIS_HOST}/\codepath{REDIS_PORT} \\
 Administration (SSH) & 22 & TCP & security group rule \\
 \bottomrule

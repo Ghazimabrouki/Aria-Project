@@ -156,7 +156,7 @@ The script ends by printing the exact JSON payload that registers the asset in A
 
 \section{Containerized and Global Deployment}
 
-Beyond individual agents, the platform itself is deployed as cooperating services. The production-oriented layout runs the HTTP API and the background workers as separate processes, so that a crash in a long-running polling or correlation loop cannot take down the API that serves the dashboard. The FastAPI application listens on port~8001 and the dashboard on port~3000, while Redis and SQLite are local data services and Elasticsearch is the external source shared by all monitored servers. This process separation, combined with the restart-and-graceful-shutdown handling of the background process, is what lets the platform run unattended.
+Beyond individual agents, the platform itself is deployed as cooperating services. The production-oriented layout runs the HTTP API and the background workers as separate processes, so that a crash in a long-running polling or correlation loop cannot take down the API that serves the dashboard. The FastAPI application listens on port~8001 and the production dashboard is exposed on port~3001 (the Next.js container listens internally on port~3000), while Redis and SQLite are local data services and Elasticsearch is the external source shared by all monitored servers. This process separation, combined with the restart-and-graceful-shutdown handling of the background process, is what lets the platform run unattended.
 
 \begin{figure}[H]
 \centering
@@ -167,7 +167,7 @@ Beyond individual agents, the platform itself is deployed as cooperating service
   arrow/.style={-Latex, thick}
 ]
 \node[host] (user) {SOC user browser};
-\node[svc, below=of user] (front) {Next.js dashboard\\port 3000};
+\node[svc, below=of user] (front) {Next.js dashboard\\port 3001};
 \node[svc, below=of front] (api) {FastAPI API\\port 8001};
 \node[svc, below left=0.9cm and 1.8cm of api] (main) {main.py\\background tasks};
 \node[svc, below=of main] (sqlite) {SQLite\\investigations.db};
@@ -185,6 +185,43 @@ Beyond individual agents, the platform itself is deployed as cooperating service
 \end{tikzpicture}\end{adjustbox}
 \caption{Deployment architecture}
 \end{figure}
+
+The containerized layout is captured in the Docker Compose file shown in Listing~\ref{lst:docker-compose}. Redis is exposed on host port~6380 and mapped to the standard container port~6379; the API and worker share the same backend image but run different commands; and the frontend container listens internally on port~3000 while the host exposes port~3001.
+
+\begin{lstlisting}[style=aria,language=yaml,caption={Docker Compose services excerpt},label={lst:docker-compose}]
+services:
+  redis:
+    image: ghaziiii/aria_project:redis-latest
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+
+  api:
+    image: ghaziiii/aria_project:backend-latest
+    ports:
+      - "8001:8001"
+    environment:
+      - BACKEND_PORT=8001
+      - CORS_ORIGINS=http://localhost:3001
+    depends_on:
+      - redis
+
+  worker:
+    image: ghaziiii/aria_project:worker-latest
+    environment:
+      - BACKEND_PORT=8001
+    depends_on:
+      - api
+      - redis
+
+  frontend:
+    image: ghaziiii/aria_project:frontend-latest
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+\end{lstlisting}
 
 \section{Production Deployment Workflow}
 
