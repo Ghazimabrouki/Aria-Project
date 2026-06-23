@@ -6,7 +6,7 @@ Edit PORTFOLIO_URL below, then run this script from the aria-report directory.
 import os
 import qrcode
 
-PORTFOLIO_URL = "https://portfolio.example.com"  # <-- replace with your portfolio URL
+PORTFOLIO_URL = "https://v0-portfolio-website-creation-eosin.vercel.app/"
 
 os.makedirs("assets/qr", exist_ok=True)
 
