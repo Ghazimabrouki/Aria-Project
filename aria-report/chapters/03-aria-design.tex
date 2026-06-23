@@ -2,7 +2,17 @@
 
 \section{Introduction}
 
-The previous chapter ended with real telemetry sitting in Elasticsearch. On its own, that telemetry is still a stream of heterogeneous technical documents. ARIA is the platform that gives this data operational meaning. This chapter explains how ARIA is designed and, more importantly, the \emph{logic} behind each of its internal stages, that is, why each transformation exists and what problem it solves, rather than only listing the modules involved. It first describes the global, backend, and frontend architecture and the persistence model, then follows the data through ingestion, normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping, and finally presents the security and control mechanisms that hold the whole workflow together.
+The previous chapter ended with real telemetry sitting in Elasticsearch. On its own, that telemetry is still a stream of heterogeneous technical documents. ARIA is the platform that gives this data operational meaning.
+
+This chapter explains how ARIA is designed and, more importantly, the \emph{logic} behind each transformation. The goal is to show \emph{why} each stage exists and what problem it solves, not merely to list the modules involved. The discussion is organized in three layers:
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Architecture:} global, backend, frontend, and persistence views of the platform.
+\item \textbf{Pipeline:} the path from alert ingestion through normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping.
+\item \textbf{Controls:} the security mechanisms and approval boundaries that keep the analyst in control of risky actions.
+\end{enumerate}
+
+For each stage we explain not only what happens, but why it is necessary.
 
 \section{Twelve-Step Intelligence Pipeline}
 
@@ -389,7 +399,15 @@ To make this concrete, Figure~\ref{fig:object-case} is an object diagram of a si
 
 \section{AI-Assisted Analysis Logic}
 
-The response layer (\sourcefile{response/ai_engine/}, \sourcefile{response/runtime_ai_engine/}, \sourcefile{response/infrastructure_ai_engine/}) turns an incident into actionable investigation material. Its logic has three parts. First, \textbf{context building}: before any model is called, ARIA assembles a structured context with the alert timeline, source and destination indicators, MITRE information, behavioral history, risk score, and host information, because output quality depends almost entirely on input quality. Second, \textbf{provider routing}: prompt-builder modules and multi-provider client support let the system route calls to a configured LLM and fall back gracefully when no provider is reachable, so the workflow never blocks on an external dependency. Third, \textbf{structured output parsing}: the response is expected to contain a summary, a narrative, a risk assessment, and a playbook; the parser extracts these into the \codepath{Investigation} model, and because LLM output can be malformed, it includes fallback parsing and rule-based generation. The consistent theme is that AI is treated as a fallible assistant whose output is always parsed, validated, and constrained, never trusted blindly.
+The response layer (\sourcefile{response/ai_engine/}, \sourcefile{response/runtime_ai_engine/}, \sourcefile{response/infrastructure_ai_engine/}) turns an incident into actionable investigation material. Its logic has three parts:
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Context building.} Before any model is called, ARIA assembles a structured context with the alert timeline, source and destination indicators, MITRE information, behavioral history, risk score, and host information. Output quality depends almost entirely on input quality.
+\item \textbf{Provider routing.} Prompt-builder modules and a multi-provider client route calls to the configured LLM and fall back gracefully when no provider is reachable, so the workflow never blocks on an external dependency.
+\item \textbf{Structured output parsing.} The response is expected to contain a summary, a narrative, a risk assessment, and a playbook. The parser extracts these into the \codepath{Investigation} model, and fallback parsing plus rule-based generation handle malformed LLM output.
+\end{enumerate}
+
+The consistent theme is that AI is treated as a fallible assistant whose output is always parsed, validated, and constrained, never trusted blindly.
 
 \diagramimagecompact{phase3_ai_response.png}{AI response engine from restitution diagrams}
 

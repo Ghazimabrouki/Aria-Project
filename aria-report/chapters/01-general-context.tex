@@ -157,7 +157,14 @@ To answer this problem, the project pursued the following objectives:
 
 \section{Proposed Solution: ARIA}
 
-The proposed solution is ARIA, an intelligent SOC/SOAR platform. It connects the monitoring foundation to a backend intelligence layer and a dashboard. The platform collects events from Elasticsearch, normalizes them, filters noise, deduplicates repeated alerts, enriches indicators with GeoIP and MITRE ATT\&CK context, correlates alerts into incidents, creates investigations, generates AI-assisted explanations and Ansible playbooks, requests approval, executes controlled remediation, verifies the result, and archives the case.
+The proposed solution is ARIA, an intelligent SOC/SOAR platform. It connects the monitoring foundation built in Chapter~2 to a backend intelligence layer and a Next.js dashboard. ARIA performs four main functions:
+
+\begin{itemize}[leftmargin=1cm]
+\item \textbf{Ingest and normalize:} poll Elasticsearch indices and turn heterogeneous raw documents from Wazuh, Suricata, Falco, Telegraf, and generic sources into a common alert model.
+\item \textbf{Enrich and correlate:} add GeoIP and MITRE ATT\&CK context, remove duplicates and noise, and group related alerts into incidents.
+\item \textbf{Assist and control response:} generate AI-assisted investigation summaries, risk scores, narratives, and Ansible playbooks; require analyst approval and admin-secret validation before any sensitive action.
+\item \textbf{Verify and archive:} execute playbooks, re-check evidence, archive closed cases, and persist a complete audit trail.
+\end{itemize}
 
 \diagramimage{phase3_global_backend.png}{ARIA backend intelligence layer}
 

@@ -34,5 +34,25 @@ The project objectives were:
 \section*{Report Organization}
 \addcontentsline{toc}{section}{Report Organization}
 
-This report is organized to follow the real engineering story of the project, that is, the order in which the solution was actually built from the ground up. \textbf{Chapter~1} presents the general context and project scope: the host organization, the cybersecurity and SOC background, the study and limits of the existing situation, the problem statement, the objectives, the proposed ARIA solution, and the working methodology and planning. \textbf{Chapter~2} describes the cloud environment and the central monitoring foundation: the Huawei Cloud infrastructure, the preparation of the main server, the network and communication design, and the installation, configuration, automation, and stability of each monitoring and security tool (Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, and Redis) until real telemetry is verified inside Elasticsearch. \textbf{Chapter~3} explains the design and internal logic of the ARIA platform: its global, backend, and frontend architecture, its data model, and the reasoning behind each processing stage, from alert ingestion to normalization, deduplication, correlation, AI-assisted analysis, controlled remediation, verification, and asset scoping. \textbf{Chapter~4} presents the functional realization of ARIA, showing how each operational feature of the dashboard works on top of the collected data. \textbf{Chapter~5} covers multi-server onboarding and production deployment: how a new server is automatically prepared to send its data to the central stack, becomes a scoped asset inside ARIA, and how the whole solution is deployed and hardened for production. \textbf{Chapter~6} presents the validation and evaluation of the solution in the same build order: it validates the cloud environment and central monitoring stack first, confirms that real telemetry reaches Elasticsearch, and then validates the ARIA backend, frontend, individual features, multi-server scoping, runtime and remediation workflows, automated tests, and end-to-end scenarios, before listing the remaining limitations. The report ends with a general conclusion and appendices containing technical inventories, configuration extracts, and validation evidence.
+This report is organized to follow the real engineering story of the project, that is, the order in which the solution was actually built from the ground up. Table~\ref{tab:report-org} maps each chapter to its focus and to the validation evidence that supports it.
+
+\begin{table}[H]
+\centering
+\caption{Report organization and validation focus}
+\label{tab:report-org}
+\begin{tabularx}{\textwidth}{@{}p{0.14\textwidth}p{0.48\textwidth}X@{}}
+\toprule
+\textbf{Chapter} & \textbf{Focus} & \textbf{Validated by} \\
+\midrule
+Chapter~1 & Host organization, SOC context, existing limits, objectives, methodology & Background review, planning documents \\
+Chapter~2 & Huawei Cloud environment and central monitoring stack (ES, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, Redis) & Live ES indices, service health checks \\
+Chapter~3 & ARIA design: architecture, data model, pipeline stages, security controls & Architecture diagrams, model and unit tests \\
+Chapter~4 & Dashboard functional realization and operational interfaces & Screenshots, API checks, end-to-end scenarios \\
+Chapter~5 & Multi-server onboarding, asset scoping, and production deployment & Bootstrap simulation, asset registry, Docker Compose evidence \\
+Chapter~6 & Validation, evaluation, limitations, and future work & Compilation, type checks, automated tests, live captures \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Chapter~1} presents the general context and project scope. \textbf{Chapter~2} builds the telemetry foundation. \textbf{Chapter~3} explains the design and internal logic of ARIA. \textbf{Chapter~4} shows the functional realization through the dashboard. \textbf{Chapter~5} covers onboarding and production deployment. \textbf{Chapter~6} validates the solution and discusses limitations and future work. The report ends with a general conclusion and appendices containing technical inventories, configuration extracts, and validation evidence.
 

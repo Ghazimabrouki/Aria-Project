@@ -13,6 +13,29 @@ The initial problem asked how a SOC can reduce manual effort and response delay 
 
 A major result of the project is the balance between automation and control. The AI layer helps generate summaries, narratives, risk assessments, and Ansible playbooks, but it does not remove the analyst from sensitive decisions. Playbook execution remains protected by validation, approval workflows, admin-secret checks, Ansible execution tracking, fix verification, and audit persistence. This human-in-the-loop design is essential in cybersecurity, where an incorrect action can affect availability or security.
 
+Table~\ref{tab:main-results} summarizes the concrete outputs of the internship.
+
+\begin{table}[H]
+\centering
+\caption{Main project outputs}
+\label{tab:main-results}
+\begin{tabularx}{\textwidth}{@{}p{0.46\textwidth}X@{}}
+\toprule
+\textbf{Output} & \textbf{Quantity / Status} \\
+\midrule
+Backend Python code & $\sim$39 K lines \\
+Frontend TypeScript code & $\sim$57 K lines \\
+Backend modules compiled & 146 \\
+Automated tests reported passing & 910 \\
+API routes & 16 modules \\
+Database models & 13 \\
+Dashboard pages built & 28/28 \\
+Monitored assets activated & \codepath{dash-linux} validated \\
+End-to-end remediation workflow & Nine-stage workflow completed \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 The work also produced a rich operational interface. The Next.js dashboard exposes alerts, incidents, investigations, runtime investigations, infrastructure investigations, monitoring, metrics, IPS visualization, search, archives, assistant, operator workflows, assets, accounts, data-source settings, pipeline settings, Ansible settings, and protected administrative actions. The backend exposes these capabilities through FastAPI routes and WebSocket updates, while Redis, SQLite, Elasticsearch, and Ansible support the underlying workflow. The validation evidence -- API checks, backend compilation, frontend build verification, multi-server activation on the \codepath{dash-linux} asset, admin-secret verification, and a large automated test suite -- confirms that the main objectives defined at the start of the internship were reached for the controlled-environment scope.
 
 \section*{Difficulties Encountered}
@@ -38,7 +61,18 @@ For me as a student, the project was an opportunity to work end to end on a real
 \section*{Future Work}
 \addcontentsline{toc}{section}{Future Work}
 
-The current project is a strong controlled-environment SOC/SOAR foundation. Its main future improvements are: full authentication and role-based access control for public exposure; stronger production hardening; a strengthened persistence layer where deployment concurrency and scale require it; expanded asset scoping where some monitoring views remain global by design; richer playbook libraries; improved LLM evaluation and guardrails; automated incident reporting; broader enterprise log integration; and more automated validation of the monitored-VM onboarding path.
+The current project is a strong controlled-environment SOC/SOAR foundation. The main future improvements are:
+
+\begin{itemize}[leftmargin=1cm]
+\item \textbf{Authentication and RBAC:} add full user authentication and role-based access control before public exposure.
+\item \textbf{Production hardening:} strengthen network restrictions, secret management, and persistence for larger deployments.
+\item \textbf{Scalability:} replace SQLite with a production-grade database where concurrency and scale require it.
+\item \textbf{Expanded asset scoping:} apply scoping consistently to all monitoring views that are currently global by design.
+\item \textbf{Richer playbook libraries:} build reusable, tested playbooks for common incident classes.
+\item \textbf{LLM guardrails:} improve prompt engineering, output evaluation, and safety checks.
+\item \textbf{Reporting and integration:} add automated incident reports and broader enterprise log sources.
+\item \textbf{Onboarding validation:} add automated tests for the monitored-VM bootstrap path.
+\end{itemize}
 
 \section*{Final Word}
 \addcontentsline{toc}{section}{Final Word}

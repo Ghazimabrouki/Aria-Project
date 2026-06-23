@@ -2,7 +2,19 @@
 
 \section{Introduction}
 
-ARIA does not generate telemetry by itself; it consumes telemetry that already exists in Elasticsearch. Before any intelligence can be built, that telemetry must actually arrive: real host, network, runtime, and resource events must be produced by monitoring tools, forwarded, indexed, and made queryable. This chapter follows the engineering story at its foundation. It describes the Huawei Cloud environment that hosts the stack, the preparation of the central server, the network and communication design, and the installation, configuration, automation, and stabilization of each monitoring and security tool. It ends by verifying that real data is present inside Elasticsearch, which is the precondition for everything ARIA does in the following chapters.
+ARIA does not generate telemetry by itself; it consumes telemetry that already exists in Elasticsearch. Before any intelligence can be built, that telemetry must actually arrive: real host, network, runtime, and resource events must be produced, forwarded, indexed, and made queryable.
+
+This chapter follows the engineering story at its foundation. It covers:
+
+\begin{itemize}[leftmargin=1cm]
+\item the Huawei Cloud environment that hosts the stack;
+\item the preparation and hardening of the central server;
+\item the network, ports, and communication design;
+\item the installation, configuration, and automation of each monitoring and security tool;
+\item the verification that real data is present inside Elasticsearch.
+\end{itemize}
+
+The chapter ends with live Elasticsearch evidence, which is the precondition for everything ARIA does in the following chapters.
 
 \section{Huawei Cloud Environment}
 
