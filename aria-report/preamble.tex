@@ -11,6 +11,7 @@
 \setlength{\parindent}{0.5cm}
 \setlength{\parskip}{0pt}
 \setlength{\emergencystretch}{3em}
+\raggedbottom
 \renewcommand{\topfraction}{0.92}
 \renewcommand{\bottomfraction}{0.9}
 \renewcommand{\textfraction}{0.06}
@@ -42,6 +43,8 @@
 \usepackage{array}
 \usepackage{xcolor}
 \usepackage{enumitem}
+\setlist[itemize]{noitemsep,topsep=0.25em}
+\setlist[enumerate]{noitemsep,topsep=0.25em}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,calc}
 \PassOptionsToPackage{obeyspaces}{url}
@@ -69,7 +72,7 @@
   breaklines=true, breakatwhitespace=false,
   showstringspaces=false, tabsize=2,
   captionpos=b, xleftmargin=14pt, xrightmargin=4pt,
-  aboveskip=0.6em, belowskip=0.4em,
+  aboveskip=0.4em, belowskip=0.25em,
   upquote=true, columns=fullflexible, keepspaces=true,
 }
 \lstdefinestyle{ariaterm}{%
@@ -145,14 +148,14 @@
 
 
 \newcommand{\reservedblock}[3]{%
-\par\vspace{0.35cm}
+\par\vspace{0.2cm}
 \noindent\fbox{%
 \begin{minipage}[c][#2][c]{0.94\textwidth}
 \centering
-\textbf{#1}\\[0.25cm]
+\textbf{#1}\\[0.15cm]
 \small #3
 \end{minipage}}
-\par\vspace{0.45cm}
+\par\vspace{0.3cm}
 }
 
 \newcommand{\diagramimage}[2]{%
@@ -173,7 +176,7 @@
 \newcommand{\umlfigure}[3]{%
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{assets/diagrams/#1}
+\includegraphics[width=\textwidth,height=0.50\textheight,keepaspectratio]{assets/diagrams/#1}
 \caption{#2}\label{#3}
 \end{figure}
 }
@@ -221,10 +224,10 @@
 \newcommand{\quadfig}[6]{%
 \begin{figure}[H]
 \centering
-\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#1}}\hfill
-\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#2}}\\[3pt]
-\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#3}}\hfill
-\fbox{\includegraphics[width=0.47\textwidth,height=0.27\textheight,keepaspectratio]{assets/screenshots/#4}}
+\fbox{\includegraphics[width=0.47\textwidth,height=0.29\textheight,keepaspectratio]{assets/screenshots/#1}}\hfill
+\fbox{\includegraphics[width=0.47\textwidth,height=0.29\textheight,keepaspectratio]{assets/screenshots/#2}}\\[2pt]
+\fbox{\includegraphics[width=0.47\textwidth,height=0.29\textheight,keepaspectratio]{assets/screenshots/#3}}\hfill
+\fbox{\includegraphics[width=0.47\textwidth,height=0.29\textheight,keepaspectratio]{assets/screenshots/#4}}
 \caption{#5}\label{#6}
 \end{figure}
 }

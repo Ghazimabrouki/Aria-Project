@@ -231,6 +231,7 @@ Architecturally, the frontend is built around three ideas. A dashboard shell hol
 
 The dashboard pages themselves are organized into a navigation map (Figure~\ref{fig:frontend-nav}) that follows the SOC workflow: an \emph{Overview} group (dashboard, search), \emph{Security Operations} (alerts, incidents, investigations, IPS map, whitelist), \emph{Infrastructure \& Performance}, \emph{Runtime Security}, \emph{AI Intelligence} (assistant, operator), and \emph{System Management} (archives, settings). This grouping is what lets an analyst move from a high-level signal to a specific case in two or three clicks.
 
+\clearpage
 \umlfigure{frontend_navigation_map.png}{Frontend navigation map (sidebar groups to dashboard routes)}{fig:frontend-nav}
 
 \section{Database and Persistence Logic}
@@ -515,6 +516,7 @@ Figure~\ref{fig:asset-scoping} shows the same idea as a data-flow diagram centre
 
 \umlfigurecompact{asset_scoping_data_flow.png}{Asset-scoped filtering across all data stores (data-flow diagram)}{fig:asset-scoping}
 
+\clearpage
 \umlfigure{monitored_asset_state_machine.png}{Monitored asset lifecycle state diagram (real validation\_status values)}{fig:asset-states}
 
 \section{Security and Control Mechanisms}
