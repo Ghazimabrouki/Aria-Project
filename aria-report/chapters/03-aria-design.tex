@@ -36,39 +36,51 @@ The ARIA workflow can be described as a twelve-step pipeline that carries a sign
 \begin{figure}[H]
 \centering
 \begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
-  stepbox/.style={draw, rounded corners, align=center, minimum width=2.2cm, minimum height=0.75cm, fill=gray!8, font=\scriptsize},
-  arrow/.style={-Latex, thick}
+  font=\small,
+  stepbox/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.9cm, fill=white, font=\fontsize{12}{14}\selectfont},
+  phase/.style={draw=none, rounded corners=3pt, inner sep=8pt, minimum width=3.1cm},
+  arrow/.style={-Latex, line width=1.1pt}
 ]
-% Row 1
-\node[stepbox] (s1) at (0,0) {1. Ingestion};
-\node[stepbox, right=0.25cm of s1] (s2) {2. Mapping};
-\node[stepbox, right=0.25cm of s2] (s3) {3. Enrichment};
-\node[stepbox, right=0.25cm of s3] (s4) {4. Dedup};
-\node[stepbox, right=0.25cm of s4] (s5) {5. Noise filter};
-\node[stepbox, right=0.25cm of s5] (s6) {6. SQLite};
-% Row 2
-\node[stepbox, below=0.5cm of s1] (s7) {7. Correlation};
-\node[stepbox, right=0.25cm of s7] (s8) {8. Investigation};
-\node[stepbox, right=0.25cm of s8] (s9) {9. AI analysis};
-\node[stepbox, right=0.25cm of s9] (s10) {10. Approval};
-\node[stepbox, right=0.25cm of s10] (s11) {11. Execution};
-\node[stepbox, right=0.25cm of s11] (s12) {12. Verify + Archive};
-% Arrows row 1
-\draw[arrow] (s1) -- (s2);
-\draw[arrow] (s2) -- (s3);
-\draw[arrow] (s3) -- (s4);
-\draw[arrow] (s4) -- (s5);
-\draw[arrow] (s5) -- (s6);
-% Arrow down
-\draw[arrow] (s6) -- ++(0,-0.35) -| (s7);
-% Arrows row 2
-\draw[arrow] (s7) -- (s8);
-\draw[arrow] (s8) -- (s9);
-\draw[arrow] (s9) -- (s10);
-\draw[arrow] (s10) -- (s11);
-\draw[arrow] (s11) -- (s12);
+\newcommand{\stepnum}[1]{\fontsize{9}{10}\selectfont\textbf{\textcolor{gray!70}{#1}}}
+% Phase backgrounds
+\node[phase, fill=blue!8, fit={(0,0) (3.1,-4.2)}] (p1) {};
+\node[phase, fill=teal!8, fit={(3.6,0) (6.7,-4.2)}] (p2) {};
+\node[phase, fill=orange!8, fit={(7.2,0) (10.3,-4.2)}] (p3) {};
+\node[phase, fill=green!8, fit={(10.8,0) (13.9,-4.2)}] (p4) {};
+
+% Phase titles
+\node[above=0.15cm of p1.north, font=\fontsize{13}{15}\selectfont\bfseries, text=blue!70!black] {Ingest \& Normalize};
+\node[above=0.15cm of p2.north, font=\fontsize{13}{15}\selectfont\bfseries, text=teal!70!black] {Filter \& Store};
+\node[above=0.15cm of p3.north, font=\fontsize{13}{15}\selectfont\bfseries, text=orange!70!black] {Correlate \& Analyze};
+\node[above=0.15cm of p4.north, font=\fontsize{13}{15}\selectfont\bfseries, text=green!60!black] {Respond \& Verify};
+
+% Step nodes
+\node[stepbox] (s1) at (1.55,-0.7) {\stepnum{1}\ Ingestion};
+\node[stepbox] (s2) at (1.55,-1.85) {\stepnum{2}\ Mapping};
+\node[stepbox] (s3) at (1.55,-3.0) {\stepnum{3}\ Enrichment};
+
+\node[stepbox] (s4) at (5.15,-0.7) {\stepnum{4}\ Dedup};
+\node[stepbox] (s5) at (5.15,-1.85) {\stepnum{5}\ Noise filter};
+\node[stepbox] (s6) at (5.15,-3.0) {\stepnum{6}\ SQLite};
+
+\node[stepbox] (s7) at (8.75,-0.7) {\stepnum{7}\ Correlation};
+\node[stepbox] (s8) at (8.75,-1.85) {\stepnum{8}\ Investigation};
+\node[stepbox] (s9) at (8.75,-3.0) {\stepnum{9}\ AI analysis};
+
+\node[stepbox] (s10) at (12.35,-0.7) {\stepnum{10}\ Approval};
+\node[stepbox] (s11) at (12.35,-1.85) {\stepnum{11}\ Execution};
+\node[stepbox] (s12) at (12.35,-3.0) {\stepnum{12}\ Verify + Archive};
+
+% Vertical arrows within phases
+\foreach \a/\b in {s1/s2, s2/s3, s4/s5, s5/s6, s7/s8, s8/s9, s10/s11, s11/s12}{
+  \draw[arrow] (\a) -- (\b);
+}
+% Horizontal arrows between phases
+\draw[arrow] (s3.east) -- ++(0.35,0) |- (s4.west);
+\draw[arrow] (s6.east) -- ++(0.35,0) |- (s7.west);
+\draw[arrow] (s9.east) -- ++(0.35,0) |- (s10.west);
 \end{tikzpicture}\end{adjustbox}
-\caption{ARIA twelve-step intelligence pipeline}\label{fig:twelve-step}
+\caption{ARIA twelve-step intelligence pipeline grouped by phase}\label{fig:twelve-step}
 \end{figure}
 
 \section{Global ARIA Architecture}
@@ -586,29 +598,50 @@ Verification & Execution success is not enough; recurrence or remote state is ve
 \begin{figure}[H]
 \centering
 \begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
-  box/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=gray!8},
-  guard/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=red!8},
-  audit/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=blue!8},
-  arrow/.style={-Latex, thick}
+  font=\small,
+  box/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=gray!8, font=\fontsize{13}{15}\selectfont},
+  guard/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=red!10, font=\fontsize{13}{15}\selectfont},
+  exec/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=orange!10, font=\fontsize{13}{15}\selectfont},
+  verify/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=green!10, font=\fontsize{13}{15}\selectfont},
+  audit/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=blue!10, font=\fontsize{13}{15}\selectfont},
+  label/.style={align=center, font=\fontsize{11}{13}\selectfont, text=gray!70!black},
+  arrow/.style={-Latex, line width=1.2pt},
+  auditarrow/.style={-Latex, line width=1.0pt, dashed, gray!70}
 ]
-\node[box] (ai) {AI proposal};
-\node[guard, right=0.45cm of ai] (safety) {Safety policy};
-\node[guard, right=0.45cm of safety] (approval) {Approval gate};
-\node[guard, right=0.45cm of approval] (admin) {Admin-secret gate};
-\node[box, right=0.45cm of admin] (exec) {Ansible execution};
-\node[box, right=0.45cm of exec] (verify) {Verification};
-\node[audit, below=0.9cm of verify] (audit) {Audit log};
+% Main workflow nodes
+\node[box] (ai) {\textbf{AI proposal}};
+\node[guard, right=1.0cm of ai] (safety) {\textbf{Safety policy}};
+\node[guard, right=1.0cm of safety] (approval) {\textbf{Approval gate}};
+\node[guard, right=1.0cm of approval] (admin) {\textbf{Admin-secret gate}};
+\node[exec, right=1.0cm of admin] (execnode) {\textbf{Ansible execution}};
+\node[verify, right=1.0cm of execnode] (verifynode) {\textbf{Verification}};
+
+% Audit output below
+\node[audit, below=1.8cm of $(approval.east)!0.5!(admin.west)$] (auditnode) {\textbf{Audit log}};
+
+% Main arrows
 \draw[arrow] (ai) -- (safety);
 \draw[arrow] (safety) -- (approval);
 \draw[arrow] (approval) -- (admin);
-\draw[arrow] (admin) -- (exec);
-\draw[arrow] (exec) -- (verify);
-\draw[arrow] (verify) -- (audit);
-\draw[arrow, dashed] (approval) |- ++(0,-0.45) -| (audit);
-\draw[arrow, dashed] (admin) |- ++(0,-0.6) -| (audit);
-\draw[arrow, dashed] (exec) |- ++(0,-0.75) -| (audit);
+\draw[arrow] (admin) -- (execnode);
+\draw[arrow] (execnode) -- (verifynode);
+
+% Phase labels above
+\node[label, above=0.45cm] at ($(ai.east)!0.5!(safety.west)$) {proposed action};
+\node[label, above=0.45cm] at ($(safety.east)!0.5!(approval.west)$) {risk check};
+\node[label, above=0.45cm] at ($(approval.east)!0.5!(admin.west)$) {analyst decision};
+\node[label, above=0.45cm] at ($(admin.east)!0.5!(execnode.west)$) {privilege check};
+\node[label, above=0.45cm] at ($(execnode.east)!0.5!(verifynode.west)$) {fix applied};
+
+% Audit arrows (dashed, from gates and execution)
+\draw[auditarrow] (safety.south) -- ++(0,-0.4) -| (auditnode.north);
+\draw[auditarrow] (approval.south) -- ++(0,-0.55) -| (auditnode.north);
+\draw[auditarrow] (admin.south) -- ++(0,-0.7) -| (auditnode.north);
+\draw[auditarrow] (execnode.south) -- ++(0,-0.85) -| (auditnode.north);
+\draw[auditarrow] (verifynode.south) -- ++(0,-0.55) -| (auditnode.north);
+
 \end{tikzpicture}\end{adjustbox}
-\caption{Security control chain for AI-assisted remediation}
+\caption{Security control chain for AI-assisted remediation. Colors distinguish AI/analysis (gray), governance gates (red), execution (orange), verification (green), and audit output (blue).}
 \end{figure}
 
 \begin{figure}[H]
