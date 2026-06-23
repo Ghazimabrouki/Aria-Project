@@ -250,11 +250,24 @@ The realized assistant (Figure~\ref{fig:ss-assistant-operator}, left) shows a SO
 
 \section{Operator}
 
-The operator workflow is the most safety-sensitive page, because it can drive remote action from a natural-language request. It provides asset-scoped sessions, inventory host discovery, readiness banners, prompt submission, playbook preview, approval, run polling, and result display. The logic enforces every guard in sequence: the operator validates that the selected asset exists, is enabled, and has remediation configured, refuses \codepath{asset_id=all}, invalid, or disabled assets, generates a preview or playbook with risk information, blocks execution until approval, and re-validates before the run. A request never becomes an action without passing all of these gates.
+The operator workflow is the most safety-sensitive page, because it can drive remote action from a natural-language request. It provides asset-scoped sessions, inventory host discovery, readiness banners, prompt submission, playbook preview, approval, run polling, and result display.
 
-\diagramimagecompact{phase3_ai_operator.png}{AI operator workflow}
+The operator enforces every guard in sequence, as shown in Figure~\ref{fig:ai-operator}, Figure~\ref{fig:seq-operator}, and Figure~\ref{fig:act-operator}:
 
-The full natural-language-to-action path is the sequence in Figure~\ref{fig:seq-operator}, and the safety decision that can block it at every step is the activity diagram in Figure~\ref{fig:act-operator}: the request is parsed into an intent and a playbook, the target is checked against the allowed asset scope, the operation is classified by risk, and a risky operation requires the admin secret before any preview can be confirmed. Table~\ref{tab:operator-risk} summarizes how risk levels gate execution, using the real \codepath{OperatorRun.risk_level} values.
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Asset validation.} The selected asset must exist, be enabled, and have remediation configured. \codepath{asset_id=all}, invalid, or disabled assets are refused.
+\item \textbf{Intent parsing.} The natural-language request is parsed into an intent and a playbook.
+\item \textbf{Scope check.} The target is checked against the account's allowed asset scope.
+\item \textbf{Risk classification.} The operation is classified as low, medium, or high risk.
+\item \textbf{Approval gate.} Execution is blocked until the analyst confirms the preview; high-risk operations also require the admin secret.
+\item \textbf{Re-validation.} The request is re-validated immediately before the run.
+\end{enumerate}
+
+A request never becomes an action without passing all of these gates.
+
+\umlfigure{phase3_ai_operator.png}{AI operator workflow}{fig:ai-operator}
+
+The full natural-language-to-action path is the sequence in Figure~\ref{fig:seq-operator}, and the safety decision that can block it at every step is the activity diagram in Figure~\ref{fig:act-operator}. Table~\ref{tab:operator-risk} summarizes how risk levels gate execution, using the real \codepath{OperatorRun.risk_level} values.
 
 \umlfigure{seq_operator.png}{Operator natural-language-to-action sequence}{fig:seq-operator}
 
