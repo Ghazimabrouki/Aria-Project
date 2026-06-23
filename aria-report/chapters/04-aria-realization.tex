@@ -95,7 +95,15 @@ The realized page is shown in Figure~\ref{fig:ss-alerts}: the filter bar, the se
 
 \section{Incidents}
 
-The incidents page presents the result of correlation: related alerts grouped into a single case. It lists incidents, filters by status, severity, time, and asset, and shows detail tabs with the correlated alerts, the timeline, and related investigations. From here an analyst can assign an incident, change its status, or launch an investigation manually. The page exists so that the analyst reasons at the level of an incident, not at the level of dozens of individual alerts. The grouping logic and the incident lifecycle this page exposes were modelled in Chapter~3 as the correlation activity diagram (Figure~\ref{fig:act-correlation}), the incident state machine (Figure~\ref{fig:incident-states}), and the investigation-creation sequence (Figure~\ref{fig:seq-incident}).
+The incidents page presents the result of correlation: related alerts grouped into a single case. Its main capabilities are:
+
+\begin{itemize}[leftmargin=1cm]
+\item list incidents and filter by status, severity, time, and asset;
+\item show detail tabs with correlated alerts, timeline, and related investigations;
+\item let the analyst assign the incident, change its status, or launch an investigation manually.
+\end{itemize}
+
+The page exists so that the analyst reasons at the level of an incident, not at the level of dozens of individual alerts. The grouping logic and the incident lifecycle this page exposes were modelled in Chapter~3 as the correlation activity diagram (Figure~\ref{fig:act-correlation}), the incident state machine (Figure~\ref{fig:incident-states}), and the investigation-creation sequence (Figure~\ref{fig:seq-incident}).
 
 Figure~\ref{fig:ss-incident} shows a realized incident detail view, where the correlated alerts, the case metadata, and the status controls let the analyst reason at the incident level rather than over individual alerts.
 
@@ -250,11 +258,24 @@ The realized assistant (Figure~\ref{fig:ss-assistant-operator}, left) shows a SO
 
 \section{Operator}
 
-The operator workflow is the most safety-sensitive page, because it can drive remote action from a natural-language request. It provides asset-scoped sessions, inventory host discovery, readiness banners, prompt submission, playbook preview, approval, run polling, and result display. The logic enforces every guard in sequence: the operator validates that the selected asset exists, is enabled, and has remediation configured, refuses \codepath{asset_id=all}, invalid, or disabled assets, generates a preview or playbook with risk information, blocks execution until approval, and re-validates before the run. A request never becomes an action without passing all of these gates.
+The operator workflow is the most safety-sensitive page, because it can drive remote action from a natural-language request. It provides asset-scoped sessions, inventory host discovery, readiness banners, prompt submission, playbook preview, approval, run polling, and result display.
 
-\diagramimagecompact{phase3_ai_operator.png}{AI operator workflow}
+The operator enforces every guard in sequence, as shown in Figure~\ref{fig:ai-operator}, Figure~\ref{fig:seq-operator}, and Figure~\ref{fig:act-operator}:
 
-The full natural-language-to-action path is the sequence in Figure~\ref{fig:seq-operator}, and the safety decision that can block it at every step is the activity diagram in Figure~\ref{fig:act-operator}: the request is parsed into an intent and a playbook, the target is checked against the allowed asset scope, the operation is classified by risk, and a risky operation requires the admin secret before any preview can be confirmed. Table~\ref{tab:operator-risk} summarizes how risk levels gate execution, using the real \codepath{OperatorRun.risk_level} values.
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Asset validation.} The selected asset must exist, be enabled, and have remediation configured. \codepath{asset_id=all}, invalid, or disabled assets are refused.
+\item \textbf{Intent parsing.} The natural-language request is parsed into an intent and a playbook.
+\item \textbf{Scope check.} The target is checked against the account's allowed asset scope.
+\item \textbf{Risk classification.} The operation is classified as low, medium, or high risk.
+\item \textbf{Approval gate.} Execution is blocked until the analyst confirms the preview; high-risk operations also require the admin secret.
+\item \textbf{Re-validation.} The request is re-validated immediately before the run.
+\end{enumerate}
+
+A request never becomes an action without passing all of these gates.
+
+\umlfigure{phase3_ai_operator.png}{AI operator workflow}{fig:ai-operator}
+
+The full natural-language-to-action path is the sequence in Figure~\ref{fig:seq-operator}, and the safety decision that can block it at every step is the activity diagram in Figure~\ref{fig:act-operator}. Table~\ref{tab:operator-risk} summarizes how risk levels gate execution, using the real \codepath{OperatorRun.risk_level} values.
 
 \umlfigure{seq_operator.png}{Operator natural-language-to-action sequence}{fig:seq-operator}
 
@@ -357,27 +378,50 @@ The pages above are not used in isolation; they form end-to-end flows. The follo
 \begin{figure}[H]
 \centering
 \begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
-  flowstep/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=gray!8},
-  gate/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=red!8},
-  arrow/.style={-Latex, thick}
+  font=\small,
+  detect/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=blue!10, font=\fontsize{12}{14}\selectfont},
+  case/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=orange!10, font=\fontsize{12}{14}\selectfont},
+  analysis/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=purple!10, font=\fontsize{12}{14}\selectfont},
+  gate/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=red!10, font=\fontsize{12}{14}\selectfont},
+  act/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=green!10, font=\fontsize{12}{14}\selectfont},
+  arrow/.style={-Latex, line width=1.2pt},
+  label/.style={font=\fontsize{11}{13}\selectfont, text=gray!70!black, align=center}
 ]
-\node[flowstep] (alert) {Normalized alert\\or anomaly};
-\node[flowstep, right=0.55cm of alert] (incident) {Incident or\\runtime/infra case};
-\node[flowstep, right=0.55cm of incident] (invest) {Investigation\\evidence};
-\node[flowstep, right=0.55cm of invest] (ai) {AI or rule-based\\analysis};
-\node[gate, below=0.75cm of ai] (approval) {Approval and\\target validation};
-\node[flowstep, left=0.55cm of approval] (run) {Controlled\\execution};
-\node[flowstep, left=0.55cm of run] (verify) {Verification};
-\node[flowstep, left=0.55cm of verify] (archive) {Archive};
+% Top row: detection to analysis
+\node[detect] (alert) {\textbf{Normalized alert or anomaly}};
+\node[case, right=0.7cm of alert] (incident) {\textbf{Incident or case}};
+\node[case, right=0.7cm of incident] (invest) {\textbf{Investigation evidence}};
+\node[analysis, right=0.7cm of invest] (ai) {\textbf{AI or rule-based analysis}};
+
+% Bottom row: governance to archive
+\node[gate, below=1.2cm of ai] (approval) {\textbf{Approval and target validation}};
+\node[act, left=0.7cm of approval] (run) {\textbf{Controlled execution}};
+\node[act, left=0.7cm of run] (verify) {\textbf{Verification}};
+\node[act, left=0.7cm of verify] (archive) {\textbf{Archive}};
+
+% Arrows top row
 \draw[arrow] (alert) -- (incident);
 \draw[arrow] (incident) -- (invest);
 \draw[arrow] (invest) -- (ai);
+
+% Arrow down to approval
 \draw[arrow] (ai) -- (approval);
+
+% Arrows bottom row
 \draw[arrow] (approval) -- (run);
 \draw[arrow] (run) -- (verify);
 \draw[arrow] (verify) -- (archive);
+
+% Phase labels
+\node[label, above=0.35cm] at ($(alert.east)!0.5!(incident.west)$) {correlation};
+\node[label, above=0.35cm] at ($(incident.east)!0.5!(invest.west)$) {case building};
+\node[label, above=0.35cm] at ($(invest.east)!0.5!(ai.west)$) {analysis};
+\node[label, right=0.25cm, rotate=90, anchor=south] at ($(ai.south)!0.5!(approval.north)$) {decide};
+\node[label, above=0.35cm] at ($(approval.east)!0.5!(run.west)$) {act};
+\node[label, above=0.35cm] at ($(run.east)!0.5!(verify.west)$) {prove fix};
+\node[label, above=0.35cm] at ($(verify.east)!0.5!(archive.west)$) {close};
 \end{tikzpicture}\end{adjustbox}
-\caption{Detection-to-response lifecycle}
+\caption{Detection-to-response lifecycle across all ARIA features}
 \end{figure}
 
 The following table consolidates the workflow coverage of the dashboard pages described above.
