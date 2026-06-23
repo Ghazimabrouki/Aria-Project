@@ -13,9 +13,9 @@ Validation confirms a working multi-server deployment, 910 passing automated tes
 \chapter*{Summary}
 \addcontentsline{toc}{chapter}{Summary}
 
-This final-year project focuses on the design and implementation of \project{}, also called \projectlong{}, a platform for automating security and system operations. The project aims to reduce fragmentation in SOC and system-team workflows by connecting alert ingestion, enrichment, incident correlation, AI-assisted investigation, human approval, Ansible remediation, post-fix verification, archiving, monitoring, and visualization into one coherent solution.
+This final-year project presents \project{} (\projectlong{}), a platform that helps security teams respond faster to cyber threats. The system gathers alerts from many monitoring tools, groups related events into incidents, uses artificial intelligence to suggest remediation actions, and keeps a human analyst in charge of every sensitive decision. It was built during an internship at Huawei Technologies and is validated by working code, automated tests, and live operational evidence.
 
-The implemented platform collects data from Elasticsearch, including Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic alerts. It normalizes security and observability signals, removes duplicates, filters noise, adds GeoIP and MITRE ATT\&CK context, correlates events, and stores operational data in SQLite while using Redis for cursors, cache, deduplication, and metrics. The FastAPI backend exposes features through REST and WebSocket, while the Next.js dashboard provides the operational interfaces.
+The report explains why the platform was needed, how it was designed and built, what the dashboard looks like, how new servers are onboarded, and how the solution was tested.
 
 \textbf{Keywords:} SOAR, SOC, FastAPI, Next.js, Elasticsearch, Redis, SQLite, Ansible, MITRE ATT\&CK, Sigma, incident response, system monitoring, observability.
 
