@@ -13,9 +13,13 @@ Validation confirms a working multi-server deployment, 910 passing automated tes
 \chapter*{Summary}
 \addcontentsline{toc}{chapter}{Summary}
 
-This final-year project presents \project{} (\projectlong{}), a platform that helps security teams respond faster to cyber threats. The system gathers alerts from many monitoring tools, groups related events into incidents, uses artificial intelligence to suggest remediation actions, and keeps a human analyst in charge of every sensitive decision. It was built during an internship at Huawei Technologies and is validated by working code, automated tests, and live operational evidence.
+This final-year project presents \project{} (\projectlong{}), a comprehensive SOAR/SOC automation platform designed and implemented during an internship at Huawei Technologies. ARIA addresses a real and widely felt problem: security operations centers are flooded with alerts from many disconnected tools, and analysts waste too much time switching consoles, manually correlating events, and deciding what to do next. Existing commercial solutions are either prohibitively expensive, vendor-locked, or too narrow in scope, while open-source stacks provide visibility without the intelligence and controlled response layer needed to act.
 
-The report explains why the platform was needed, how it was designed and built, what the dashboard looks like, how new servers are onboarded, and how the solution was tested.
+ARIA brings these pieces together in a single, open, locally deployable platform. It ingests host, network, runtime, and metric telemetry from Elasticsearch; normalizes heterogeneous alerts into one operational model; enriches them with GeoIP and MITRE ATT\&CK context; removes duplicates and noise; correlates related events into incidents; and uses artificial intelligence to generate summaries, risk scores, narratives, and Ansible playbooks. Every sensitive action passes through an analyst approval gate protected by an admin-secret check, and every remediation is verified before a case is closed and archived.
+
+The result is not just another dashboard: it is an end-to-end detection-to-response workflow that reduces analyst workload, accelerates incident understanding, and keeps humans in control of risky decisions. The implementation is validated by a working multi-server deployment, 910 passing automated tests, backend and frontend build success, and live operational evidence captured on the running platform.
+
+This report describes the motivation behind ARIA, the state of the art it improves upon, the cloud and monitoring foundation, the platform design and internal logic, the dashboard realization, the onboarding and production deployment workflow, and the validation evidence that confirms its correctness.
 
 \textbf{Keywords:} SOAR, SOC, FastAPI, Next.js, Elasticsearch, Redis, SQLite, Ansible, MITRE ATT\&CK, Sigma, incident response, system monitoring, observability.
 
