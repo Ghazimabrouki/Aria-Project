@@ -444,35 +444,42 @@ A command that returns success is not the same as a problem that is solved. Afte
 \centering
 \begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[
-  block/.style={draw, rounded corners, align=center, minimum width=2.7cm, minimum height=1.4cm, fill=gray!8},
-  flow/.style={-Latex, line width=1.1pt},
-  feedback/.style={-Latex, line width=1.1pt, dashed},
-  label/.style={font=\fontsize{13}{15}\selectfont, align=center, fill=white, inner sep=2pt}
+  block/.style={draw, rounded corners, align=center, minimum width=2.8cm, minimum height=1.4cm, fill=gray!8, font=\fontsize{17}{19}\selectfont},
+  label/.style={align=center, font=\fontsize{13}{15}\selectfont},
+  flow/.style={-Latex, line width=1.2pt},
+  feedback/.style={-Latex, line width=1.2pt, dashed}
 ]
-% Main components
+% Main components (equally sized boxes, generous spacing)
 \node[block] (analyst) {\textbf{Analyst}};
-\node[block, right=3.6cm of analyst] (api) {\textbf{FastAPI}};
-\node[block, right=3.6cm of api] (ai) {\textbf{AI Engine}};
-\node[block, right=3.6cm of ai] (ansible) {\textbf{Ansible}};
-\node[block, right=3.6cm of ansible] (verifier) {\textbf{Verifier}};
+\node[block, right=4.2cm of analyst] (api) {\textbf{FastAPI}};
+\node[block, right=4.2cm of api] (ai) {\textbf{AI Engine}};
+\node[block, right=4.2cm of ai] (ansible) {\textbf{Ansible}};
+\node[block, right=4.2cm of ansible] (verifier) {\textbf{Verifier}};
 
-% Primary workflow (solid arrows, centered)
-\draw[flow] (analyst.20) -- node[label, above]{Open investigation} (api.160);
-\draw[flow] (api.20) -- node[label, above]{Operation summary} (ai.160);
-\draw[flow] (ai.20) -- node[label, above]{Generated playbook} (ansible.160);
-\draw[flow] (ansible.20) -- node[label, above]{Execution result} (verifier.160);
+% Primary workflow arrows (solid, horizontal, through box centers)
+\draw[flow, <->] (analyst.east) -- (api.west);
+\draw[flow] (api.east) -- (ai.west);
+\draw[flow] (ai.east) -- (ansible.west);
+\draw[flow] (ansible.east) -- (verifier.west);
 
-% Analyst <-> FastAPI approval loop
-\draw[flow] (api.200) -- node[label, below]{Approve / edit} (analyst.340);
+% Labels in reserved spaces above the main arrows (never on the arrows)
+\node[label, above=0.55cm] at ($(api.east)!0.5!(ai.west)$) {Operation summary};
+\node[label, above=0.55cm] at ($(ai.east)!0.5!(ansible.west)$) {Generated playbook};
+\node[label, above=0.55cm] at ($(ansible.east)!0.5!(verifier.west)$) {Execution result};
 
-% Return / feedback flows underneath (dashed)
-\coordinate (ai-return) at ($(ai.south)+(0,-0.9)$);
-\coordinate (api-ai-return) at ($(api.south |- ai-return)$);
-\draw[feedback] (ai.south) -- (ai-return) -- node[label, below, pos=0.5]{Summary + playbook} (api-ai-return) -- (api.south);
+% Analyst <-> FastAPI bidirectional label (below the main arrow)
+\node[label, below=0.55cm] at ($(analyst.east)!0.5!(api.west)$) {Approve / edit};
 
-\coordinate (verifier-return) at ($(verifier.south)+(0,-1.7)$);
-\coordinate (api-verifier-return) at ($(api.south |- verifier-return)$);
-\draw[feedback] (verifier.south) -- (verifier-return) -- node[label, below, pos=0.5]{Failure / unresolved state / retry feedback} (api-verifier-return) -- (api.south);
+% Feedback / return flows underneath the main flow (dashed, non-overlapping)
+\coordinate (ai-fb) at ($(ai.south)+(0,-1.1)$);
+\coordinate (api-fb-ai) at ($(api.south |- ai-fb)$);
+\draw[feedback] (ai.south) -- (ai-fb) -- (api-fb-ai) -- (api.south);
+\node[label, below=0.35cm] at ($(ai.south)!0.5!(api.south |- ai-fb)$) {Summary + playbook};
+
+\coordinate (verifier-fb) at ($(verifier.south)+(0,-2.5)$);
+\coordinate (api-fb-v) at ($(api.south |- verifier-fb)$);
+\draw[feedback] (verifier.south) -- (verifier-fb) -- (api-fb-v) -- (api.south);
+\node[label, below=0.35cm] at ($(verifier.south)!0.5!(api.south |- verifier-fb)$) {Failure / unresolved state /\\retry feedback};
 \end{tikzpicture}
 \end{adjustbox}
 \caption{AI investigation and remediation sequence (simplified)}
