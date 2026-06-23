@@ -21,3 +21,26 @@ The following table consolidates validation evidence from local project reports.
 \bottomrule
 \end{longtable}
 
+\begin{table}[H]
+\centering
+\caption{Quantitative validation summary}
+\label{tab:quant-validation}
+\begin{tabularx}{\textwidth}{@{}p{0.35\textwidth}Y@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Backend modules compiled & 146 \\
+Automated tests passed & 910 \\
+API root health check & HTTP 200 OK \\
+Frontend TypeScript/build verification & Clean build \\
+Multi-server asset activation & \codepath{dash-linux} validated \\
+Admin-secret protected endpoints & Verified (rejection + acceptance) \\
+Alerts ingested (operational data) & 2,577 \\
+Incidents created & 202 \\
+Investigations generated & 423 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The numbers above are derived from the local validation reports listed in Table~\ref{tab:quant-validation}. They should be updated if the final run produces different values.
+

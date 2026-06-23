@@ -4,6 +4,63 @@
 
 The previous chapter ended with real telemetry sitting in Elasticsearch. On its own, that telemetry is still a stream of heterogeneous technical documents. ARIA is the platform that gives this data operational meaning. This chapter explains how ARIA is designed and, more importantly, the \emph{logic} behind each of its internal stages, that is, why each transformation exists and what problem it solves, rather than only listing the modules involved. It first describes the global, backend, and frontend architecture and the persistence model, then follows the data through ingestion, normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping, and finally presents the security and control mechanisms that hold the whole workflow together.
 
+\section{Twelve-Step Intelligence Pipeline}
+
+The ARIA workflow can be described as a twelve-step pipeline that carries a signal from raw Elasticsearch document to a closed, auditable case. Figure~\ref{fig:twelve-step} gives the high-level view; the following sections explain the logic of each stage.
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Ingestion} — cursor-based polling of Elasticsearch sources every 10 seconds.
+\item \textbf{Mapping} — source-specific mappers turn raw documents into a common alert model.
+\item \textbf{Enrichment} — GeoIP, MITRE ATT\&CK, IOC extraction, and host context are added.
+\item \textbf{Deduplication} — memory, Redis, and DB checks collapse repeated events.
+\item \textbf{Noise filtering} — Sigma rules and auto-learned patterns drop low-value alerts.
+\item \textbf{SQLite storage} — normalized alerts persist in the operational shadow database.
+\item \textbf{Correlation} — related alerts are grouped into incidents by indicator and time window.
+\item \textbf{Investigation} — an investigation case is created and populated with context.
+\item \textbf{AI analysis} — the AI engine produces a summary, narrative, risk score, and Ansible playbook.
+\item \textbf{Approval} — an analyst reviews and approves, edits, or declines the proposed action.
+\item \textbf{Execution} — Ansible runs the approved playbook on the scoped asset.
+\item \textbf{Verification and archive} — the verifier re-checks evidence, then the case is archived with an audit trail.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  stepbox/.style={draw, rounded corners, align=center, minimum width=2.2cm, minimum height=0.75cm, fill=gray!8, font=\scriptsize},
+  arrow/.style={-Latex, thick}
+]
+% Row 1
+\node[stepbox] (s1) at (0,0) {1. Ingestion};
+\node[stepbox, right=0.25cm of s1] (s2) {2. Mapping};
+\node[stepbox, right=0.25cm of s2] (s3) {3. Enrichment};
+\node[stepbox, right=0.25cm of s3] (s4) {4. Dedup};
+\node[stepbox, right=0.25cm of s4] (s5) {5. Noise filter};
+\node[stepbox, right=0.25cm of s5] (s6) {6. SQLite};
+% Row 2
+\node[stepbox, below=0.5cm of s1] (s7) {7. Correlation};
+\node[stepbox, right=0.25cm of s7] (s8) {8. Investigation};
+\node[stepbox, right=0.25cm of s8] (s9) {9. AI analysis};
+\node[stepbox, right=0.25cm of s9] (s10) {10. Approval};
+\node[stepbox, right=0.25cm of s10] (s11) {11. Execution};
+\node[stepbox, right=0.25cm of s11] (s12) {12. Verify + Archive};
+% Arrows row 1
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (s4);
+\draw[arrow] (s4) -- (s5);
+\draw[arrow] (s5) -- (s6);
+% Arrow down
+\draw[arrow] (s6) -- ++(0,-0.35) -| (s7);
+% Arrows row 2
+\draw[arrow] (s7) -- (s8);
+\draw[arrow] (s8) -- (s9);
+\draw[arrow] (s9) -- (s10);
+\draw[arrow] (s10) -- (s11);
+\draw[arrow] (s11) -- (s12);
+\end{tikzpicture}\end{adjustbox}
+\caption{ARIA twelve-step intelligence pipeline}\label{fig:twelve-step}
+\end{figure}
+
 \section{Global ARIA Architecture}
 
 ARIA is organized as four cooperating layers. A frontend dashboard presents SOC operations to users; an API layer exposes the workflow over REST and WebSocket; a workflow layer contains the actual intelligence (pipeline, correlation, AI response, runtime, infrastructure, and operator logic); and an infrastructure layer connects to Elasticsearch, Redis, SQLite, Ansible, and the AI providers. Each layer depends only on the one below it, which keeps responsibilities clear and makes the system testable.
@@ -384,26 +441,39 @@ A command that returns success is not the same as a problem that is solved. Afte
 
 \begin{figure}[H]
 \centering
-\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
-  lifeline/.style={draw, minimum width=2.5cm, minimum height=0.7cm, fill=gray!8},
-  msg/.style={-Latex, thick},
-  node distance=1cm
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[
+  block/.style={draw, rounded corners, align=center, minimum width=2.7cm, minimum height=1.4cm, fill=gray!8},
+  flow/.style={-Latex, line width=1.1pt},
+  feedback/.style={-Latex, line width=1.1pt, dashed},
+  label/.style={font=\fontsize{13}{15}\selectfont, align=center, fill=white, inner sep=2pt}
 ]
-\node[lifeline] (analyst) {Analyst};
-\node[lifeline, right=1cm of analyst] (api) {FastAPI};
-\node[lifeline, right=1cm of api] (ai) {AI Engine};
-\node[lifeline, right=1cm of ai] (ansible) {Ansible};
-\node[lifeline, right=1cm of ansible] (verify) {Verifier};
-\draw[msg] (analyst) -- node[above]{open investigation} (api);
-\draw[msg] (api) -- node[above]{build context} (ai);
-\draw[msg] (ai) -- node[above]{summary + playbook} (api);
-\draw[msg] (api) -- node[above]{await approval} (analyst);
-\draw[msg] (analyst) -- node[below]{approve/edit} (api);
-\draw[msg] (api) -- node[above]{run playbook} (ansible);
-\draw[msg] (ansible) -- node[below]{execution result} (api);
-\draw[msg] (api) -- node[above]{verify recurrence/state} (verify);
-\draw[msg] (verify) -- node[below]{fixed or unresolved} (api);
-\end{tikzpicture}\end{adjustbox}
+% Main components
+\node[block] (analyst) {\textbf{Analyst}};
+\node[block, right=3.6cm of analyst] (api) {\textbf{FastAPI}};
+\node[block, right=3.6cm of api] (ai) {\textbf{AI Engine}};
+\node[block, right=3.6cm of ai] (ansible) {\textbf{Ansible}};
+\node[block, right=3.6cm of ansible] (verifier) {\textbf{Verifier}};
+
+% Primary workflow (solid arrows, centered)
+\draw[flow] (analyst.20) -- node[label, above]{Open investigation} (api.160);
+\draw[flow] (api.20) -- node[label, above]{Operation summary} (ai.160);
+\draw[flow] (ai.20) -- node[label, above]{Generated playbook} (ansible.160);
+\draw[flow] (ansible.20) -- node[label, above]{Execution result} (verifier.160);
+
+% Analyst <-> FastAPI approval loop
+\draw[flow] (api.200) -- node[label, below]{Approve / edit} (analyst.340);
+
+% Return / feedback flows underneath (dashed)
+\coordinate (ai-return) at ($(ai.south)+(0,-0.9)$);
+\coordinate (api-ai-return) at ($(api.south |- ai-return)$);
+\draw[feedback] (ai.south) -- (ai-return) -- node[label, below, pos=0.5]{Summary + playbook} (api-ai-return) -- (api.south);
+
+\coordinate (verifier-return) at ($(verifier.south)+(0,-1.7)$);
+\coordinate (api-verifier-return) at ($(api.south |- verifier-return)$);
+\draw[feedback] (verifier.south) -- (verifier-return) -- node[label, below, pos=0.5]{Failure / unresolved state / retry feedback} (api-verifier-return) -- (api.south);
+\end{tikzpicture}
+\end{adjustbox}
 \caption{AI investigation and remediation sequence (simplified)}
 \end{figure}
 
@@ -489,21 +559,49 @@ Verification & Execution success is not enough; recurrence or remote state is ve
 \begin{figure}[H]
 \centering
 \begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  box/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=gray!8},
+  guard/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=red!8},
+  audit/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=0.85cm, fill=blue!8},
+  arrow/.style={-Latex, thick}
+]
+\node[box] (ai) {AI proposal};
+\node[guard, right=0.45cm of ai] (safety) {Safety policy};
+\node[guard, right=0.45cm of safety] (approval) {Approval gate};
+\node[guard, right=0.45cm of approval] (admin) {Admin-secret gate};
+\node[box, right=0.45cm of admin] (exec) {Ansible execution};
+\node[box, right=0.45cm of exec] (verify) {Verification};
+\node[audit, below=0.9cm of verify] (audit) {Audit log};
+\draw[arrow] (ai) -- (safety);
+\draw[arrow] (safety) -- (approval);
+\draw[arrow] (approval) -- (admin);
+\draw[arrow] (admin) -- (exec);
+\draw[arrow] (exec) -- (verify);
+\draw[arrow] (verify) -- (audit);
+\draw[arrow, dashed] (approval) |- ++(0,-0.45) -| (audit);
+\draw[arrow, dashed] (admin) |- ++(0,-0.6) -| (audit);
+\draw[arrow, dashed] (exec) |- ++(0,-0.75) -| (audit);
+\end{tikzpicture}\end{adjustbox}
+\caption{Security control chain for AI-assisted remediation}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
   box/.style={draw, rounded corners, align=center, text width=2.9cm, minimum height=0.9cm, fill=gray!8},
   guard/.style={draw, rounded corners, align=center, text width=2.9cm, minimum height=0.9cm, fill=red!8},
   arrow/.style={-Latex, thick}
 ]
 \node[box] (prompt) {Analyst prompt or investigation context};
-\node[box, right=0.7cm of prompt] (ai) {AI summary and proposed action};
-\node[guard, right=0.7cm of ai] (preview) {Preview, validation, risk checks};
-\node[guard, below=0.8cm of preview] (approval) {Approval and admin-secret gate};
-\node[box, left=0.7cm of approval] (exec) {Ansible execution on selected asset};
-\node[box, left=0.7cm of exec] (verify) {Verification and archive};
-\draw[arrow] (prompt) -- (ai);
-\draw[arrow] (ai) -- (preview);
-\draw[arrow] (preview) -- (approval);
-\draw[arrow] (approval) -- (exec);
-\draw[arrow] (exec) -- (verify);
+\node[box, right=0.7cm of prompt] (ai2) {AI summary and proposed action};
+\node[guard, right=0.7cm of ai2] (preview) {Preview, validation, risk checks};
+\node[guard, below=0.8cm of preview] (approval2) {Approval and admin-secret gate};
+\node[box, left=0.7cm of approval2] (exec2) {Ansible execution on selected asset};
+\node[box, left=0.7cm of exec2] (verify2) {Verification and archive};
+\draw[arrow] (prompt) -- (ai2);
+\draw[arrow] (ai2) -- (preview);
+\draw[arrow] (preview) -- (approval2);
+\draw[arrow] (approval2) -- (exec2);
+\draw[arrow] (exec2) -- (verify2);
 \end{tikzpicture}\end{adjustbox}
 \caption{Security control boundary for AI-assisted response}
 \end{figure}

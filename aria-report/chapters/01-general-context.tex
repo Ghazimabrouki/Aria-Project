@@ -22,9 +22,9 @@ Student & Ghazi Mabrouki \\
 Institution / training & ESPRIT University -- ArcTic \\
 Host organization & Huawei Technologies \\
 Project context & ARIA Project / SOC, monitoring, cybersecurity, automation, AI \\
-Internship period & January 12, 2026 -- April 10, 2026 \\
+Internship period & January 12, 2026 -- July 12, 2026 \\
 Company supervisors & Arfaoui Ibrahim and Zhong Yan \\
-Academic supervisor & \todo{Name of academic supervisor} \\
+Academic supervisor & Mongi Dziri \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -49,6 +49,34 @@ The complete high-level chain can be summarized as follows:
 
 \begin{center}
 \texttt{Security tools -> Elasticsearch -> Backend intelligence -> Frontend SOC operations}
+\end{center}
+
+\section{State of the Art and Identified Gap}
+
+Several commercial and open-source platforms address parts of the SOC workflow. Table~\ref{tab:state-of-the-art} summarizes the most relevant ones and their limits.
+
+\begin{table}[H]
+\centering
+\caption{State-of-the-art SOC and SOAR solutions}
+\label{tab:state-of-the-art}
+\begin{tabularx}{\textwidth}{@{}p{0.22\textwidth}p{0.34\textwidth}Y@{}}
+\toprule
+\textbf{Solution} & \textbf{Strengths} & \textbf{Limitations} \\
+\midrule
+Splunk ES & Powerful SIEM, rich app ecosystem & High cost, heavy infrastructure \\
+IBM QRadar & Correlation, asset database & Complex deployment and tuning \\
+Microsoft Sentinel & Cloud-native, built-in AI alerts & Vendor lock-in, cloud dependency \\
+Palo Alto XSOAR & Large playbook marketplace & Expensive, steep learning curve \\
+Wazuh + ELK & Open source, good visibility & No built-in SOAR or AI response layer \\
+Falcon / SentinelOne & Strong EDR capabilities & EDR-centric, limited cross-layer correlation \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+None of these solutions combine multi-layer monitoring (host, network, runtime, and metrics), alert enrichment, incident correlation, AI-generated playbooks, and human-controlled Ansible remediation in a single open, local-deployment platform. This gap is the motivation for ARIA.
+
+\begin{center}
+\textit{Identified gap: there is no open, integrated solution that turns heterogeneous security and observability telemetry into actionable, approved, and verifiable incidents.}
 \end{center}
 
 \section{Study of the Existing Situation}
@@ -145,9 +173,9 @@ From the user's point of view, the scope of ARIA is best expressed as a global u
 
 \section{Methodology and Planning}
 
-The internship followed an iterative engineering approach organized by technical phases. The journal of board identifies weekly work from January~12, 2026 to April~10, 2026. Early weeks focused on cloud and Linux preparation, then Elasticsearch/Kibana, Wazuh, Suricata, Falco, Filebeat, Redis, and ARIA setup. Later weeks focused on backend configuration, Sigma filtering, deduplication, AI playbook generation, watcher logic, multi-server onboarding, and automation.
+The internship followed an Agile iterative methodology organized in two-week sprints. Each sprint delivered a usable increment, followed by a short review and planning session for the next increment. The journal of board identifies weekly work from January~12, 2026 to July~12, 2026. Early sprints focused on cloud and Linux preparation, then Elasticsearch/Kibana, Wazuh, Suricata, Falco, Filebeat, Redis, and ARIA setup. Later sprints focused on backend configuration, Sigma filtering, deduplication, AI playbook generation, watcher logic, multi-server onboarding, hardening, documentation, and final validation.
 
-The methodology was chosen after comparing common project organization models. A strict waterfall model was not appropriate because the monitoring stack, backend workflows, and validation evidence evolved as the environment became available. A full Scrum process was also too heavy for a single-intern implementation context. The adopted approach was therefore a phased iterative method: each phase produced a usable technical base, then later phases refined and extended it.
+The methodology was chosen after comparing common project organization models. A strict waterfall model was not appropriate because the monitoring stack, backend workflows, and validation evidence evolved as the environment became available. A full Scrum process was also too heavy for a single-intern implementation context. The adopted approach was therefore a phased iterative method with two-week sprints: each sprint produced a usable technical base, then later sprints refined and extended it.
 
 \begin{table}[H]
 \centering
@@ -158,7 +186,7 @@ The methodology was chosen after comparing common project organization models. A
 \midrule
 Waterfall & Clear sequence and documentation. & Too rigid for infrastructure and integration discoveries. & Not selected. \\
 Scrum & Strong feedback rhythm and backlog refinement. & Heavy ceremonies for a compact internship and single main developer. & Used only as inspiration for iterative validation. \\
-Phased iterative work & Fits monitoring, cloud, backend, and validation increments. & Requires careful documentation to keep continuity. & Selected. \\
+Phased iterative work (2-week sprints) & Fits monitoring, cloud, backend, and validation increments. & Requires careful documentation to keep continuity. & Selected. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -205,36 +233,36 @@ PB-12 & Validation & Compile, test, build, and document verification results. & 
 \bottomrule
 \end{longtable}
 
-The complete planning is summarized in the Gantt chart of Figure~\ref{fig:gantt}, which spans the thirteen weeks of the internship from January~12 to April~10, 2026. The chart shows how the technical work packages overlap: the monitoring foundation begins while cloud preparation is finishing, the backend intelligence layer is built on top of the available telemetry, and validation and documentation run continuously alongside the dashboard and multi-server work.
+The complete planning is summarized in the Gantt chart of Figure~\ref{fig:gantt}, which spans the internship from January~12 to July~12, 2026. The chart shows how the technical work packages overlap: the monitoring foundation begins while cloud preparation is finishing, the backend intelligence layer is built on top of the available telemetry, the dashboard and multi-server work extend through the middle of the internship, and validation and documentation run continuously until the final weeks.
 
 \begin{figure}[H]
 \centering
 \begin{adjustbox}{max width=\textwidth}
-\begin{tikzpicture}[x=0.92cm,y=0.82cm,
+\begin{tikzpicture}[x=0.48cm,y=0.78cm,
   bar/.style={fill=blue!55,draw=blue!70!black,rounded corners=1pt},
   bar2/.style={fill=teal!55,draw=teal!65!black,rounded corners=1pt},
   tasklabel/.style={anchor=east,font=\small}]
 % month headers
-\foreach \m/\a/\b in {January/0/3, February/3/7, March/7/11, April/11/13}{%
+\foreach \m/\a/\b in {January/0/3, February/3/7, March/7/11, April/11/16, May/16/20, June/20/25, July/25/26}{%
   \draw[gray!55] (\a,0.7) -- (\b,0.7);
   \node[font=\small\bfseries] at ({(\a+\b)/2},1.05) {\m};
 }
 % week gridlines
-\foreach \w in {0,1,...,13}{\draw[gray!25] (\w,0.7) -- (\w,-5.1);}
+\foreach \w in {0,1,...,26}{\draw[gray!25] (\w,0.7) -- (\w,-5.1);}
 % rows: label / y / xstart / xend / style
 \foreach \name/\y/\s/\e/\st in {%
-  {Cloud and Linux preparation}/0/0/2/bar,
-  {Monitoring foundation}/{-0.8}/1/6/bar,
-  {Backend intelligence layer}/{-1.6}/4/11/bar,
-  {Dashboard and SOC workflows}/{-2.4}/7/12/bar,
-  {Multi-server and hardening}/{-3.2}/9/12/bar2,
-  {Validation and documentation}/{-4.0}/8/13/bar2}{%
+  {Cloud and Linux preparation}/0/0/3/bar,
+  {Monitoring foundation}/{-0.8}/1/8/bar,
+  {Backend intelligence layer}/{-1.6}/5/16/bar,
+  {Dashboard and SOC workflows}/{-2.4}/9/20/bar,
+  {Multi-server and hardening}/{-3.2}/12/22/bar2,
+  {Validation and documentation}/{-4.0}/10/26/bar2}{%
   \node[tasklabel] at (-0.25,\y) {\name};
   \fill[\st] (\s,\y-0.26) rectangle (\e,\y+0.26);
 }
 \end{tikzpicture}
 \end{adjustbox}
-\caption{Gantt chart of the internship planning (January 12 -- April 10, 2026)}
+\caption{Gantt chart of the internship planning (January 12 -- July 12, 2026)}
 \label{fig:gantt}
 \end{figure}
 

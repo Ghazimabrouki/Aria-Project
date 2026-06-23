@@ -95,3 +95,5 @@ test-results/
 .agents/
 .systemd/
 *.bak.*
+# Local Python virtual environments for report helpers
+.venv-pptx/
