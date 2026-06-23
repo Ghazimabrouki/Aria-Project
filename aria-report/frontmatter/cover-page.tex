@@ -11,21 +11,20 @@
     at ([xshift=10.5cm,yshift=-11.9cm]current page.north west)
     {Cloud Computing};
 
-  % --- ARIA logo (badge with dark background for visibility on the ESPRIT cover) ---
+  % --- ARIA logo (official transparent logo with subtle shadow for visibility) ---
   \node[anchor=north, inner sep=0]
-    at ([yshift=-11.5cm]current page.north)
-    {\includegraphics[width=4.5cm]{assets/logos/aria-logo-badge.png}};
+    at ([yshift=-11.8cm]current page.north)
+    {\includegraphics[width=4.0cm,keepaspectratio]{assets/logos/aria-logo-cover.png}};
 
-  % --- Project title block ---
+  % --- Project title block (ARIA wordmark comes from the logo above) ---
   \node[anchor=north, align=center, text width=16cm]
-    at ([yshift=-15.2cm]current page.north)
-    {{\fontsize{30}{34}\selectfont\bfseries \project}\\[0.35cm]
-     {\Large\bfseries \projectlong}\\[0.25cm]
+    at ([yshift=-15.0cm]current page.north)
+    {{\Large\bfseries \projectlong}\\[0.30cm]
      {\large AI-Assisted Security Operations, Incident Response,\\and Remediation Platform}};
 
   % --- Author and supervision details ---
   \node[anchor=north]
-    at ([yshift=-19.2cm]current page.north)
+    at ([yshift=-18.2cm]current page.north)
     {\normalsize
      \renewcommand{\arraystretch}{1.3}%
      \begin{tabular}{@{}r@{\hskip 0.4cm}l@{}}
