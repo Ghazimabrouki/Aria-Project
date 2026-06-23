@@ -6,7 +6,14 @@ So far the solution has been described as a single central node: one server host
 
 \section{Why Multi-Server Monitoring Is Needed}
 
-A SOC that can only observe its own host is a demonstration, not an operational tool. The value of ARIA grows with the number of servers it can see, but adding servers introduces two hard requirements. First, each new server must be configured \emph{consistently}: the same agents, the same forwarding targets, and a predictable index naming convention, otherwise data either fails to arrive or cannot be attributed to the right server. Second, once data from several servers shares one Elasticsearch cluster, the platform must keep it separated, so that an alert, an investigation, or a remediation for one server is never confused with another. The first requirement is solved by the bootstrap script described below; the second is solved by the asset-scoping logic of Chapter~3, which this chapter connects to onboarding.
+A SOC that can only observe its own host is a demonstration, not an operational tool. The value of ARIA grows with the number of servers it can see, but adding servers introduces two hard requirements:
+
+\begin{itemize}[leftmargin=1cm]
+\item \textbf{Consistent configuration.} Every new server needs the same agents, forwarding targets, and predictable index naming. Otherwise data fails to arrive or cannot be attributed to the right server.
+\item \textbf{Strict separation.} Once several servers share one Elasticsearch cluster, alerts, investigations, and remediation actions for one server must never be confused with another.
+\end{itemize}
+
+The bootstrap script below solves the first requirement; the asset-scoping logic of Chapter~3 solves the second. This chapter connects the two.
 
 \section{Monitored Server Bootstrap Script}
 

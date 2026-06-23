@@ -40,7 +40,15 @@ The central host is an ECS instance named \codepath{ecs-ghazi} running Ubuntu~24
 
 \section{Main Server Preparation}
 
-The central server is the single node on which the whole monitoring foundation is installed. Its preparation followed a deliberate order so that later components could rely on a stable base. First, the operating system package sources were fixed and updated, and the base utilities required by the setup scripts (\codepath{curl}, \codepath{gpg}, \codepath{wget}, \codepath{tar}, \codepath{ca-certificates}, and \codepath{unzip}) were installed. Second, the local IP address of the host was detected and reused consistently as the binding and connection address for every service, so that Elasticsearch, Kibana, Filebeat, Falcosidekick, and Telegraf all agree on the same central endpoint. Third, the host was hardened (Section~\ref{sec:stability}) before exposing any service. This ordering matters: a service that is installed before the firewall and SSH policy are in place would be briefly exposed, and a service that binds to the wrong address would silently fail to receive data.
+The central server is the single node on which the whole monitoring foundation is installed. Its preparation followed a deliberate order so that later components could rely on a stable base:
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Base utilities.} Operating-system package sources were fixed and updated, and the utilities required by the setup scripts (\codepath{curl}, \codepath{gpg}, \codepath{wget}, \codepath{tar}, \codepath{ca-certificates}, \codepath{unzip}) were installed.
+\item \textbf{Central address.} The local IP address of the host was detected and reused consistently as the binding and connection address for every service, so that Elasticsearch, Kibana, Filebeat, Falcosidekick, and Telegraf all agree on the same central endpoint.
+\item \textbf{Hardening.} The host was hardened (Section~\ref{sec:stability}) before exposing any service.
+\end{enumerate}
+
+This ordering matters: a service installed before the firewall and SSH policy are in place would be briefly exposed, and a service bound to the wrong address would silently fail to receive data.
 
 Figure~\ref{fig:deployment-context} summarizes the resulting deployment: the single Ubuntu host runs the security and observability tools partly as native system services (Suricata, Wazuh Manager, Filebeat, Telegraf, Elasticsearch, and Kibana) and partly as Docker services (Falco and Falcosidekick), with the main configuration files and the hardware requirements that the host must satisfy.
 

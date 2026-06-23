@@ -111,7 +111,9 @@ Figure~\ref{fig:ss-investigation} shows a realized investigation, with the workf
 
 \section{Remediation Workflow}
 
-Remediation is not a separate page but a controlled sequence that runs through the investigation view: review the AI-proposed playbook, approve or edit it, satisfy the admin-secret gate, execute through Ansible, and read back the execution result and the fix verification. The interface makes each gate explicit, so the analyst always sees that execution is blocked until approval and that a case is marked resolved only after verification. This is the visible expression of the safety boundary described in Chapter~3, whose full interaction is the end-to-end sequence of Figure~\ref{fig:seq-remediation}, whose gate logic is the approval activity of Figure~\ref{fig:act-approval}, and whose staged execution is the remediation state machine of Figure~\ref{fig:remediation-states}.
+Remediation is not a separate page; it is a controlled sequence that runs inside the investigation view. The analyst reviews the AI-proposed playbook, approves or edits it, satisfies the admin-secret gate, executes it through Ansible, and reads back the execution result and fix verification.
+
+The interface makes every gate explicit: execution stays blocked until approval, and a case is marked resolved only after verification. This visible workflow expresses the safety boundary described in Chapter~3. Its full interaction is shown in Figure~\ref{fig:seq-remediation}, its gate logic in Figure~\ref{fig:act-approval}, and its staged execution in Figure~\ref{fig:remediation-states}.
 
 Figure~\ref{fig:ss-remediation} shows this sequence inside the investigation view: the AI-proposed playbook with its corrective actions, the approval controls, and the explicit gate that keeps execution blocked until the analyst approves.
 

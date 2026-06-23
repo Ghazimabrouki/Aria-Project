@@ -36,17 +36,38 @@ End-to-end remediation workflow & Nine-stage workflow completed \\
 \end{tabularx}
 \end{table}
 
-The work also produced a rich operational interface. The Next.js dashboard exposes alerts, incidents, investigations, runtime investigations, infrastructure investigations, monitoring, metrics, IPS visualization, search, archives, assistant, operator workflows, assets, accounts, data-source settings, pipeline settings, Ansible settings, and protected administrative actions. The backend exposes these capabilities through FastAPI routes and WebSocket updates, while Redis, SQLite, Elasticsearch, and Ansible support the underlying workflow. The validation evidence -- API checks, backend compilation, frontend build verification, multi-server activation on the \codepath{dash-linux} asset, admin-secret verification, and a large automated test suite -- confirms that the main objectives defined at the start of the internship were reached for the controlled-environment scope.
+The work also produced a rich operational interface. The Next.js dashboard exposes alerts, incidents, security and infrastructure investigations, monitoring, metrics, IPS visualization, search, archives, the assistant, operator workflows, assets, accounts, and settings --- including protected administrative actions.
+
+The backend surfaces these capabilities through FastAPI routes and WebSocket updates. Redis, SQLite, Elasticsearch, and Ansible support the underlying workflow.
+
+The validation evidence confirms that the internship objectives were reached within the controlled-environment scope: API checks, backend compilation, frontend build verification, multi-server activation on the \codepath{dash-linux} and \codepath{vm-test} assets, admin-secret verification, and the automated test suite all succeeded.
 
 \section*{Difficulties Encountered}
 \addcontentsline{toc}{section}{Difficulties Encountered}
 
-Several difficulties were encountered during the internship. The first was the diversity of tools and formats: Wazuh, Suricata, Falco, Telegraf, Filebeat, and Elasticsearch do not naturally speak the same operational language, which required ARIA to provide source-specific mappers and a common alert model. The second was alert noise, which required filtering, deduplication, and severity handling. A third was AI reliability: LLM output can be incomplete or malformed, so parsing, fallbacks, validation, and human approval were necessary. Finally, multi-server operation introduced asset-scoping requirements that had to be validated carefully against the current backend.
+Several difficulties were encountered during the internship:
+
+\begin{itemize}[leftmargin=1cm]
+\item \textbf{Tool and format diversity.} Wazuh, Suricata, Falco, Telegraf, Filebeat, and Elasticsearch do not naturally share an operational language, so ARIA needed source-specific mappers and a common alert model.
+\item \textbf{Alert noise.} Repeated and low-value alerts required filtering, deduplication, and severity handling.
+\item \textbf{AI reliability.} LLM output can be incomplete or malformed, so parsing, fallbacks, validation, and human approval were necessary.
+\item \textbf{Multi-server scoping.} Once several servers share one cluster, alerts, investigations, and remediation actions for one server must never be confused with another.
+\end{itemize}
 
 \section*{Skills Acquired}
 \addcontentsline{toc}{section}{Skills Acquired}
 
-On the technical side, the internship strengthened skills in Linux administration, cloud infrastructure, Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Falcosidekick, Telegraf, Redis, Python, FastAPI, SQLAlchemy, SQLite, Next.js, TypeScript, Ansible, prompt engineering, API validation, setup scripting, and SOC workflow design. On the professional side, it strengthened the habit of documenting assumptions, distinguishing proven behavior from limitations, validating work progressively, and keeping sensitive operations under human control.
+On the technical side, the internship strengthened skills in:
+
+\begin{itemize}[leftmargin=1cm]
+\item Linux administration, cloud infrastructure, and network hardening;
+\item Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Falcosidekick, Telegraf, and Redis;
+\item Python, FastAPI, SQLAlchemy, SQLite, Next.js, and TypeScript;
+\item Ansible automation, prompt engineering, API validation, and setup scripting;
+\item SOC workflow design and SOAR architecture.
+\end{itemize}
+
+On the professional side, it strengthened the habit of documenting assumptions, distinguishing proven behavior from limitations, validating work progressively, and keeping sensitive operations under human control.
 
 \section*{Value for the Host Organization}
 \addcontentsline{toc}{section}{Value for the Host Organization}
@@ -77,4 +98,4 @@ The current project is a strong controlled-environment SOC/SOAR foundation. The 
 \section*{Final Word}
 \addcontentsline{toc}{section}{Final Word}
 
-In conclusion, ARIA demonstrates the value of connecting monitoring, intelligence, and remediation in one controlled workflow. The platform improves visibility, reduces manual investigation effort, accelerates incident understanding, and provides a safer path from detection to response while keeping the analyst responsible for critical decisions.
+In conclusion, ARIA demonstrates the value of connecting monitoring, intelligence, and remediation in one controlled workflow. The platform improves visibility, reduces manual investigation effort, accelerates incident understanding, and provides a safer path from detection to response while keeping the analyst responsible for critical decisions. As a controlled-environment SOC/SOAR foundation, it is ready for internal use and extension, and its documented limitations give the next iteration a clear roadmap.

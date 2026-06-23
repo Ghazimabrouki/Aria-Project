@@ -151,7 +151,11 @@ The same project records note an important limitation that is kept visible: LLM-
 
 \section{Frontend Validation}
 
-The frontend is a Next.js application built with TypeScript. Running the production type check (\codepath{tsc --noEmit}) against the current codebase did not pass cleanly: it reported five type errors, summarized in Table~\ref{tab:tsc}. Three are animation-typing drifts in presentational components, caused by a minor-version difference in the \codepath{framer-motion} type definitions (string literals such as \codepath{ease: "easeOut"} no longer satisfy the stricter \codepath{Easing} union); two are missing optional fields (\codepath{has_aria_account}, \codepath{aria_account_username}) on the \codepath{MonitoredAsset} type used by the assets page. None of these change runtime behaviour, but they are reported honestly rather than as a clean pass, and they are tracked as type-definition cleanup items before final submission. The functional state of every page is independently evidenced by the live screenshots used throughout Chapters~4--6 and in Appendix~\ref{app:screens}.
+The frontend is a Next.js application built with TypeScript. Running the production type check (\codepath{tsc --noEmit}) against the current codebase did not pass cleanly: it reported five type errors, summarized in Table~\ref{tab:tsc}.
+
+Three errors are animation-typing drifts in presentational components. They are caused by a minor-version difference in the \codepath{framer-motion} type definitions: string literals such as \codepath{ease: "easeOut"} no longer satisfy the stricter \codepath{Easing} union. The other two errors are missing optional fields (\codepath{has_aria_account}, \codepath{aria_account_username}) on the \codepath{MonitoredAsset} type used by the assets page.
+
+None of these errors change runtime behaviour. They are reported honestly rather than as a clean pass, and they are tracked as type-definition cleanup items before final submission. The functional state of every page is independently evidenced by the live screenshots used throughout Chapters~4--6 and in Appendix~\ref{app:screens}.
 
 \begin{table}[H]
 \centering
@@ -220,26 +224,48 @@ Frontend build & Project records & 28/28 pages built in earlier validation runs.
 
 The project records also note that some full-suite \codepath{pytest} runs were affected by a pre-existing SQLite write-ahead-lock issue during database initialization in the local environment. This is a real limitation of the test environment, not of the implemented features, and is listed in Section~\ref{sec:val-limits}.
 
-Table~\ref{tab:fr-matrix} maps each high-level functional requirement from Chapter~1 to the validation evidence that supports it.
+Tables~\ref{tab:fr-matrix-a} and~\ref{tab:fr-matrix-b} map each functional requirement from Chapter~4 to the validation evidence that supports it.
 
 \begin{table}[H]
 \centering
-\caption{Functional requirement to validation evidence matrix}
-\label{tab:fr-matrix}
-\begin{tabularx}{\textwidth}{@{}p{0.10\textwidth}p{0.40\textwidth}X@{}}
+\caption{Functional requirement to validation evidence matrix (FR-01 to FR-10)}
+\label{tab:fr-matrix-a}
+\begin{tabularx}{\textwidth}{@{}p{0.10\textwidth}p{0.46\textwidth}X@{}}
 \toprule
-\textbf{FR} & \textbf{Requirement} & \textbf{Evidence} \\
+\textbf{FR} & \textbf{Requirement (from Chapter~4)} & \textbf{Evidence} \\
 \midrule
-FR-01 & Poll multi-source alerts from Elasticsearch & Live ES indices (Fig.~\ref{fig:val-discover}, \ref{fig:ch2-es-idx}) \\
-FR-02 & Normalize alerts into a common model & Chapter~3 pipeline diagrams and API alert records \\
-FR-03 & Enrich with GeoIP and MITRE ATT\&CK & Chapter~4 IPS map and alert detail screenshots \\
-FR-04 & Deduplicate and filter noise & Chapter~3 dedup/filter logic, project test records \\
-FR-05 & Correlate alerts into incidents & Chapter~4 incident screenshots, API records \\
-FR-06 & Generate AI investigations and playbooks & Chapter~4 investigation AI result, Listing~\ref{lst:ai-schema} \\
-FR-07 & Approval workflow with admin-secret gate & Chapter~3 controls, Fig.~\ref{fig:val-rem} \\
-FR-08 & Execute Ansible playbooks safely & Fig.~\ref{fig:val-rem} dry-run and hardening phases \\
-FR-09 & Verify fixes and archive cases & Fig.~\ref{fig:val-rem} verification stage, archive screenshots \\
-FR-10 & Multi-server asset scoping & Fig.~\ref{fig:val-assets}--\ref{fig:val-sources} \\
+FR-01 & View alerts from multiple sources with severity, source, IPs, tags, and relationships. & Chapter~4 alerts screenshots, live ES indices \\
+FR-02 & Poll Elasticsearch indices for Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic alerts. & Live ES indices (Fig.~\ref{fig:val-discover}, \ref{fig:ch2-es-idx}) \\
+FR-03 & Normalize source-specific documents into a common alert model. & Chapter~3 pipeline diagrams and API alert records \\
+FR-04 & Deduplicate alerts using Redis, memory cache, and local database checks. & Chapter~3 dedup/filter logic, project test records \\
+FR-05 & Apply Sigma noise filtering and severity filtering. & Chapter~3 noise-filter logic, alert screenshots \\
+FR-06 & Enrich alerts with GeoIP and MITRE ATT\&CK context. & Chapter~4 IPS map and alert detail screenshots \\
+FR-07 & Correlate alerts into incidents using time windows and shared indicators. & Chapter~4 incident screenshots, API records \\
+FR-08 & Build investigation context and generate summaries, narratives, risk assessments, and playbooks. & Chapter~4 investigation AI result, Listing~\ref{lst:ai-schema} \\
+FR-09 & Approve, decline, edit, execute, or archive investigations according to status and safety rules. & Fig.~\ref{fig:val-rem}, archive screenshots \\
+FR-10 & Protect dangerous endpoints with an admin secret. & Chapter~3 controls, admin-secret verification \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Functional requirement to validation evidence matrix (FR-11 to FR-20)}
+\label{tab:fr-matrix-b}
+\begin{tabularx}{\textwidth}{@{}p{0.10\textwidth}p{0.46\textwidth}X@{}}
+\toprule
+\textbf{FR} & \textbf{Requirement (from Chapter~4)} & \textbf{Evidence} \\
+\midrule
+FR-11 & Execute approved Ansible playbooks and record execution results. & Fig.~\ref{fig:val-rem} dry-run and hardening phases \\
+FR-12 & Verify remediation by re-querying evidence or checking remote state. & Fig.~\ref{fig:val-rem} verification stage \\
+FR-13 & Search alerts, incidents, investigations, archives, IPs, and domains. & Chapter~4 search screenshots, API records \\
+FR-14 & Visualize attack paths and GeoIP events through the IPS map. & Chapter~4 IPS map screenshots \\
+FR-15 & Monitor performance metrics, anomalies, and infrastructure investigations. & Chapter~4 metrics and infrastructure screenshots \\
+FR-16 & Manage monitored assets and scope data by \codepath{asset_id}. & Fig.~\ref{fig:val-assets}--\ref{fig:val-sources} \\
+FR-17 & Receive real-time WebSocket updates for investigations, performance, and system channels. & Chapter~3 architecture, dashboard live updates \\
+FR-18 & Onboard a monitored VM by installing agents, validating data visibility, and registering the asset. & Chapter~5 bootstrap simulation, \codepath{vm-test} indices \\
+FR-19 & Use an asset-scoped operator workflow that previews actions before any execution. & Chapter~4 operator screenshots, safety checks \\
+FR-20 & Configure data sources, pipeline cursors, Ansible settings, and protected changes without exposing secrets. & Chapter~4 settings screenshots, masked config excerpts \\
 \bottomrule
 \end{tabularx}
 \end{table}
