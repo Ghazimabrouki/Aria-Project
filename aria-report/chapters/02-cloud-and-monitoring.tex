@@ -152,7 +152,7 @@ The installation of the stack is driven by a set of setup scripts. A small wrapp
 
 \section{Elasticsearch and Kibana}
 
-Elasticsearch is the central indexing, search, and storage engine; Kibana is its visualization front end. They are installed together by \sourcefile{siem_setup.sh} from the official Elastic 7.x APT repository at a pinned version, so that every component of the stack agrees on a single compatible release.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/elasticsearch.png}}\hspace{0.15cm}Elasticsearch is the central indexing, search, and storage engine; \raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/elasticstack.png}}\hspace{0.15cm}Kibana is its visualization front end. They are installed together by \sourcefile{siem_setup.sh} from the official Elastic 7.x APT repository at a pinned version, so that every component of the stack agrees on a single compatible release.
 
 The configuration logic is security-first. Elasticsearch is configured as a single-node cluster (\codepath{discovery.type: single-node}) that binds to all interfaces on port~9200, with \codepath{xpack.security.enabled} turned on and TLS enabled on both the transport and HTTP layers. The certificates are generated locally with \codepath{elasticsearch-certutil}, which produces a certificate authority and per-service certificates for Elasticsearch, Kibana, and Filebeat; these are installed under each service's \codepath{certs} directory with restrictive ownership and permissions. After the service starts, the built-in users (\codepath{elastic}, \codepath{kibana}, \codepath{beats_system}, and the monitoring users) receive passwords through \codepath{elasticsearch-setup-passwords}. This means that from the very first component, no traffic and no authentication is left in clear text.
 
@@ -225,7 +225,7 @@ The configuration logic is careful about two practical issues. First, Telegraf m
 
 \section{Redis and Supporting Services}
 
-Redis is not a detection tool but a supporting service for the ARIA workflow. It provides a low-latency store for polling cursors, deduplication keys, rolling metric baselines, retry queues, and cached performance data. Keeping this operational state in Redis, rather than recomputing it from Elasticsearch on every cycle, is what allows ARIA's pipeline to poll incrementally and avoid reprocessing the same events. Redis runs locally on the central host alongside the rest of the stack and is reached only by the ARIA backend; it is never exposed to monitored servers or to the public network.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/redis.png}}\hspace{0.15cm}Redis is not a detection tool but a supporting service for the ARIA workflow. It provides a low-latency store for polling cursors, deduplication keys, rolling metric baselines, retry queues, and cached performance data. Keeping this operational state in Redis, rather than recomputing it from Elasticsearch on every cycle, is what allows ARIA's pipeline to poll incrementally and avoid reprocessing the same events. Redis runs locally on the central host alongside the rest of the stack and is reached only by the ARIA backend; it is never exposed to monitored servers or to the public network.
 
 \section{Setup Scripts and Automation Logic}
 \label{sec:setup-automation}
