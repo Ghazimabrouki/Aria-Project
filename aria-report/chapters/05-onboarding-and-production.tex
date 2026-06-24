@@ -161,9 +161,67 @@ The script ends by printing the exact JSON payload that registers the asset in A
 
 \screenshot{aria_add_server.png}{ARIA asset registration: per-source index patterns and host identity with inline source validation against Elasticsearch}{fig:ss-add-server}
 
+\section{Brain VM Setup Script}
+
+The ARIA solution is brought up on the central (brain) server by a single wrapper script, \sourcefile{install_brain_vm.sh}. The script is intentionally not a manual checklist: it encodes the exact order in which the monitoring foundation and the ARIA application must start, validates every layer before proceeding, and refuses partial or interactive-only runs. Its workflow is shown in Figure~\ref{fig:brain-setup}.
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  font=\small,
+  bstep/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=1.0cm, fill=gray!8, font=\fontsize{11}{13}\selectfont},
+  check/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=1.0cm, fill=green!10, font=\fontsize{11}{13}\selectfont},
+  gate/.style={draw, rounded corners, align=center, text width=2.6cm, minimum height=1.0cm, fill=red!10, font=\fontsize{11}{13}\selectfont},
+  arrow/.style={-Latex, line width=1.1pt}
+]
+\node[check] (env) {Validate\\host environment};
+\node[gate, right=0.6cm of env] (confirm) {Require explicit\\confirmation phrase};
+\node[bstep, right=0.6cm of confirm] (tools) {Run central\\tools runner};
+\node[check, right=0.6cm of tools] (native) {Verify native\\services active};
+\node[check, below=0.7cm of native] (envfile) {Check\\.env exists};
+\node[bstep, left=0.6cm of envfile] (compose) {\codepath{docker compose pull}\\\codepath{docker compose up -d}};
+\node[check, left=0.6cm of compose] (containers) {Verify redis, api,\\worker, frontend};
+\node[check, below=0.7cm of containers] (health) {API health\\+ frontend response};
+\draw[arrow] (env) -- (confirm);
+\draw[arrow] (confirm) -- (tools);
+\draw[arrow] (tools) -- (native);
+\draw[arrow] (native) -- (envfile);
+\draw[arrow] (envfile) -- (compose);
+\draw[arrow] (compose) -- (containers);
+\draw[arrow] (containers) -- (health);
+\end{tikzpicture}\end{adjustbox}
+\caption{Brain VM setup script flow}\label{fig:brain-setup}
+\end{figure}
+
+The script performs the following actions in order:
+
+\begin{enumerate}[leftmargin=1cm]
+\item \textbf{Environment validation.} It checks that the host is Linux, the script runs as root, systemd is available, and both Docker and the Docker Compose plugin are installed.
+\item \textbf{Destructive confirmation.} It requires the operator to type an explicit phrase so the script is never run accidentally on the wrong host.
+\item \textbf{Central tools runner.} It executes \sourcefile{setup_script_telegraf.sh}, which installs and hardens Elasticsearch, Kibana, Filebeat, Suricata, Wazuh Manager, Falco, Falcosidekick, Telegraf, and Fail2Ban.
+\item \textbf{Native service validation.} It verifies that every required service is active before continuing.
+\item \textbf{\codepath{.env} validation.} It checks that a readable \codepath{.env} file exists beside the Compose file; it never reads or prints its contents.
+\item \textbf{Compose deployment.} It runs \codepath{docker compose pull} and \codepath{docker compose up -d} from \sourcefile{aria-application/docker-compose.yml}.
+\item \textbf{Container validation.} It confirms that redis, api, worker, and frontend containers are running, and that Redis responds to \codepath{PING}.
+\item \textbf{Health checks.} It polls the API health endpoint at \codepath{http://127.0.0.1:8001/health} and checks that the frontend responds on port~3001.
+\end{enumerate}
+
+If any layer fails, the script prints diagnostic commands and exits without leaving the platform in a half-validated state. This makes the brain-server installation a single, reproducible command rather than a fragile manual procedure.
+
 \section{Containerized and Global Deployment}
 
 Beyond individual agents, the platform itself is deployed as cooperating services. The production-oriented layout runs the HTTP API and the background workers as separate processes, so that a crash in a long-running polling or correlation loop cannot take down the API that serves the dashboard. The FastAPI application listens on port~8001 and the production dashboard is exposed on port~3001 (the Next.js container listens internally on port~3000), while Redis and SQLite are local data services and Elasticsearch is the external source shared by all monitored servers. This process separation, combined with the restart-and-graceful-shutdown handling of the background process, is what lets the platform run unattended.
+
+The ARIA containers are pre-built and published to Docker Hub under the \codepath{ghaziiii/aria_project} namespace. This means the brain server does not build images locally; it pulls the published tags:
+
+\begin{itemize}[leftmargin=1cm]
+\item \codepath{ghaziiii/aria_project:redis-latest} for the Redis cache and cursor store;
+\item \codepath{ghaziiii/aria_project:backend-latest} for the FastAPI service;
+\item \codepath{ghaziiii/aria_project:worker-latest} for the background polling and correlation worker;
+\item \codepath{ghaziiii/aria_project:frontend-latest} for the Next.js dashboard.
+\end{itemize}
+
+The backend and worker share the same image but run different commands: the backend starts \codepath{uvicorn} on port~8001, while the worker runs \codepath{python3 main.py} with \codepath{SKIP_RESPONSE_API=1} so it does not try to bind the API port. The frontend container builds the Next.js application in a multi-stage Dockerfile and serves it internally on port~3000, mapped to host port~3001. Redis persists its data in a named Docker volume and is exposed on host port~6380 mapped to container port~6379.
 
 \begin{figure}[H]
 \centering
@@ -229,6 +287,48 @@ services:
     environment:
       - NODE_ENV=production
 \end{lstlisting}
+
+\section{Mass Deployment with Ansible}
+
+Onboarding one server by running \sourcefile{bootstrap_monitored_vm.sh} manually is useful for testing, but a SOC with tens or hundreds of servers needs an automated, repeatable mechanism. The repository provides an Ansible playbook, \sourcefile{ansible-vm-setup/playbook.yml}, that deploys the bootstrap script to every host in the \codepath{monitored_vms} inventory group and runs it with pre-supplied answers.
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  font=\small,
+  ctrl/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.1cm, fill=blue!10, font=\fontsize{11}{13}\selectfont},
+  vm/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.1cm, fill=gray!8, font=\fontsize{11}{13}\selectfont},
+  data/.style={draw, cylinder, shape border rotate=90, aspect=0.25, align=center, text width=2.6cm, minimum height=1.1cm, fill=orange!10, font=\fontsize{11}{13}\selectfont},
+  arrow/.style={-Latex, line width=1.1pt}
+]
+\node[ctrl] (ansible) {\textbf{Ansible control node}\\playbook.yml};
+\node[vm, right=1.2cm of ansible] (vm1) {\textbf{Monitored VM 1}\\bootstrap script};
+\node[vm, below=0.6cm of vm1] (vm2) {\textbf{Monitored VM 2}\\bootstrap script};
+\node[vm, below=0.6cm of vm2] (vm3) {\textbf{Monitored VM N}\\bootstrap script};
+\node[data, right=1.2cm of vm2] (es) {\textbf{Elasticsearch}\\indices};
+
+\draw[arrow] (ansible) -- (vm1) node[midway, above, font=\fontsize{10}{12}\selectfont] {copy + run};
+\draw[arrow] (ansible) -- (vm2);
+\draw[arrow] (ansible) -- (vm3);
+\draw[arrow] (vm1) -- (es);
+\draw[arrow] (vm2) -- (es);
+\draw[arrow] (vm3) -- (es);
+\end{tikzpicture}\end{adjustbox}
+\caption{Ansible-managed monitored-server deployment}\label{fig:ansible-deploy}
+\end{figure}
+
+The playbook performs the following steps for each target host:
+
+\begin{enumerate}[leftmargin=1cm]
+\item Stops and disables \codepath{unattended-upgrades} to prevent apt lock conflicts.
+\item Cleans up any stuck apt/dpkg/debconf processes and locks.
+\item Determines a safe VM name from the remote hostname.
+\item Copies \sourcefile{bootstrap_monitored_vm.sh} to \codepath{/tmp} on the remote host.
+\item Runs the script in non-interactive mode with the central Elasticsearch IP, credentials, Wazuh group, and environment tag.
+\item Streams the script output back to the Ansible console for auditing.
+\end{enumerate}
+
+The operator only needs to keep the Ansible inventory file up to date and run the playbook; every new VM receives the same agents, the same central target, and the same index-naming convention. After the playbook finishes, the administrator registers each generated asset payload in ARIA and runs source validation exactly as with a manual onboarding.
 
 \section{Production Deployment Workflow}
 
