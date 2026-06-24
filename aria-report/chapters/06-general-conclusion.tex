@@ -1,17 +1,17 @@
 \chapter*{General Conclusion}
 \addcontentsline{toc}{chapter}{General Conclusion}
 
-This final-year internship addressed a concrete SOC problem: transforming heterogeneous security and observability events into centralized, understandable, traceable, and actionable operations. Beginning with a monitoring foundation built on Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, and Redis, the project moved to Huawei Cloud infrastructure and evolved into the ARIA backend intelligence layer and operational dashboard.
+This internship transformed a real SOC pain point into a working, end-to-end solution. ARIA proves that heterogeneous security and observability telemetry --- host, network, runtime, and metric --- can be unified into one understandable, traceable, and actionable workflow.
 
 \section*{Answer to the Initial Problem}
 \addcontentsline{toc}{section}{Answer to the Initial Problem}
 
-The initial problem asked how a SOC can reduce manual effort and response delay for alerts arriving from heterogeneous sources such as Wazuh, Suricata, Falco, Filebeat, and Telegraf, while keeping remediation controlled, auditable, and verifiable. The platform answers by connecting collection, detection, normalization, filtering, deduplication, enrichment, correlation, AI-assisted explanation, controlled remediation, verification, and archiving into one workflow. Raw technical events are no longer isolated logs; they become normalized alerts, incidents, investigations, response proposals, execution records, and archived cases. The tools/setup work completes this chain by documenting how monitored VMs are prepared, how agents send data to the central stack, and how each server becomes a scoped asset inside ARIA.
+The initial problem asked how a SOC can reduce manual effort and response delay when alerts arrive from many disconnected tools, while keeping remediation controlled, auditable, and verifiable. ARIA answers this by connecting every stage of the response chain in one platform: collection, detection, normalization, filtering, deduplication, enrichment, correlation, AI-assisted explanation, controlled remediation, verification, and archiving. Raw technical events become normalized alerts, incidents, investigations, response proposals, execution records, and archived cases. Monitored VMs are prepared once, onboarded as scoped assets, and validated before any remediation is enabled.
 
 \section*{Main Results}
 \addcontentsline{toc}{section}{Main Results}
 
-A major result is the balance between automation and control. The AI layer generates summaries, narratives, risk assessments, and Ansible playbooks, yet the analyst controls sensitive decisions. Playbook execution is protected by validation, approval workflows, admin-secret checks, Ansible execution tracking, fix verification, and audit persistence. This human-in-the-loop design is essential in cybersecurity, where incorrect actions can affect availability or security.
+The central achievement is the balance between automation and analyst control. AI generates summaries, narratives, risk scores, and Ansible playbooks; the analyst approves, executes, and verifies. Every sensitive action passes validation, approval, admin-secret checks, execution tracking, and audit persistence. This human-in-the-loop design is essential in cybersecurity, where the wrong automated action can damage availability or security.
 
 Table~\ref{tab:main-results} summarizes the concrete outputs of the internship.
 
@@ -30,25 +30,19 @@ Automated tests reported passing & 910 \\
 API routes & 16 modules \\
 Database models & 13 \\
 Dashboard pages built & 28/28 \\
-Monitored assets activated & \codepath{dash-linux} validated \\
+Monitored assets activated & \codepath{dash-linux} and \codepath{vm-test} validated \\
 End-to-end remediation workflow & Nine-stage workflow completed \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-The resulting Next.js dashboard exposes alerts, incidents, security and infrastructure investigations, monitoring, metrics, IPS visualization, search, archives, the assistant, operator workflows, assets, accounts, and settings --- including protected administrative actions.
-
-The backend surfaces these capabilities through FastAPI routes and WebSocket updates, supported by Redis, SQLite, Elasticsearch, and Ansible.
-
-Validation confirms the internship objectives within the controlled-environment scope: API checks, backend compilation, frontend build verification, multi-server activation on the \codepath{dash-linux} and \codepath{vm-test} assets, admin-secret verification, and the automated test suite succeeded.
+The Next.js dashboard exposes alerts, incidents, runtime and infrastructure investigations, monitoring, metrics, IPS visualization, search, archives, the assistant, operator workflows, assets, accounts, and protected administrative actions. The FastAPI backend serves these capabilities through REST and WebSocket, supported by Redis, SQLite, Elasticsearch, and Ansible. Validation confirms that the internship objectives were reached within the controlled-environment scope.
 
 \section*{Difficulties Encountered}
 \addcontentsline{toc}{section}{Difficulties Encountered}
 
-Several difficulties were encountered:
-
 \begin{itemize}[leftmargin=1cm]
-\item \textbf{Tool and format diversity.} Wazuh, Suricata, Falco, Telegraf, Filebeat, and Elasticsearch do not naturally share an operational language, so ARIA needed source-specific mappers and a common alert model.
+\item \textbf{Tool and format diversity.} Wazuh, Suricata, Falco, Telegraf, Filebeat, and Elasticsearch do not share an operational language, so ARIA needed source-specific mappers and a common alert model.
 \item \textbf{Alert noise.} Repeated and low-value alerts required filtering, deduplication, and severity handling.
 \item \textbf{AI reliability.} LLM output can be incomplete or malformed, so parsing, fallbacks, validation, and human approval were necessary.
 \item \textbf{Multi-server scoping.} Once several servers share one cluster, alerts, investigations, and remediation actions for one server must never be confused with another.
@@ -56,8 +50,6 @@ Several difficulties were encountered:
 
 \section*{Skills Acquired}
 \addcontentsline{toc}{section}{Skills Acquired}
-
-On the technical side, it strengthened skills in:
 
 \begin{itemize}[leftmargin=1cm]
 \item Linux administration, cloud infrastructure, and network hardening;
@@ -67,17 +59,17 @@ On the technical side, it strengthened skills in:
 \item SOC workflow design and SOAR architecture.
 \end{itemize}
 
-On the professional side, it strengthened habits in documenting assumptions, distinguishing proven behavior from limitations, validating work progressively, and keeping sensitive operations under human control.
+Professionally, the internship strengthened the habit of documenting assumptions, distinguishing proven behavior from limitations, validating work progressively, and keeping sensitive operations under human control.
 
 \section*{Value for the Host Organization}
 \addcontentsline{toc}{section}{Value for the Host Organization}
 
-For the host organization, the internship delivered a working, documented SOC/SOAR foundation consolidating several open-source security and observability tools into one controlled workflow. The platform reduces the manual effort to move from a raw alert to an understood incident, provides a reusable monitored-VM onboarding procedure, and demonstrates a safe pattern for AI-assisted remediation that an internal team can extend. The accompanying validation reports and setup scripts lower the cost of reproducing and operating the environment.
+For the host organization, the internship delivered a working, documented SOC/SOAR foundation that consolidates several open-source security and observability tools into one controlled workflow. The platform reduces the manual effort to move from a raw alert to an understood incident, provides a reusable monitored-VM onboarding procedure, and demonstrates a safe pattern for AI-assisted remediation that an internal team can extend.
 
 \section*{Value for the Student}
 \addcontentsline{toc}{section}{Value for the Student}
 
-For me as a student, the project offered end-to-end work on a realistic cybersecurity engineering problem, not an isolated exercise. I designed and integrated a complete pipeline, made and justified architectural trade-offs, confronted the real constraints of heterogeneous telemetry and unreliable external services, and learned to communicate clearly what is proven, partial, or future work. This experience consolidated both my technical autonomy and professional rigor.
+For me as a student, the project offered end-to-end work on a realistic cybersecurity engineering problem. I designed and integrated a complete pipeline, justified architectural trade-offs, confronted the real constraints of heterogeneous telemetry and unreliable external services, and learned to communicate clearly what is proven, partial, or future work. This experience consolidated both technical autonomy and professional rigor.
 
 \section*{Future Work}
 \addcontentsline{toc}{section}{Future Work}
@@ -85,9 +77,7 @@ For me as a student, the project offered end-to-end work on a realistic cybersec
 The current project is a strong controlled-environment SOC/SOAR foundation. Main future improvements are:
 
 \begin{itemize}[leftmargin=1cm]
-\item \textbf{Authentication and RBAC:} add full user authentication and role-based access control before public exposure.
-\item \textbf{Production hardening:} strengthen network restrictions, secret management, and persistence for larger deployments.
-\item \textbf{Scalability:} replace SQLite with a production-grade database where concurrency and scale require it.
+\item \textbf{Broader monitoring-tool support:} extend ARIA's mappers and source configs to ingest alerts from additional EDR, SIEM, and cloud-security tools beyond Wazuh, Suricata, Falco, Filebeat, and Telegraf.
 \item \textbf{Expanded asset scoping:} apply scoping consistently to all monitoring views that are currently global by design.
 \item \textbf{Richer playbook libraries:} build reusable, tested playbooks for common incident classes.
 \item \textbf{LLM guardrails:} improve prompt engineering, output evaluation, and safety checks.
@@ -98,4 +88,4 @@ The current project is a strong controlled-environment SOC/SOAR foundation. Main
 \section*{Final Word}
 \addcontentsline{toc}{section}{Final Word}
 
-In conclusion, ARIA demonstrates the value of connecting monitoring, intelligence, and remediation in one controlled workflow. The platform improves visibility, reduces manual investigation effort, accelerates incident understanding, and provides a safer path from detection to response while keeping the analyst responsible for critical decisions. As a controlled-environment SOC/SOAR foundation, it is ready for internal use and extension; its documented limitations give the next iteration a clear roadmap.
+ARIA is more than a dashboard: it is a complete detection-to-response philosophy made concrete. By connecting monitoring, intelligence, and remediation in one controlled workflow, it shows that automation and human judgment can reinforce each other rather than compete. The platform improves visibility, reduces manual investigation effort, accelerates incident understanding, and provides a safer path from detection to response --- while keeping the analyst responsible for every critical decision. Built as a controlled-environment SOC/SOAR foundation, it is ready for internal use, extension, and the next generation of monitoring integrations.
