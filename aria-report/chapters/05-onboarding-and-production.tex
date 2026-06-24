@@ -2,14 +2,14 @@
 
 \section{Introduction}
 
-So far the solution has been described as a single central node: one server hosting the monitoring stack and ARIA, observing itself. A real SOC, however, must watch many servers. This final technical chapter closes the engineering story by explaining how a new server is onboarded automatically, that is, prepared to send its own logs, security events, runtime events, and metrics to the central stack, and how it becomes a scoped asset inside ARIA. It then describes how the complete solution is deployed and hardened for production. The central instrument is a single bootstrap script that turns a bare Linux server into a fully monitored asset and prints exactly the information ARIA needs to register it.
+So far the solution has been described as a single central node: one server hosting the monitoring stack and ARIA, observing itself. A real SOC, however, must watch many servers. This final technical chapter explains how a new server is onboarded to send its logs, security and runtime events, and metrics to the central stack, becoming a scoped ARIA asset. It then describes production deployment and hardening. The central instrument is a single bootstrap script that turns a bare Linux server into a fully monitored asset and prints exactly the information ARIA needs to register it.
 
 \section{Why Multi-Server Monitoring Is Needed}
 
-A SOC that can only observe its own host is a demonstration, not an operational tool. The value of ARIA grows with the number of servers it can see, but adding servers introduces two hard requirements:
+A SOC that only observes its own host is a demonstration, not an operational tool. ARIA's value grows with the servers it monitors, but adding servers introduces two requirements:
 
 \begin{itemize}[leftmargin=1cm]
-\item \textbf{Consistent configuration.} Every new server needs the same agents, forwarding targets, and predictable index naming. Otherwise data fails to arrive or cannot be attributed to the right server.
+\item \textbf{Consistent configuration.} Every new server needs the same agents, forwarding targets, and predictable index naming; otherwise data fails to arrive or cannot be attributed to the right server.
 \item \textbf{Strict separation.} Once several servers share one Elasticsearch cluster, alerts, investigations, and remediation actions for one server must never be confused with another.
 \end{itemize}
 
@@ -17,9 +17,9 @@ The bootstrap script below solves the first requirement; the asset-scoping logic
 
 \section{Monitored Server Bootstrap Script}
 
-The onboarding script, \sourcefile{bootstrap_monitored_vm.sh}, is designed to run on a server that will be \emph{observed} by ARIA, never on the central host. Its first action is therefore a safety guard: it detects central indicators (a local Elasticsearch, Kibana, or Wazuh Manager, or a central-looking hostname) and refuses to continue unless the operator confirms with an explicit phrase. This prevents the most damaging mistake, which would be reconfiguring the central server as if it were a monitored client.
+The onboarding script, \sourcefile{bootstrap_monitored_vm.sh}, runs on servers to be \emph{observed} by ARIA, not the central host. Its first action is a safety guard: it detects central indicators (local Elasticsearch, Kibana, or Wazuh Manager, or a central-looking hostname) and refuses to continue unless the operator confirms with an explicit phrase. This prevents the most damaging mistake---reconfiguring the central server as a monitored client.
 
-After the guard, the script collects the onboarding inputs: the server name, an environment label (such as \codepath{safe}, \codepath{prod}, or \codepath{dmz}), the server IP, the central Elasticsearch URL or IP and credentials, an optional certificate authority path, and optional Wazuh Manager details. Component flags (\codepath{--wazuh}, \codepath{--falco}, \codepath{--telegraf}, \codepath{--filebeat}, \codepath{--suricata}) let the operator install only what a given server needs, and a \codepath{--yes} mode supports non-interactive runs. The script then tests Elasticsearch reachability before installing anything, installs the selected agents, writes their configurations with the server's identity, starts and verifies the services, checks that the expected indices appear, and finally prints a ready-to-use ARIA asset payload. A sandboxed test mode (\codepath{ARIA_TEST_MODE}) allows the whole flow to be exercised safely against a fake root before touching a real server.
+After the guard, the script collects onboarding inputs: server name, environment label (such as \codepath{safe}, \codepath{prod}, or \codepath{dmz}), server IP, central Elasticsearch URL or IP and credentials, optional certificate authority path, and optional Wazuh Manager details. Component flags (\codepath{--wazuh}, \codepath{--falco}, \codepath{--telegraf}, \codepath{--filebeat}, \codepath{--suricata}) install only needed components, and a \codepath{--yes} mode supports non-interactive runs. It tests Elasticsearch reachability before installing anything, installs selected agents, writes configurations with the server's identity, starts and verifies services, checks expected indices appear, and prints a ready-to-use ARIA asset payload. A sandboxed test mode (\codepath{ARIA_TEST_MODE}) lets the whole flow be exercised safely against a fake root before touching a real server.
 
 \begin{figure}[H]
 \centering
@@ -49,7 +49,7 @@ After the guard, the script collects the onboarding inputs: the server name, an 
 \caption{Monitored server bootstrap flow}\label{fig:bootstrap-flow}
 \end{figure}
 
-Figure~\ref{fig:act-bootstrap} expands this flow into the activity diagram of the real script, including its decision points (the safety guard, the apt-lock wait, and the per-service health checks with restart-on-failure), and Figure~\ref{fig:seq-onboard} shows the same onboarding as a sequence across the administrator, the new server, the central stack, Elasticsearch, and the ARIA asset API.
+Figure~\ref{fig:act-bootstrap} expands this flow into the activity diagram of the real script, including its decision points (the safety guard, the apt-lock wait, and the per-service health checks with restart-on-failure). Figure~\ref{fig:seq-onboard} shows the same onboarding as a sequence across the administrator, the new server, the central stack, Elasticsearch, and the ARIA asset API.
 
 \umlfigure{act_monitored_bootstrap.png}{Monitored-server bootstrap script activity flow}{fig:act-bootstrap}
 
@@ -57,31 +57,31 @@ Figure~\ref{fig:act-bootstrap} expands this flow into the activity diagram of th
 
 \section{Wazuh Agent Configuration on Monitored Servers}
 
-On a monitored server, the script installs the \textbf{Wazuh Agent} (not the manager) and points it at the central Wazuh Manager. The manager host defaults to the Elasticsearch host unless overridden, and the agent enrolls into a configurable group through the enrollment channel on port~1515, then reports security events on port~1514. A useful detail is that the script can query the Wazuh API on port~55000 to retrieve the agent's identifier by name, so that the resulting ARIA asset records the exact \codepath{agent_id}. From then on, that server's host security alerts flow through the manager into the shared \codepath{wazuh-alerts-*} index, where ARIA can attribute them to the asset using the recorded agent identity.
+On monitored servers, it installs the \textbf{Wazuh Agent} (not the manager) and points it at the central Wazuh Manager. The manager host defaults to the Elasticsearch host unless overridden, and the agent enrolls into a configurable group through the enrollment channel on port~1515 and reports security events on port~1514. The script can also query the Wazuh API on port~55000 to retrieve the agent's identifier by name, so the resulting ARIA asset records the exact \codepath{agent_id}. That server's host security alerts then flow through the manager into the shared \codepath{wazuh-alerts-*} index, where ARIA attributes them to the asset using the recorded agent identity.
 
 \section{Suricata Configuration}
 
-If network monitoring is requested, the script installs and configures Suricata on the monitored server using the same logic as the central node: it detects the active interface so capture happens on the right link, and it enables the EVE JSON output. On monitored servers, however, the Suricata events are shipped by the local Filebeat into the server's own \codepath{filebeat-<server>-*} index rather than a central one. This keeps each server's network events attributable, and ARIA's asset configuration records that the Suricata source for this server lives in the Filebeat index family.
+If network monitoring is requested, the script installs and configures Suricata using the same logic as the central node: it detects the active interface for capture and enables the EVE JSON output. On monitored servers, however, local Filebeat ships Suricata events into the server's own \codepath{filebeat-<server>-*} index rather than a central one. This keeps each server's network events attributable; ARIA's asset configuration records that the Suricata source for this server lives in the Filebeat index family.
 
 \section{Filebeat Forwarding Logic}
 
-Filebeat is the workhorse of monitored-server onboarding. The script installs it from the Elastic repository, trusts the central certificate authority, and configures it to forward the server's system and authentication logs, and its Suricata EVE events, into a per-server index named \codepath{filebeat-<server>-*}. The per-server naming is the heart of attribution: because the index name embeds the server identity, ARIA can later scope all log and network data to exactly one asset simply by targeting that pattern. Without this convention, multiple servers would write into a shared index and could not be cleanly separated.
+Filebeat is the workhorse of monitored-server onboarding. The script installs it from the Elastic repository, trusts the central certificate authority, and configures it to forward the server's system and authentication logs and Suricata EVE events into a per-server index named \codepath{filebeat-<server>-*}. Per-server naming is the heart of attribution: the index name embeds the server identity, so ARIA can scope all log and network data to exactly one asset by targeting that pattern. Without this convention, multiple servers would write into a shared index and could not be cleanly separated.
 
 \section{Telegraf Metrics Forwarding}
 
-When metrics are requested, the script installs \textbf{Telegraf} from the InfluxData repository, trusts the Elasticsearch certificate authority, and configures the Elasticsearch output to write into \codepath{telegraf-<server>-*}. As on the central node, it verifies the Elasticsearch version before writing the output so the metrics pipeline is not silently broken, and it collects the standard host metrics (CPU, memory, disk, network, processes, sockets). These per-server metric indices feed the metrics page and the infrastructure investigations for that specific asset.
+When metrics are requested, it installs \textbf{Telegraf} from the InfluxData repository, trusts the Elasticsearch certificate authority, and configures the Elasticsearch output to write into \codepath{telegraf-<server>-*}. As on the central node, it verifies the Elasticsearch version before writing output so the metrics pipeline is not silently broken, and collects standard host metrics (CPU, memory, disk, network, processes, sockets). These per-server metric indices feed the metrics page and infrastructure investigations for that asset.
 
 \section{Falco and Falcosidekick Runtime Forwarding}
 
-For runtime monitoring, the script installs \textbf{Falco} with the modern eBPF driver and \textbf{Falcosidekick} as the forwarder, configured to send runtime events to the central Elasticsearch under \codepath{falco-<server>-*}. The same validation discipline applies: the Elasticsearch endpoint is checked before Falcosidekick is started, so a misconfigured credential or unreachable target fails loudly during onboarding rather than silently producing no runtime data. ARIA's runtime investigation engine then consumes this per-server index for the asset.
+For runtime monitoring, it installs \textbf{Falco} with the modern eBPF driver and \textbf{Falcosidekick} as the forwarder, configured to send runtime events to the central Elasticsearch under \codepath{falco-<server>-*}. The same validation discipline applies: the Elasticsearch endpoint is checked before Falcosidekick starts, so a misconfigured credential or unreachable target fails loudly during onboarding rather than silently producing no runtime data. ARIA's runtime investigation engine consumes this per-server index for the asset.
 
 \section{Elasticsearch Target Configuration}
 
-Every agent on a monitored server points back to the same central Elasticsearch, reached over HTTPS using the central credentials and certificate authority. The script tests this target before installing anything, which is the single most important precondition: if the server cannot reach and authenticate to Elasticsearch, no amount of agent installation will produce visible data. Centralizing the target also means a monitored server holds no analytical state of its own; it is purely a producer, and all correlation and intelligence happen centrally in ARIA.
+Every agent points back to the same central Elasticsearch, reached over HTTPS with the central credentials and certificate authority. The script tests this target before installing anything---the single most important precondition: if the server cannot reach and authenticate to Elasticsearch, no amount of agent installation will produce visible data. Centralizing the target also means a monitored server holds no analytical state; it is purely a producer, and all correlation and intelligence happen centrally in ARIA.
 
 \section{ARIA Asset Creation from Script Output}
 
-The bootstrap script ends by printing a JSON payload for ARIA's asset API (\codepath{POST /api/v1/assets}). This is the connective tissue between onboarding and the platform: the script already knows the server's identity and exactly which sources were installed, so it emits a payload that describes them precisely. The payload carries the asset identifier, name, hostname, IP, environment, an enabled flag, a remediation flag (off by default for safety), and a \codepath{source_config_json} that lists, for each installed source, its per-server index pattern and host identity, including the Wazuh \codepath{agent_id} when applicable. Listing~\ref{lst:asset-payload} shows the payload printed for the \codepath{dash-linux} server.
+The bootstrap script prints a JSON payload for ARIA's asset API (\codepath{POST /api/v1/assets}). This connects onboarding to the platform: the script already knows the server's identity and exactly which sources were installed, so it emits a payload that describes them precisely. The payload carries asset identifier, name, hostname, IP, environment, enabled and remediation flags (the latter off by default for safety), and a \codepath{source_config_json} listing each installed source's per-server index pattern and host identity, including the Wazuh \codepath{agent_id} when applicable. Listing~\ref{lst:asset-payload} shows the payload printed for the \codepath{dash-linux} server.
 
 \begin{lstlisting}[style=aria,caption={Asset Registration JSON printed by the bootstrap script (sanitized)},label={lst:asset-payload},
   emph={asset_id,name,hostname,ip_address,environment,enabled,remediation_enabled,source_config_json,wazuh,falco,telegraf,filebeat,index_pattern,agent_name,agent_id,host_name},
@@ -119,11 +119,11 @@ Telegraf & \codepath{telegraf-<server>-*} & Per-server metric index. \\
 \end{tabularx}
 \end{table}
 
-The administrator pastes this payload into the asset registry (or the \codepath{/settings/assets} page). Because the script generated it from the real installation, the asset in ARIA matches the server's actual sources without manual guesswork. The default \codepath{remediation_enabled: false} embodies a safe-by-default policy: a freshly onboarded server is observed first and only later, deliberately, allowed to be a remediation target.
+The administrator pastes the payload into the asset registry (or the \codepath{/settings/assets} page). Because the script generated it from the real installation, the asset in ARIA matches the server's actual sources without manual guesswork. The default \codepath{remediation_enabled: false} embodies a safe-by-default policy: a freshly onboarded server is observed first; only later does it deliberately become a remediation target.
 
 \section{Source Validation Inside ARIA}
 
-Registering an asset is not the same as proving it works. ARIA exposes a source-validation action that queries Elasticsearch for each configured pattern and reports whether data is actually arriving. This was exercised during the multi-server activation, where validating the \codepath{dash-linux} asset against live Elasticsearch produced concrete counts and, importantly, an \emph{expected} absence for a source that was not installed:
+Registering an asset is not the same as proving it works. ARIA exposes a source-validation action that queries Elasticsearch for each configured pattern and reports whether data is arriving. This was exercised during the multi-server activation: validating the \codepath{dash-linux} asset against live Elasticsearch produced concrete counts and, importantly, an \emph{expected} absence for a source that was not installed:
 
 \begin{table}[H]
 \centering
@@ -141,7 +141,7 @@ Suricata & \codepath{filebeat-dash-linux-*} & Missing & 0 documents; expected, s
 \end{tabularx}
 \end{table}
 
-This validation step turns onboarding into a repeatable, verifiable workflow rather than a hopeful one. A source with zero documents is either a real problem or, as with Suricata above, an expected consequence of not installing that component, and the asset configuration records which case applies. Because re-running the installer on a live host from the reporting environment would modify that host, Listing~\ref{lst:bootstrap-out} reproduces the script's own validation sequence as a \emph{controlled simulation} derived directly from the bootstrap script branches; no production host was modified to produce it.
+This validation step makes onboarding repeatable and verifiable. A source with zero documents is either a real problem or, as with Suricata above, an expected consequence of not installing that component; the asset configuration records which case applies. Because re-running the installer on a live host from the reporting environment would modify it, Listing~\ref{lst:bootstrap-out} reproduces the script's own validation sequence as a \emph{controlled simulation} derived directly from the bootstrap script branches; no production host was modified to produce it.
 
 \begin{lstlisting}[style=ariaterm,caption={Controlled Simulation Result: monitored-server bootstrap validation},label={lst:bootstrap-out},
   emph={[2]PASS,FAIL,WARNING}, emphstyle={[2]\color{green!60!black}\bfseries}]
@@ -165,13 +165,13 @@ Endpoint:    https://<CENTRAL_ES>:9200
 No production host was modified during this controlled simulation.
 \end{lstlisting}
 
-The script ends by printing the exact JSON payload that registers the asset in ARIA (the same payload shown in Listing~\ref{lst:asset-payload}); because the script generates it from the real installation, the asset in ARIA matches the server's actual sources. The ARIA side of this workflow is shown in Figure~\ref{fig:ss-add-server}: each declared source carries an index pattern and a host identity, and a per-source validation control queries Elasticsearch to confirm that data is actually arriving before the asset is trusted. The equivalent mapping for \codepath{vm-test} is captured live in the validation chapter (Figure~\ref{fig:val-sources}).
+The script prints the exact JSON payload that registers the asset in ARIA (the same payload shown in Listing~\ref{lst:asset-payload}); generated from the real installation, the asset in ARIA matches the server's actual sources. The ARIA side of this workflow is shown in Figure~\ref{fig:ss-add-server}: each declared source carries an index pattern and a host identity, and a per-source validation control queries Elasticsearch to confirm that data is arriving before the asset is trusted. The equivalent mapping for \codepath{vm-test} is captured live in the validation chapter (Figure~\ref{fig:val-sources}).
 
 \screenshot{aria_add_server.png}{ARIA asset registration: per-source index patterns and host identity with inline source validation against Elasticsearch}{fig:ss-add-server}
 
 \section{Brain VM Setup Script}
 
-\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/linux.png}}\hspace{0.15cm}The ARIA solution is brought up on the central (brain) server by a single wrapper script, \sourcefile{install_brain_vm.sh}. The script is intentionally not a manual checklist: it encodes the exact order in which the monitoring foundation and the ARIA application must start, validates every layer before proceeding, and refuses partial or interactive-only runs. Its workflow is shown in Figure~\ref{fig:brain-setup}.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/linux.png}}\hspace{0.15cm}ARIA is brought up on the central (brain) server by a single wrapper script, \sourcefile{install_brain_vm.sh}. It is intentionally not a manual checklist: it encodes the exact order in which the monitoring foundation and ARIA application must start, validates every layer before proceeding, and refuses partial or interactive-only runs. Its workflow is shown in Figure~\ref{fig:brain-setup}.
 
 \begin{figure}[H]
 \centering
@@ -204,23 +204,23 @@ The script ends by printing the exact JSON payload that registers the asset in A
 The script performs the following actions in order:
 
 \begin{enumerate}[leftmargin=1cm]
-\item \textbf{Environment validation.} It checks that the host is Linux, the script runs as root, systemd is available, and both Docker and the Docker Compose plugin are installed.
+\item \textbf{Environment validation.} It checks that the host is Linux, the script runs as root, systemd is available, and both Docker and Docker Compose plugin are installed.
 \item \textbf{Destructive confirmation.} It requires the operator to type an explicit phrase so the script is never run accidentally on the wrong host.
 \item \textbf{Central tools runner.} It executes \sourcefile{setup_script_telegraf.sh}, which installs and hardens Elasticsearch, Kibana, Filebeat, Suricata, Wazuh Manager, Falco, Falcosidekick, Telegraf, and Fail2Ban.
 \item \textbf{Native service validation.} It verifies that every required service is active before continuing.
-\item \textbf{\codepath{.env} validation.} It checks that a readable \codepath{.env} file exists beside the Compose file; it never reads or prints its contents.
+\item \textbf{\codepath{.env} validation.} It checks that a readable \codepath{.env} exists beside the Compose file, never reading or printing its contents.
 \item \textbf{Compose deployment.} It runs \codepath{docker compose pull} and \codepath{docker compose up -d} from \sourcefile{aria-application/docker-compose.yml}.
-\item \textbf{Container validation.} It confirms that redis, api, worker, and frontend containers are running, and that Redis responds to \codepath{PING}.
+\item \textbf{Container validation.} It confirms that redis, api, worker, and frontend containers are running and that Redis responds to \codepath{PING}.
 \item \textbf{Health checks.} It polls the API health endpoint at \codepath{http://127.0.0.1:8001/health} and checks that the frontend responds on port~3001.
 \end{enumerate}
 
-If any layer fails, the script prints diagnostic commands and exits without leaving the platform in a half-validated state. This makes the brain-server installation a single, reproducible command rather than a fragile manual procedure.
+If any layer fails, the script prints diagnostic commands and exits, leaving no half-validated platform. This makes brain-server installation a single, reproducible command rather than a fragile manual procedure.
 
 \section{Containerized and Global Deployment}
 
-\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/docker.png}}\hspace{0.15cm}Beyond individual agents, the platform itself is deployed as cooperating services. The production-oriented layout runs the HTTP API and the background workers as separate processes, so that a crash in a long-running polling or correlation loop cannot take down the API that serves the dashboard. The FastAPI application listens on port~8001 and the production dashboard is exposed on port~3001 (the Next.js container listens internally on port~3000), while Redis and SQLite are local data services and Elasticsearch is the external source shared by all monitored servers. This process separation, combined with the restart-and-graceful-shutdown handling of the background process, is what lets the platform run unattended.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/docker.png}}\hspace{0.15cm}Beyond individual agents, the platform is deployed as cooperating services. The production-oriented layout runs the HTTP API and background workers as separate processes, so a crash in a long-running polling or correlation loop cannot take down the API serving the dashboard. The FastAPI application listens on port~8001 and the production dashboard is exposed on port~3001 (the Next.js container listens internally on port~3000), while Redis and SQLite are local data services and Elasticsearch is the external source shared by monitored servers. This process separation, combined with restart-and-graceful-shutdown handling of the background process, lets the platform run unattended.
 
-The ARIA containers are pre-built and published to Docker Hub under the \codepath{ghaziiii/aria_project} namespace. This means the brain server does not build images locally; it pulls the published tags:
+The ARIA containers are pre-built and published to Docker Hub under the \codepath{ghaziiii/aria_project} namespace. The brain server therefore does not build images locally; it pulls the published tags:
 
 \begin{itemize}[leftmargin=1cm]
 \item \textbf{\codepath{ghaziiii/aria_project:redis-latest}} --- Redis cache and cursor store.
@@ -229,7 +229,7 @@ The ARIA containers are pre-built and published to Docker Hub under the \codepat
 \item \textbf{\codepath{ghaziiii/aria_project:frontend-latest}} --- Next.js dashboard.
 \end{itemize}
 
-The backend and worker share the same image but run different commands: the backend starts \codepath{uvicorn} on port~8001, while the worker runs \codepath{python3 main.py} with \codepath{SKIP_RESPONSE_API=1} so it does not try to bind the API port. The frontend container builds the Next.js application in a multi-stage Dockerfile and serves it internally on port~3000, mapped to host port~3001. Redis persists its data in a named Docker volume and is exposed on host port~6380 mapped to container port~6379.
+The backend and worker share the same image but run different commands: the backend starts \codepath{uvicorn} on port~8001, while the worker runs \codepath{python3 main.py} with \codepath{SKIP_RESPONSE_API=1} to avoid binding the API port. The frontend container builds the Next.js application in a multi-stage Dockerfile and serves it internally on port~3000, mapped to host port~3001. Redis persists its data in a named Docker volume and is exposed on host port~6380 mapped to container port~6379.
 
 \begin{figure}[H]
 \centering
@@ -259,7 +259,7 @@ The backend and worker share the same image but run different commands: the back
 \caption{Deployment architecture}
 \end{figure}
 
-The containerized layout is captured in the Docker Compose file shown in Listing~\ref{lst:docker-compose}. Redis is exposed on host port~6380 and mapped to the standard container port~6379; the API and worker share the same backend image but run different commands; and the frontend container listens internally on port~3000 while the host exposes port~3001.
+The containerized layout is captured in Listing~\ref{lst:docker-compose}. Redis is exposed on host port~6380 and mapped to the standard container port~6379; the API and worker share the same backend image but run different commands; and the frontend container listens internally on port~3000 while the host exposes port~3001.
 
 \begin{lstlisting}[style=aria,language=yaml,caption={Docker Compose services excerpt},label={lst:docker-compose},
   emph={services,redis,api,worker,frontend,image,container_name,ports,volumes,environment,depends_on,restart,command},
@@ -308,11 +308,11 @@ services:
 
 \subsection{Dockerfile and Image Build}
 
-The published images are built from Dockerfiles in \sourcefile{aria-application/}. The backend Dockerfile starts from a Python 3.12 slim image, installs build tools, Ansible, SSH client, network utilities, and the Python dependencies listed in \codepath{requirements.txt}, then copies the application code and exposes port~8001. This single image serves both the API and the worker because the Compose file overrides the command at runtime.
+The published images are built from Dockerfiles in \sourcefile{aria-application/}. The backend Dockerfile starts from a Python 3.12 slim image, installs build tools, Ansible, SSH client, network utilities, and the Python dependencies listed in \codepath{requirements.txt}, then copies application code and exposes port~8001. The same image serves both the API and the worker because the Compose file overrides the command at runtime.
 
-The frontend Dockerfile is a multi-stage Node.js 22 Alpine build. It enables \codepath{pnpm}, installs dependencies with \codepath{--frozen-lockfile}, injects the API and WebSocket URLs as build arguments, builds the Next.js application, and copies only the production artifacts into the final stage. The runner stage exposes port~3000 and starts the application with \codepath{pnpm start}.
+The frontend Dockerfile is a multi-stage Node.js 22 Alpine build. It enables \codepath{pnpm}, installs dependencies with \codepath{--frozen-lockfile}, injects the API and WebSocket URLs as build arguments, builds Next.js, and copies only the production artifacts into the final stage. The runner stage exposes port~3000 and starts the application with \codepath{pnpm start}.
 
-Images are built locally with \codepath{docker build}, tagged as \codepath{ghaziiii/aria_project:<service>-latest}, and pushed to Docker Hub. The brain server therefore does not need the source code or a build environment; it only needs the Compose file, a readable \codepath{.env}, and Docker credentials to pull the images.
+Images are built locally with \codepath{docker build}, tagged as \codepath{ghaziiii/aria_project:<service>-latest}, and pushed to Docker Hub. The brain server needs neither source code nor a build environment; only the Compose file, a readable \codepath{.env}, and Docker credentials to pull the images.
 
 \begin{lstlisting}[style=aria,language=bash,caption={Backend Dockerfile excerpt},label={lst:dockerfile-backend}]
 FROM python:3.12-slim AS base
@@ -361,7 +361,7 @@ CMD ["pnpm", "start"]
 
 \section{Mass Deployment with Ansible}
 
-\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/ansible.png}}\hspace{0.15cm}Onboarding one server by running \sourcefile{bootstrap_monitored_vm.sh} manually is useful for testing, but a SOC with tens or hundreds of servers needs an automated, repeatable mechanism. The repository provides an Ansible playbook, \sourcefile{ansible-vm-setup/playbook.yml}, that deploys the bootstrap script to every host in the \codepath{monitored_vms} inventory group and runs it with pre-supplied answers.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/ansible.png}}\hspace{0.15cm}Onboarding one server by running \sourcefile{bootstrap_monitored_vm.sh} manually is useful for testing, but a SOC with tens or hundreds of servers needs an automated, repeatable mechanism. The repository provides an Ansible playbook, \sourcefile{ansible-vm-setup/playbook.yml}, that deploys the bootstrap script to every host in the \codepath{monitored_vms} inventory group and runs it with supplied answers.
 
 \begin{figure}[H]
 \centering
@@ -439,11 +439,11 @@ Listing~\ref{lst:ansible-playbook} shows the core tasks of the playbook.
       poll: 10
 \end{lstlisting}
 
-The operator only needs to keep the Ansible inventory file up to date and run the playbook; every new VM receives the same agents, the same central target, and the same index-naming convention. After the playbook finishes, the administrator registers each generated asset payload in ARIA and runs source validation exactly as with a manual onboarding.
+The operator only needs to keep the Ansible inventory file up to date and run the playbook; every new VM receives the same agents, central target, and index-naming convention. After the playbook finishes, the administrator registers each generated asset payload in ARIA and runs source validation as with manual onboarding.
 
 \section{Production Deployment Workflow}
 
-Putting the whole solution into production follows the same order as the report itself, which is also the order of dependencies. The cloud infrastructure and hardened central host are provisioned first; the monitoring foundation is installed and verified to deliver data into Elasticsearch; the ARIA backend and dashboard are deployed on top; monitored servers are onboarded one by one with the bootstrap script and registered as assets; each asset is source-validated; and only then is remediation selectively enabled per asset. This staged rollout means the platform is never trusted with action before it has been proven to see data correctly. Figure~\ref{fig:seq-rollout} shows the deployment steps as a sequence: setting the masked \codepath{.env}, running the SQLite migrations, enabling the backend and worker processes under \codepath{systemd}, building and starting the dashboard, running health checks, and finally applying the production hardening.
+Putting the whole solution into production follows the same order as the report itself, the order of dependencies. The cloud infrastructure and hardened central host are provisioned first; the monitoring foundation is installed and verified to deliver data into Elasticsearch; the ARIA backend and dashboard are deployed on top; monitored servers are onboarded one by one with the bootstrap script and registered as assets; each asset is source-validated; and only then is remediation selectively enabled per asset. This staged rollout means the platform is never trusted with action before proving it can see data correctly. Figure~\ref{fig:seq-rollout} shows the deployment steps as a sequence: setting the masked \codepath{.env}, running the SQLite migrations, enabling the backend and worker processes under \codepath{systemd}, building and starting the dashboard, running health checks, and finally applying production hardening.
 
 \umlfigure{seq_production_rollout.png}{Production deployment sequence}{fig:seq-rollout}
 
@@ -466,7 +466,7 @@ Putting the whole solution into production follows the same order as the report 
 
 \section{Production Limitations and Hardening}
 
-The platform was validated for an internal, trusted-network deployment, and this scope must be stated honestly. Several items must be addressed before public exposure. There is no full public authentication layer yet: the platform relies on internal trusted-network deployment and the admin-secret gate for dangerous endpoints, and role-based access control is not implemented. SQLite is appropriate for the current single-node SOC, but a higher-concurrency production deployment should strengthen the persistence layer accordingly. TLS and certificate handling must be adapted to the production environment rather than bypassed. Finally, Elasticsearch and Redis must remain internal, administrative access should be restricted to trusted networks or a VPN, and only strictly required ports should be exposed. These constraints define the production-hardening work and align with the future work in the general conclusion.
+The platform was validated for an internal, trusted-network deployment---a scope that must be stated honestly. Several items must be addressed before public exposure. There is no full public authentication layer yet: the platform relies on internal trusted-network deployment and the admin-secret gate for dangerous endpoints; role-based access control is not implemented. SQLite suits the current single-node SOC, but a higher-concurrency deployment should strengthen the persistence layer. TLS and certificate handling must be adapted to the production environment rather than bypassed. Finally, Elasticsearch and Redis must remain internal, administrative access should be restricted to trusted networks or a VPN, and only required ports should be exposed. These constraints define the production-hardening work and align with the future work in the general conclusion.
 
 \begin{table}[H]
 \centering
@@ -486,4 +486,4 @@ Secret management & Continue redacting secrets; manage admin secret and credenti
 
 \section{Conclusion}
 
-This chapter completed the engineering story: a single bootstrap script turns any Linux server into a consistently configured, fully attributable monitored asset, ARIA registers and source-validates that asset, and the whole platform is deployed as separated services with a staged, gated production rollout. The solution therefore scales from one self-monitored host to a fleet of servers without losing the separation and control that make it safe. The honest production limitations, authentication, RBAC, persistence, and exposure, frame the work that remains, which the general conclusion now summarizes alongside the project's overall results.
+This chapter completed the engineering story: a single bootstrap script turns any Linux server into a consistently configured, fully attributable monitored asset, ARIA registers and source-validates that asset, and the whole platform is deployed as separated services with a staged, gated production rollout. The solution therefore scales from one self-monitored host to a fleet of servers without losing the separation and control that make it safe. The honest production limitations---authentication, RBAC, persistence, and exposure---frame the remaining work, which the general conclusion now summarizes alongside the project's overall results.
