@@ -1,9 +1,9 @@
 \chapter*{General Introduction}
 \addcontentsline{toc}{chapter}{General Introduction}
 
-Organizations increasingly depend on connected information systems, cloud services, containers, remote servers, and continuously deployed applications. This evolution increases operational flexibility, but it also increases the number of alerts that security teams must analyze. A Security Operations Center (SOC) receives telemetry from many sources: host detection tools, network intrusion detection engines, runtime security agents, system metrics, application logs, and manual reports. When these signals remain isolated, the analyst must manually connect events, determine impact, decide whether remediation is safe, and verify whether the corrective action actually worked.
+Organizations increasingly depend on connected information systems, cloud services, containers, remote servers, and continuously deployed applications. This evolution increases operational flexibility, but also multiplies the alerts security teams must analyze. A Security Operations Center (SOC) receives telemetry from host detection tools, network intrusion detection engines, runtime security agents, system metrics, application logs, and manual reports. When these signals remain isolated, analysts must manually connect events, determine impact, decide whether remediation is safe, and verify that the corrective action worked.
 
-The internship project studied in this report addresses this operational problem through \project{}, also named \projectlong{}. The system is a security automation platform that connects alert ingestion, enrichment, incident correlation, AI-assisted investigation, human approval, Ansible remediation, post-fix verification, archiving, monitoring, and dashboard visualization. The project is positioned in the SOAR domain, where orchestration and automation are used to support incident response while preserving analyst control for risky actions.
+This report studies an internship project that addresses this operational problem through \project{}, also named \projectlong{}. The system is a security automation platform that connects alert ingestion, enrichment, incident correlation, AI-assisted investigation, human approval, Ansible remediation, post-fix verification, archiving, monitoring, and dashboard visualization. Positioned in the SOAR domain, it uses orchestration and automation to support incident response while preserving analyst control over risky actions.
 
 \section*{Internship Mission}
 \addcontentsline{toc}{section}{Internship Mission}
@@ -13,9 +13,9 @@ The assigned mission was to design, implement, harden, and validate a backend-ce
 \section*{Problem Statement}
 \addcontentsline{toc}{section}{Problem Statement}
 
-The initial problem can be formulated as follows: how can a SOC reduce manual effort and response delay when alerts arrive from heterogeneous sources such as Wazuh, Suricata, Falco, Filebeat, and Telegraf, while still keeping remediation actions controlled, auditable, and verifiable?
+The problem is: how can a SOC reduce manual effort and response delay when alerts arrive from heterogeneous sources such as Wazuh, Suricata, Falco, Filebeat, and Telegraf, while keeping remediation actions controlled, auditable, and verifiable?
 
-Several sub-problems follow from this question. First, raw alert formats differ from one source to another, which makes correlation difficult. Second, repeated or noisy alerts can hide important events. Third, the analyst needs context such as IP information, MITRE ATT\&CK techniques, source history, target host, and related incidents. Fourth, automatic remediation can be dangerous if it executes unvalidated commands or targets the wrong host. Finally, the result of a fix must be verified rather than assumed.
+Several sub-problems follow. First, raw alert formats differ across sources, complicating correlation. Second, repeated or noisy alerts can hide important events. Third, analysts need context such as IP information, MITRE ATT\&CK techniques, source history, target host, and related incidents. Fourth, automatic remediation can be dangerous if it executes unvalidated commands or targets the wrong host. Finally, the result of a fix must be verified rather than assumed.
 
 \section*{Objectives}
 \addcontentsline{toc}{section}{Objectives}
@@ -34,7 +34,7 @@ The project objectives were:
 \section*{Report Organization}
 \addcontentsline{toc}{section}{Report Organization}
 
-This report is organized to follow the real engineering story of the project, that is, the order in which the solution was actually built from the ground up. Table~\ref{tab:report-org} maps each chapter to its focus and to the validation evidence that supports it.
+This report follows the project's real engineering order from the ground up. Table~\ref{tab:report-org} maps each chapter to its focus and supporting validation evidence.
 
 \begin{table}[H]
 \centering
@@ -54,5 +54,5 @@ Chapter~6 & Validation, evaluation, limitations, and future work & Compilation, 
 \end{tabularx}
 \end{table}
 
-\textbf{Chapter~1} presents the general context and project scope. \textbf{Chapter~2} builds the telemetry foundation. \textbf{Chapter~3} explains the design and internal logic of ARIA. \textbf{Chapter~4} shows the functional realization through the dashboard. \textbf{Chapter~5} covers onboarding and production deployment. \textbf{Chapter~6} validates the solution and discusses limitations and future work. The report ends with a general conclusion and appendices containing technical inventories, configuration extracts, and validation evidence.
+\textbf{Chapter~1} presents the context and project scope. \textbf{Chapter~2} builds the telemetry foundation. \textbf{Chapter~3} explains ARIA's design and internal logic. \textbf{Chapter~4} shows the dashboard realization. \textbf{Chapter~5} covers onboarding and production deployment. \textbf{Chapter~6} validates the solution and discusses limitations and future work. The report ends with a general conclusion and appendices containing technical inventories, configuration extracts, and validation evidence.
 

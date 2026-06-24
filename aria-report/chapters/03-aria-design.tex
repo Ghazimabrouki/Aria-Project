@@ -2,21 +2,19 @@
 
 \section{Introduction}
 
-The previous chapter ended with real telemetry sitting in Elasticsearch. On its own, that telemetry is still a stream of heterogeneous technical documents. ARIA is the platform that gives this data operational meaning.
+The previous chapter left real telemetry in Elasticsearch. On its own, that telemetry is a stream of heterogeneous technical documents. ARIA gives it operational meaning.
 
-This chapter explains how ARIA is designed and, more importantly, the \emph{logic} behind each transformation. The goal is to show \emph{why} each stage exists and what problem it solves, not merely to list the modules involved. The discussion is organized in three layers:
+This chapter explains ARIA's design and the \emph{logic} behind each transformation --- \emph{why} each stage exists and what problem it solves, not merely what modules are involved. The discussion is organized in three layers:
 
 \begin{enumerate}[leftmargin=1cm]
-\item \textbf{Architecture:} global, backend, frontend, and persistence views of the platform.
-\item \textbf{Pipeline:} the path from alert ingestion through normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping.
+\item \textbf{Architecture:} global, backend, frontend, and persistence views.
+\item \textbf{Pipeline:} from alert ingestion through normalization, enrichment, deduplication, correlation, investigation, AI-assisted analysis, controlled remediation, verification, and asset scoping.
 \item \textbf{Controls:} the security mechanisms and approval boundaries that keep the analyst in control of risky actions.
 \end{enumerate}
 
-For each stage we explain not only what happens, but why it is necessary.
-
 \section{Project Repository and Development Environment}
 
-\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/github.png}}\hspace{0.15cm}The entire ARIA project --- source code, setup scripts, Dockerfiles, Ansible playbooks, documentation, tests, and this report --- is maintained in a single GitHub repository at \url{https://github.com/Ghazimabrouki/Aria-Project}. GitHub is used as the version-control platform, the central source of truth, and the distribution point for the project assets. The repository structure separates the monitoring-tool installers (\sourcefile{aria-tools-setup/}), the containerized application (\sourcefile{aria-application/}), the Ansible automation (\sourcefile{ansible-vm-setup/}), the report and presentation (\sourcefile{aria-report/}), and operational scripts (\sourcefile{scripts/}). This organization makes it possible to clone one repository and deploy the full stack, from the central monitoring foundation to the dashboard and to every monitored server.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/github.png}}\hspace{0.15cm}The entire ARIA project --- source code, setup scripts, Dockerfiles, Ansible playbooks, documentation, tests, and this report --- lives in one GitHub repository at \url{https://github.com/Ghazimabrouki/Aria-Project}. GitHub serves as version-control platform, source of truth, and distribution point. The repository separates monitoring-tool installers (\sourcefile{aria-tools-setup/}), the containerized application (\sourcefile{aria-application/}), Ansible automation (\sourcefile{ansible-vm-setup/}), the report and presentation (\sourcefile{aria-report/}), and operational scripts (\sourcefile{scripts/}). One clone deploys the full stack from central monitoring to dashboard and monitored servers.
 
 \begin{figure}[H]
 \centering
@@ -64,25 +62,25 @@ For each stage we explain not only what happens, but why it is necessary.
 \caption{ARIA technology stack grouped by role}\label{fig:tech-stack}
 \end{figure}
 
-Version control is used throughout the internship. Each significant change --- report chapters, setup scripts, frontend pages, backend routes, diagrams, and validation evidence --- is committed with a descriptive message. The active branch for the report and presentation work is \codepath{report-and-presentation-updates}. This discipline ensures that the deployment artifacts, the validation evidence, and the written report remain synchronized and reproducible.
+Version control is used throughout the internship. Each significant change --- report chapters, setup scripts, frontend pages, backend routes, diagrams, and validation evidence --- is committed with a descriptive message on the \codepath{report-and-presentation-updates} branch. This keeps deployment artifacts, validation evidence, and the written report synchronized and reproducible.
 
 \section{Twelve-Step Intelligence Pipeline}
 
-The ARIA workflow can be described as a twelve-step pipeline that carries a signal from raw Elasticsearch document to a closed, auditable case. Figure~\ref{fig:twelve-step} gives the high-level view; the following sections explain the logic of each stage.
+The ARIA workflow is a twelve-step pipeline that carries a signal from raw Elasticsearch document to closed, auditable case. Figure~\ref{fig:twelve-step} gives the high-level view; the sections below explain each stage.
 
 \begin{enumerate}[leftmargin=1cm]
-\item \textbf{Ingestion} — cursor-based polling of Elasticsearch sources every 10 seconds.
-\item \textbf{Mapping} — source-specific mappers turn raw documents into a common alert model.
-\item \textbf{Enrichment} — GeoIP, MITRE ATT\&CK, IOC extraction, and host context are added.
-\item \textbf{Deduplication} — memory, Redis, and DB checks collapse repeated events.
-\item \textbf{Noise filtering} — Sigma rules and auto-learned patterns drop low-value alerts.
-\item \textbf{SQLite storage} — normalized alerts persist in the operational shadow database.
-\item \textbf{Correlation} — related alerts are grouped into incidents by indicator and time window.
-\item \textbf{Investigation} — an investigation case is created and populated with context.
-\item \textbf{AI analysis} — the AI engine produces a summary, narrative, risk score, and Ansible playbook.
-\item \textbf{Approval} — an analyst reviews and approves, edits, or declines the proposed action.
-\item \textbf{Execution} — Ansible runs the approved playbook on the scoped asset.
-\item \textbf{Verification and archive} — the verifier re-checks evidence, then the case is archived with an audit trail.
+\item \textbf{Ingestion} --- cursor-based polling of Elasticsearch sources every 10 seconds.
+\item \textbf{Mapping} --- source-specific mappers turn raw documents into a common alert model.
+\item \textbf{Enrichment} --- GeoIP, MITRE ATT\&CK, IOC extraction, and host context are added.
+\item \textbf{Deduplication} --- memory, Redis, and DB checks collapse repeated events.
+\item \textbf{Noise filtering} --- Sigma rules and auto-learned patterns drop low-value alerts.
+\item \textbf{SQLite storage} --- normalized alerts persist in the operational shadow database.
+\item \textbf{Correlation} --- related alerts are grouped into incidents by indicator and time window.
+\item \textbf{Investigation} --- an investigation case is created and populated with context.
+\item \textbf{AI analysis} --- the AI engine produces a summary, narrative, risk score, and Ansible playbook.
+\item \textbf{Approval} --- an analyst reviews and approves, edits, or declines the proposed action.
+\item \textbf{Execution} --- Ansible runs the approved playbook on the scoped asset.
+\item \textbf{Verification and archive} --- the verifier re-checks evidence, then the case is archived with an audit trail.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -137,7 +135,7 @@ The ARIA workflow can be described as a twelve-step pipeline that carries a sign
 
 \section{Global ARIA Architecture}
 
-ARIA is organized as four cooperating layers. A frontend dashboard presents SOC operations to users; an API layer exposes the workflow over REST and WebSocket; a workflow layer contains the actual intelligence (pipeline, correlation, AI response, runtime, infrastructure, and operator logic); and an infrastructure layer connects to Elasticsearch, Redis, SQLite, Ansible, and the AI providers. Each layer depends only on the one below it, which keeps responsibilities clear and makes the system testable.
+ARIA has four cooperating layers. A frontend dashboard presents SOC operations; an API layer exposes the workflow over REST and WebSocket; a workflow layer contains the intelligence (pipeline, correlation, AI response, runtime, infrastructure, and operator logic); and an infrastructure layer connects to Elasticsearch, Redis, SQLite, Ansible, and the AI providers. Each layer depends only on the one below, keeping responsibilities clear and the system testable.
 
 \begin{figure}[H]
 \centering
@@ -156,7 +154,7 @@ ARIA is organized as four cooperating layers. A frontend dashboard presents SOC 
 \caption{Logical architecture layers}
 \end{figure}
 
-The platform is designed around a small set of actors, whose needs explain why these layers exist. Analysts and administrators interact through the dashboard; the monitored assets, Elasticsearch, Redis, the AI provider, and the Ansible targets are external participants that the workflow layer coordinates.
+The platform is built around a small set of actors. Analysts and administrators interact through the dashboard; monitored assets, Elasticsearch, Redis, the AI provider, and Ansible targets are external participants coordinated by the workflow layer.
 
 \begin{table}[H]
 \centering
@@ -177,11 +175,11 @@ Ansible target & Host on which approved playbooks or diagnostic tasks are execut
 \end{tabularx}
 \end{table}
 
-The complete catalogue of these interactions is presented as the global use-case diagram in Figure~\ref{fig:global-usecase} (Chapter~\ref{ch:context}), which maps every actor above to the use cases it triggers or serves. At the design level, the same actors motivate a component view (Figure~\ref{fig:component}): the Next.js dashboard talks only to the FastAPI backend, which in turn coordinates the ingestion, AI, remediation, and asset services and the data and integration tier (Elasticsearch, Redis, SQLite, and the Ansible executor). The labelled ports on this diagram are the contract between ARIA and its environment.
+The complete catalogue of these interactions is the global use-case diagram in Figure~\ref{fig:global-usecase} (Chapter~\ref{ch:context}), mapping every actor to the use cases it triggers or serves. The same actors motivate the component view in Figure~\ref{fig:component}: the Next.js dashboard talks only to the FastAPI backend, which coordinates ingestion, AI, remediation, and asset services and the data and integration tier (Elasticsearch, Redis, SQLite, and the Ansible executor). The labelled ports on this diagram are ARIA's contract with its environment.
 
 \umlfigure{aria_component_architecture.png}{ARIA component architecture and communication ports}{fig:component}
 
-The technology choices follow directly from these needs: an asynchronous backend able to poll, transform, and serve data concurrently; a search source that is already in place; a fast operational store; an agentless automation tool; and a modern dashboard framework.
+The technology choices follow directly from these needs: an asynchronous backend able to poll, transform, and serve data concurrently; a search source already in place; a fast operational store; an agentless automation tool; and a modern dashboard framework.
 
 \begin{table}[H]
 \centering
@@ -203,7 +201,7 @@ Security context & MITRE ATT\&CK, Sigma & ATT\&CK maps adversary behavior; Sigma
 
 \section{Backend Architecture}
 
-\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/python.png}}\hspace{0.1cm}\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/fastapi.png}}\hspace{0.15cm}The backend is a FastAPI application organized around domain packages. The route layer receives HTTP and WebSocket requests, the core layer centralizes shared infrastructure clients, the pipeline layer transforms external telemetry into SOC data, and the response layer manages investigations, AI output, automation, verification, and archive. This separation is what allows a background task to crash and restart without taking down the API server.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/python.png}}\hspace{0.1cm}\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/fastapi.png}}\hspace{0.15cm}The backend is a FastAPI application organized around domain packages. The route layer receives HTTP and WebSocket requests, the core layer centralizes shared infrastructure clients, the pipeline layer transforms external telemetry into SOC data, and the response layer manages investigations, AI output, automation, verification, and archive. This separation allows a background task to crash and restart without taking down the API server.
 
 \begin{figure}[H]
 \centering
@@ -251,11 +249,11 @@ Security context & MITRE ATT\&CK, Sigma & ATT\&CK maps adversary behavior; Sigma
 \end{tabularx}
 \end{table}
 
-Figure~\ref{fig:backend-modules} expands these packages into the real module tree of the implementation, showing how requests flow from the API routers down through the pipeline (poller, mappers, enrichment, data-usage) and the response layer (watcher, AI engines, remediation) into the SQLite models and the shared \sourcefile{core/} clients. This is the concrete map a maintainer uses to locate any piece of logic.
+Figure~\ref{fig:backend-modules} expands these packages into the real module tree, showing how requests flow from API routers through the pipeline (poller, mappers, enrichment, data-usage) and the response layer (watcher, AI engines, remediation) into the SQLite models and shared \sourcefile{core/} clients. This is the concrete map a maintainer uses to locate logic.
 
 \umlfigure{backend_module_organization.png}{Backend module organization (real package and file structure)}{fig:backend-modules}
 
-The application itself is defined in \sourcefile{api/app.py}. It configures CORS, a simple rate-limiting middleware, and an application lifespan that initializes the database, then mounts many routers grouped by domain: alerts, incidents, investigations, archives, and reports; assistant, adaptive, operator, runtime, and infrastructure; monitoring, pipeline, performance, dashboard, search, and IPS; assets, accounts, authentication, settings, and whitelist; plus WebSocket routes for real-time updates. Each domain has a dedicated file under \sourcefile{api/routes/}, which keeps the API maintainable as it grows. The backend is wired to its environment through a single configuration file; Listing~\ref{lst:backend-env} is a sanitized excerpt showing the Elasticsearch, Redis, LLM, Ansible, and admin-secret settings, all with secret values masked.
+The application is defined in \sourcefile{api/app.py}. It configures CORS, simple rate-limiting middleware, and a lifespan that initializes the database, then mounts domain routers: alerts, incidents, investigations, archives, and reports; assistant, adaptive, operator, runtime, and infrastructure; monitoring, pipeline, performance, dashboard, search, and IPS; assets, accounts, authentication, settings, and whitelist; plus WebSocket routes for real-time updates. Each domain has a dedicated file under \sourcefile{api/routes/}, keeping the API maintainable as it grows. The backend is wired to its environment through one configuration file; Listing~\ref{lst:backend-env} is a sanitized excerpt showing Elasticsearch, Redis, LLM, Ansible, and admin-secret settings, with secret values masked.
 
 \begin{lstlisting}[style=aria,language=conf,caption={Backend configuration excerpt (sanitized .env)},label={lst:backend-env},
   emph={ELASTICSEARCH_URL,ELASTICSEARCH_USER,ELASTICSEARCH_PASSWORD,ELASTICSEARCH_USE_SSL,REDIS_HOST,REDIS_PORT,BACKEND_PORT,ARIA_ADMIN_SECRET,LLM_PROVIDER,LLM_MODEL,LLM_ENABLED,ANSIBLE_ENABLED,ANSIBLE_SSH_PORT,ANSIBLE_SSH_KEY},
@@ -278,9 +276,9 @@ ANSIBLE_SSH_KEY=/keys/id_ed25519     # path only, key not shown
 
 \section{Frontend Architecture}
 
-\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/nextjs.png}}\hspace{0.15cm}The dashboard is a Next.js, React, and TypeScript application that uses Tailwind CSS and shadcn/ui for the interface, SWR for data fetching and caching, Recharts for charts, and a WebSocket context for live updates. Its design goal is a dense, SOC-oriented interface: dark mode, severity badges, data tables, live indicators, page skeletons, and a command menu.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/nextjs.png}}\hspace{0.15cm}The dashboard is a Next.js, React, and TypeScript application using Tailwind CSS and shadcn/ui, SWR for data fetching and caching, Recharts for charts, and a WebSocket context for live updates. Its design goal is a dense, SOC-oriented interface: dark mode, severity badges, data tables, live indicators, page skeletons, and a command menu.
 
-Architecturally, the frontend is built around three ideas. A dashboard shell holds the authentication guard, the sidebar, and the global selected-asset context. A central API client attaches the JWT and the admin-secret header and intercepts protected responses. Domain pages read and write through the SWR cache, synchronizing time filters and the selected \codepath{asset_id} into their queries so that the same component can show global or per-server data. Live events arriving over WebSocket update the cache directly, so investigation, incident, performance, and health changes appear without a manual refresh.
+Architecturally, the frontend rests on three ideas. A dashboard shell holds authentication guard, sidebar, and global selected-asset context. A central API client attaches the JWT and admin-secret header and intercepts protected responses. Domain pages read and write through the SWR cache, synchronizing time filters and selected \codepath{asset_id} into their queries so the same component shows global or per-server data. Live events over WebSocket update the cache directly, so investigation, incident, performance, and health changes appear without manual refresh.
 
 \begin{figure}[H]
 \centering
@@ -305,14 +303,14 @@ Architecturally, the frontend is built around three ideas. A dashboard shell hol
 \caption{Frontend module architecture}
 \end{figure}
 
-The dashboard pages themselves are organized into a navigation map (Figure~\ref{fig:frontend-nav}) that follows the SOC workflow: an \emph{Overview} group (dashboard, search), \emph{Security Operations} (alerts, incidents, investigations, IPS map, whitelist), \emph{Infrastructure \& Performance}, \emph{Runtime Security}, \emph{AI Intelligence} (assistant, operator), and \emph{System Management} (archives, settings). This grouping is what lets an analyst move from a high-level signal to a specific case in two or three clicks.
+The dashboard pages form a navigation map (Figure~\ref{fig:frontend-nav}) that follows the SOC workflow: an \emph{Overview} group (dashboard, search), \emph{Security Operations} (alerts, incidents, investigations, IPS map, whitelist), \emph{Infrastructure \& Performance}, \emph{Runtime Security}, \emph{AI Intelligence} (assistant, operator), and \emph{System Management} (archives, settings). This grouping lets an analyst move from a high-level signal to a specific case in two or three clicks.
 
 \clearpage
 \umlfigure{frontend_navigation_map.png}{Frontend navigation map (sidebar groups to dashboard routes)}{fig:frontend-nav}
 
 \section{Database and Persistence Logic}
 
-The local persistence layer uses SQLite with the SQLAlchemy asynchronous ORM \cite{sqlalchemy_async}. The model file \sourcefile{response/models.py} defines the investigation lifecycle entities, alert snapshots, approvals, playbook runs, verification, archives, audit events, internal ARIA alerts, monitored assets, and whitelist entries. The reasoning behind storing this in a local database, rather than only in Elasticsearch, is separation of concerns: Elasticsearch holds the raw, immutable evidence, while SQLite holds the \emph{operational state} of cases as they move through the workflow. An investigation's status, its approval decision, the output of an Ansible run, and the result of a verification are operational facts that belong to ARIA, not to the source telemetry.
+The local persistence layer uses SQLite with the SQLAlchemy asynchronous ORM \cite{sqlalchemy_async}. The model file \sourcefile{response/models.py} defines investigation lifecycle entities, alert snapshots, approvals, playbook runs, verification, archives, audit events, internal ARIA alerts, monitored assets, and whitelist entries. Storing this locally, rather than only in Elasticsearch, separates concerns: Elasticsearch holds raw, immutable evidence, while SQLite holds the \emph{operational state} of cases as they move through the workflow. An investigation's status, approval decision, Ansible run output, and verification result are operational facts that belong to ARIA, not to the source telemetry.
 
 \begin{figure}[H]
 \centering
@@ -337,11 +335,11 @@ The local persistence layer uses SQLite with the SQLAlchemy asynchronous ORM \ci
 \caption{Simplified investigation data model}
 \end{figure}
 
-Figure~\ref{fig:class-model} gives the formal class diagram extracted from \sourcefile{response/models.py}. Each class carries its real attributes and is annotated with the workflow domain it belongs to: \emph{Detection} (\codepath{Alert}, \codepath{Incident}, \codepath{AlertIncidentLink}), \emph{Remediation} (\codepath{Investigation}, \codepath{PlaybookApproval}, \codepath{PlaybookRun}, \codepath{FixVerification}, \codepath{OperatorRun}), \emph{Asset Scope} (\codepath{MonitoredAsset}, \codepath{AriaAccount}), and \emph{Audit/Archive} (\codepath{Archive}, \codepath{InvestigationAuditEvent}). The cardinalities make the central rule visible: one investigation owns at most one approval, one run, one verification, and one archive, but many context alerts and many audit events, while a monitored asset scopes many alerts, incidents, investigations, and operator runs.
+Figure~\ref{fig:class-model} gives the formal class diagram extracted from \sourcefile{response/models.py}. Each class carries its real attributes and is annotated with its workflow domain: \emph{Detection} (\codepath{Alert}, \codepath{Incident}, \codepath{AlertIncidentLink}), \emph{Remediation} (\codepath{Investigation}, \codepath{PlaybookApproval}, \codepath{PlaybookRun}, \codepath{FixVerification}, \codepath{OperatorRun}), \emph{Asset Scope} (\codepath{MonitoredAsset}, \codepath{AriaAccount}), and \emph{Audit/Archive} (\codepath{Archive}, \codepath{InvestigationAuditEvent}). The cardinalities express the central rule: one investigation owns at most one approval, one run, one verification, and one archive, but many context alerts and audit events, while a monitored asset scopes many alerts, incidents, investigations, and operator runs.
 
 \umlfigure{class_domain_model.png}{Domain class diagram extracted from the backend models}{fig:class-model}
 
-The same entities, viewed as the physical persistence schema, give the entity--relationship diagram in Figure~\ref{fig:er-model}. The schema is implemented in SQLite through the SQLAlchemy asynchronous ORM; it is intentionally sized for the single-node internship deployment and can be migrated to a stronger production database later without changing the domain model, since the application code depends on the ORM entities rather than on SQLite-specific features.
+The same entities, viewed as the physical persistence schema, give the entity--relationship diagram in Figure~\ref{fig:er-model}. The schema is implemented in SQLite through SQLAlchemy async; it is sized for the single-node internship deployment and can be migrated to a production database later without changing the domain model, since the application depends on ORM entities rather than SQLite-specific features.
 
 \umlfigure{er_data_model.png}{Entity--relationship diagram of the SQLite persistence schema}{fig:er-model}
 
@@ -349,17 +347,17 @@ The same entities, viewed as the physical persistence schema, give the entity--r
 
 \section{Alert Ingestion Logic}
 
-The alert pipeline reads raw events from Elasticsearch and prepares them for the rest of the workflow. The central design problem is to read \emph{new} events efficiently and exactly once, without busy-looping and without missing data. ARIA solves this with cursor-based polling: for each source index pattern it keeps a per-source cursor (the last processed timestamp) in Redis, with a file fallback, and queries only events after that cursor. On the first run it uses a configurable lookback window.
+The alert pipeline reads raw events from Elasticsearch. The central design problem is to read \emph{new} events efficiently and exactly once, without busy-looping or missing data. ARIA solves this with cursor-based polling: for each source index pattern it keeps a per-source cursor (the last processed timestamp) in Redis, with a file fallback, and queries only events after that cursor. On the first run it uses a configurable lookback window.
 
-The poller also adapts its pace to the workload. When a batch returns many alerts, it sleeps only briefly and continues draining the backlog; when no new alerts are found, it returns to the configured polling interval. This avoids both tight busy loops during quiet periods and unnecessary delay during active incidents. Each source (Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic) is polled asynchronously, so a slow source does not block the others.
+The poller adapts its pace to workload. When a batch returns many alerts, it sleeps briefly and continues draining the backlog; when no new alerts are found, it returns to the configured polling interval. This avoids tight busy loops during quiet periods and unnecessary delay during active incidents. Each source (Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic) is polled asynchronously, so a slow source does not block the others.
 
 \diagramimagecompact{phase3_cursor_polling.png}{Cursor-based Elasticsearch polling}
 
 \section{Normalization and Enrichment Logic}
 
-Raw security tools do not emit the same JSON schema, so the next stage normalizes every document into a single common alert model. The reasoning is that correlation, deduplication, and AI analysis are only tractable if every alert exposes the same fields regardless of origin. Source-specific mappers perform this translation: \sourcefile{wazuh.py}, \sourcefile{suricata.py}, \sourcefile{falco.py} and \sourcefile{falco_runtime.py}, \sourcefile{filebeat.py} (including Suricata EVE events shipped through Filebeat), and \sourcefile{generic.py}. The result is a normalized alert with a title, severity, source, timestamp, source and destination IPs, hostname, rule name, metadata, and indicators.
+Raw security tools do not emit the same JSON schema, so the next stage normalizes every document into one common alert model. Correlation, deduplication, and AI analysis are only tractable if every alert exposes the same fields regardless of origin. Source-specific mappers perform this translation: \sourcefile{wazuh.py}, \sourcefile{suricata.py}, \sourcefile{falco.py} and \sourcefile{falco_runtime.py}, \sourcefile{filebeat.py} (including Suricata EVE events shipped through Filebeat), and \sourcefile{generic.py}. The result is a normalized alert with title, severity, source, timestamp, source and destination IPs, hostname, rule name, metadata, and indicators.
 
-Once normalized, the alert is enriched with the context an analyst would otherwise gather by hand:
+Once normalized, the alert is enriched with context an analyst would otherwise gather by hand:
 
 \begin{itemize}[leftmargin=1cm]
 \item GeoIP enrichment extracts country, city, ASN, and provider information from IP addresses.
@@ -371,7 +369,7 @@ Once normalized, the alert is enriched with the context an analyst would otherwi
 \diagramimagecompact{phase3_raw_to_alert.png}{Raw document to normalized SOC alert}
 \diagramimagecompact{phase3_enrichment_context.png}{Enrichment and context building}
 
-Concretely, whatever the source, the pipeline produces one common shape. Listing~\ref{lst:normalized-alert} shows a normalized and enriched alert (a Wazuh SSH brute-force event) as stored in the \codepath{alerts} table; the same fields are present for a Suricata, Falco, or Filebeat alert, which is exactly what makes downstream correlation and AI analysis source-independent.
+Whatever the source, the pipeline produces one common shape. Listing~\ref{lst:normalized-alert} shows a normalized and enriched Wazuh SSH brute-force alert stored in the \codepath{alerts} table; the same fields are present for Suricata, Falco, or Filebeat alerts, making downstream correlation and AI analysis source-independent.
 
 \begin{lstlisting}[style=aria,caption={Normalized and enriched alert (sanitized)},label={lst:normalized-alert},
   emph={source,source_id,severity,category,title,source_ip,hostname,rule_name,dedup_key,asset_id,iocs,alert_metadata,geoip,mitre,status,occurrence_count},
@@ -397,11 +395,11 @@ Concretely, whatever the source, the pipeline produces one common shape. Listing
 }
 \end{lstlisting}
 
-The \codepath{dedup_key} (source, host, category, and indicator) is what the deduplication stage hashes to collapse repeats, and \codepath{asset_id} is what later confines the alert to a single monitored server.
+The \codepath{dedup_key} (source, host, category, and indicator) is what deduplication hashes to collapse repeats; \codepath{asset_id} later confines the alert to one monitored server.
 
 \section{Deduplication and Noise Filtering Logic}
 
-A SOC drowns not in unique threats but in repetition. Two stages address this. \textbf{Deduplication} prevents the same operational event from being created repeatedly, using a layered check: Redis keys catch short-term repeats across polling cycles, an in-memory set of seen identifiers catches repeats within a cycle, and a local database check catches already-persisted duplicates. \textbf{Noise filtering} removes low-value categories of alerts before they reach the analyst. ARIA uses Sigma rule files under \sourcefile{config/sigma_rules/} as a portable detection and filtering format \cite{sigma} to identify noisy categories such as low-value Suricata DNS, HTTP, protocol, and ICMP events, and routine Falco container activity, complemented by an auto-learned noise component. The logic is intentionally ordered: deduplicate first, then filter noise, then enrich, so that expensive enrichment is never wasted on duplicates or noise.
+A SOC drowns not in unique threats but in repetition. Two stages address this. \textbf{Deduplication} prevents the same operational event from being created repeatedly, using a layered check: Redis keys catch short-term repeats across polling cycles, an in-memory set catches repeats within a cycle, and a local database check catches already-persisted duplicates. \textbf{Noise filtering} removes low-value alerts before they reach the analyst. ARIA uses Sigma rule files under \sourcefile{config/sigma_rules/} as a portable detection and filtering format \cite{sigma} to identify noisy categories such as low-value Suricata DNS, HTTP, protocol, and ICMP events, and routine Falco container activity, complemented by an auto-learned noise component. The logic is intentionally ordered: deduplicate first, then filter noise, then enrich, so expensive enrichment is never wasted on duplicates or noise.
 
 \begin{figure}[H]
 \centering
@@ -436,12 +434,12 @@ Figure~\ref{fig:act-alert} expresses the same pipeline as an activity diagram wi
 
 \section{Incident Correlation Logic}
 
-Correlation turns isolated alerts into operational incidents. The reasoning is that an attack rarely shows up as one alert: a brute-force attempt is many authentication failures, a network intrusion pairs a Suricata alert with a host alert, and a runtime escape relates to both. ARIA correlates alerts using time-windowed and indicator-based logic, grouping by source IP, destination IP, hostname, user, container, attack pattern, and kill-chain progression. The analyst then reasons about one incident instead of dozens of fragments. The data-usage modules under \sourcefile{pipeline/datausage/} extend this with ticket-like lifecycle concepts, local incidents, routing rules, and observable management, supporting a more complete incident lifecycle than a flat alert list.
+Correlation turns isolated alerts into operational incidents. An attack rarely shows up as one alert: a brute-force attempt is many authentication failures, a network intrusion pairs a Suricata alert with a host alert, and a runtime escape relates to both. ARIA correlates alerts using time-windowed and indicator-based logic, grouping by source IP, destination IP, hostname, user, container, attack pattern, and kill-chain progression. The analyst then reasons about one incident instead of dozens of fragments. The data-usage modules under \sourcefile{pipeline/datausage/} extend this with ticket-like lifecycle concepts, local incidents, routing rules, and observable management, supporting a more complete incident lifecycle than a flat alert list.
 
 \diagramimagecompact{phase3_incident_correlation.png}{Incident correlation workflow from restitution diagrams}
 \diagramimagecompact{phase3_watcher_investigation.png}{Watcher and investigation creation workflow}
 
-The decision logic of this stage is summarized in the activity diagram of Figure~\ref{fig:act-correlation}: every active alert produces a \codepath{correlation_key}, which either extends an open incident or opens a new one, after which a scope check and a response check decide whether an investigation is created. The resulting incident follows the lifecycle in Figure~\ref{fig:incident-states} (\texttt{open -> investigating -> resolved -> archived}, with \codepath{resolved_by} recording whether closure was automatic or analyst-driven), and the hand-off to an investigation is shown as a sequence in Figure~\ref{fig:seq-incident}.
+The decision logic is summarized in Figure~\ref{fig:act-correlation}: every active alert produces a \codepath{correlation_key}, which either extends an open incident or opens a new one; a scope check and response check then decide whether an investigation is created. The resulting incident follows the lifecycle in Figure~\ref{fig:incident-states} (\texttt{open -> investigating -> resolved -> archived}, with \codepath{resolved_by} recording whether closure was automatic or analyst-driven), and the hand-off to investigation is shown as a sequence in Figure~\ref{fig:seq-incident}.
 
 \umlfigurecompact{act_incident_correlation.png}{Incident correlation decision flow (activity diagram)}{fig:act-correlation}
 
@@ -451,17 +449,17 @@ The decision logic of this stage is summarized in the activity diagram of Figure
 
 \section{Investigation Lifecycle Logic}
 
-An investigation is the unit of work that carries a case from evidence to closure. Its lifecycle is an explicit state machine in \sourcefile{response/models.py}:
+An investigation carries a case from evidence to closure. Its lifecycle is an explicit state machine in \sourcefile{response/models.py}:
 
 \begin{center}
 \texttt{pending -> awaiting\_approval -> approved/declined -> running -> completed/failed -> archived}
 \end{center}
 
-Additional statuses exist for manual review, regeneration requests, completion warnings, and staged remediation. Making the lifecycle explicit is a deliberate design choice: every backend rule and every user-interface action can be derived from the current state, which removes ambiguity about what is allowed next and prevents, for example, an execution being triggered on a case that has not been approved. The full state machine, including the low-quality and regeneration branches, is given in Figure~\ref{fig:investigation-states}.
+Additional statuses exist for manual review, regeneration requests, completion warnings, and staged remediation. Making the lifecycle explicit is deliberate: every backend rule and UI action can be derived from the current state, removing ambiguity about what is allowed next and preventing execution on a case that has not been approved. The full state machine, including low-quality and regeneration branches, is given in Figure~\ref{fig:investigation-states}.
 
 \umlfigure{investigation_state_machine.png}{Investigation lifecycle state diagram (real statuses from \texttt{response/models.py})}{fig:investigation-states}
 
-To make this concrete, Figure~\ref{fig:object-case} is an object diagram of a single real case on the \codepath{dash-linux} asset: one raw Elasticsearch document becomes a normalized \codepath{Alert}, is grouped through an \codepath{AlertIncidentLink} into an \codepath{Incident}, triggers an \codepath{Investigation}, which produces an AI result, an approved \codepath{PlaybookApproval}, a completed \codepath{PlaybookRun}, a \codepath{FixVerification}, and finally an \codepath{Archive}. It is the same path traced abstractly by the class diagram, instantiated with the values of one event.
+To make this concrete, Figure~\ref{fig:object-case} is an object diagram of one real case on the \codepath{dash-linux} asset: one raw Elasticsearch document becomes a normalized \codepath{Alert}, is grouped through an \codepath{AlertIncidentLink} into an \codepath{Incident}, triggers an \codepath{Investigation}, which produces an AI result, an approved \codepath{PlaybookApproval}, a completed \codepath{PlaybookRun}, a \codepath{FixVerification}, and finally an \codepath{Archive}. It is the same path traced by the class diagram, instantiated with the values of one event.
 
 \umlfigure{object_investigation_case.png}{Object diagram: one real event moving through ARIA (dash-linux)}{fig:object-case}
 
@@ -472,7 +470,7 @@ The response layer (\sourcefile{response/ai_engine/}, \sourcefile{response/runti
 \begin{enumerate}[leftmargin=1cm]
 \item \textbf{Context building.} Before any model is called, ARIA assembles a structured context with the alert timeline, source and destination indicators, MITRE information, behavioral history, risk score, and host information. Output quality depends almost entirely on input quality.
 \item \textbf{Provider routing.} Prompt-builder modules and a multi-provider client route calls to the configured LLM and fall back gracefully when no provider is reachable, so the workflow never blocks on an external dependency.
-\item \textbf{Structured output parsing.} The response is expected to contain a summary, a narrative, a risk assessment, and a playbook. The parser extracts these into the \codepath{Investigation} model, and fallback parsing plus rule-based generation handle malformed LLM output.
+\item \textbf{Structured output parsing.} The response is expected to contain a summary, narrative, risk assessment, and playbook. The parser extracts these into the \codepath{Investigation} model, and fallback parsing plus rule-based generation handle malformed LLM output.
 \end{enumerate}
 
 The consistent theme is that AI is treated as a fallible assistant whose output is always parsed, validated, and constrained, never trusted blindly.
@@ -495,9 +493,9 @@ The parser expects a structured object and maps each field onto the \codepath{In
 
 \section{Remediation and Ansible Execution Logic}
 
-ARIA separates \emph{proposing} a fix from \emph{executing} one. The AI may generate a playbook, but execution is gated by validation and approval. Ansible was chosen because it is an established, agentless automation tool that drives remote hosts over SSH \cite{ansible_docs}. In the workflow, a playbook is generated or edited, validated, written to a secure location with restrictive permissions, executed against the target host, and recorded in the database with its output and status. Crucially, a natural-language prompt or raw AI output can never directly execute a command: the system must first produce a preview, a risk classification, or a concrete playbook, and an empty playbook is blocked outright.
+ARIA separates \emph{proposing} a fix from \emph{executing} one. The AI may generate a playbook, but execution is gated by validation and approval. Ansible was chosen because it is an established, agentless automation tool that drives remote hosts over SSH \cite{ansible_docs}. In the workflow, a playbook is generated or edited, validated, written to a secure location with restrictive permissions, executed against the target host, and recorded in the database with its output and status. A natural-language prompt or raw AI output can never directly execute a command: the system must first produce a preview, a risk classification, or a concrete playbook, and an empty playbook is blocked outright.
 
-The decision that governs whether a playbook ever runs is shown in Figure~\ref{fig:act-approval}: AI quality and safety tier are checked first, a risky tier requires an explicit admin override, and only an analyst approval moves the case to \codepath{running}. Once running, execution itself is staged: the \codepath{PlaybookRun.current_phase} field walks through the phases in Figure~\ref{fig:remediation-states}, capturing a baseline, dry-running, applying containment and hardening, collecting forensics, and finally verifying, with any failure routed to a rollback path.
+The decision that governs whether a playbook runs is shown in Figure~\ref{fig:act-approval}: AI quality and safety tier are checked first, a risky tier requires an explicit admin override, and only analyst approval moves the case to \codepath{running}. Once running, execution itself is staged: the \codepath{PlaybookRun.current_phase} field walks through the phases in Figure~\ref{fig:remediation-states}, capturing a baseline, dry-running, applying containment and hardening, collecting forensics, and finally verifying, with any failure routed to a rollback path.
 
 \umlfigurecompact{act_remediation_approval.png}{Remediation approval decision flow (activity diagram)}{fig:act-approval}
 
@@ -524,7 +522,7 @@ A generated playbook is deliberately small and explicit. Listing~\ref{lst:playbo
 
 \section{Verification and Audit Logic}
 
-A command that returns success is not the same as a problem that is solved. After execution, the verifier re-checks evidence, such as the recurrence of the triggering events in Elasticsearch or the remote state of the host, before a case may be considered resolved. This closes the loop honestly: a diagnostic-only case cannot be marked fixed, and a fix that did not actually stop the behavior is surfaced rather than hidden. In parallel, every sensitive transition is persisted as an audit event with the actor, the request context, the timestamp, and the authentication mode, so that the path from alert to resolution is fully traceable after the fact.
+A command that returns success is not the same as a problem solved. After execution, the verifier re-checks evidence --- such as recurrence of the triggering events in Elasticsearch or the remote state of the host --- before a case may be considered resolved. This closes the loop honestly: a diagnostic-only case cannot be marked fixed, and a fix that did not stop the behavior is surfaced rather than hidden. Every sensitive transition is persisted as an audit event with actor, request context, timestamp, and authentication mode, so the path from alert to resolution is fully traceable.
 
 \begin{figure}[H]
 \centering
@@ -571,7 +569,7 @@ A command that returns success is not the same as a problem that is solved. Afte
 \caption{AI investigation and remediation sequence (simplified)}
 \end{figure}
 
-The complete interaction, with the real components and the admin-secret approval step, is given as a detailed sequence diagram in Figure~\ref{fig:seq-remediation}. It traces the path from automated context building and LLM generation, through safety classification and analyst approval, into the staged Ansible execution on the monitored server, the Elasticsearch re-check by the verifier, and the final archive.
+The complete interaction, with real components and the admin-secret approval step, is the detailed sequence diagram in Figure~\ref{fig:seq-remediation}. It traces the path from automated context building and LLM generation, through safety classification and analyst approval, into staged Ansible execution on the monitored server, the Elasticsearch re-check by the verifier, and the final archive.
 
 \umlfigure{seq_ai_remediation.png}{End-to-end AI-assisted investigation, approval, execution, and verification sequence}{fig:seq-remediation}
 
@@ -605,7 +603,7 @@ When more than one server is monitored, alerts, investigations, and actions from
 \caption{Multi-server asset scoping logic}
 \end{figure}
 
-Figure~\ref{fig:asset-scoping} shows the same idea as a data-flow diagram centred on the \codepath{asset_scope} filter: every request carries the account role and \codepath{asset_id}, the monitored asset supplies the per-source index patterns and host-identity fields, and the filter then constrains every store (alerts, incidents, investigations, operator runs, metrics, and runtime events) to the authorized scope. A \codepath{super_admin} account may aggregate across all assets, while a \codepath{server_user} account is confined to its own. Each asset also has a lifecycle of its own (Figure~\ref{fig:asset-states}): it is created, configured with its sources and Ansible settings, validated, and only then becomes \codepath{active}; failed validation lands in \codepath{partial}, \codepath{missing}, or \codepath{error} until it is reconfigured.
+Figure~\ref{fig:asset-scoping} shows the same idea as a data-flow diagram centred on the \codepath{asset_scope} filter: every request carries the account role and \codepath{asset_id}, the monitored asset supplies per-source index patterns and host-identity fields, and the filter constrains every store (alerts, incidents, investigations, operator runs, metrics, and runtime events) to the authorized scope. A \codepath{super_admin} account may aggregate across all assets, while a \codepath{server_user} account is confined to its own. Each asset also has a lifecycle (Figure~\ref{fig:asset-states}): it is created, configured with its sources and Ansible settings, validated, and only then becomes \codepath{active}; failed validation lands in \codepath{partial}, \codepath{missing}, or \codepath{error} until it is reconfigured.
 
 \umlfigurecompact{asset_scoping_data_flow.png}{Asset-scoped filtering across all data stores (data-flow diagram)}{fig:asset-scoping}
 
@@ -724,4 +722,4 @@ Verification & Execution success is not enough; recurrence or remote state is ve
 
 \section{Conclusion}
 
-This chapter explained how ARIA is designed and, stage by stage, the reasoning that makes each transformation necessary: cursor-based ingestion for efficiency, normalization for a common language, enrichment for context, deduplication and noise filtering to fight fatigue, correlation to reconstruct incidents, an explicit investigation lifecycle for clarity, AI as a constrained assistant, gated Ansible execution for safety, verification for honesty, asset scoping for separation, and a security boundary that keeps the analyst in control. The next chapter shows how these mechanisms surface as concrete features in the ARIA dashboard.
+This chapter explained ARIA's design and the reasoning behind each transformation: cursor-based ingestion for efficiency, normalization for a common language, enrichment for context, deduplication and noise filtering to fight fatigue, correlation to reconstruct incidents, an explicit investigation lifecycle for clarity, AI as a constrained assistant, gated Ansible execution for safety, verification for honesty, asset scoping for separation, and a security boundary that keeps the analyst in control. The next chapter shows how these mechanisms surface as concrete features in the ARIA dashboard.

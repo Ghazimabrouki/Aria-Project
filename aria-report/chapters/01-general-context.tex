@@ -3,13 +3,13 @@
 
 \section{Introduction}
 
-Modern information systems are distributed across servers, networks, applications, containers, cloud resources, and security tools. Each layer produces logs, metrics, and alerts. In a Security Operations Center (SOC) context, the operational challenge is not only to collect this data, but also to transform it into understandable, prioritized, and actionable information.
+Modern information systems span servers, networks, applications, containers, cloud resources, and security tools. Each layer produces logs, metrics, and alerts. In a Security Operations Center (SOC), the challenge is to transform this data into understandable, prioritized, and actionable information.
 
-The final-year internship project, officially titled \textbf{Intelligent Platform for Automated Monitoring and Security}, addresses this challenge through ARIA. The objective is to centralize security and observability events, detect threats, explain incidents with an AI-assisted layer, and automate selected corrective actions with Ansible while preserving human validation for sensitive operations. This first chapter defines the context in which ARIA was built: the host organization, the cybersecurity and SOC background, the existing situation and its limits, the problem statement, the project objectives, the proposed solution, and the methodology and planning followed during the internship.
+The final-year internship project, titled \textbf{Intelligent Platform for Automated Monitoring and Security}, addresses this challenge through ARIA. It centralizes security and observability events, detects threats, explains incidents with an AI-assisted layer, and automates selected corrective actions with Ansible while preserving human validation for sensitive operations. This chapter defines ARIA's context: the host organization, the cybersecurity and SOC background, the existing situation and its limits, the problem statement, the objectives, the proposed solution, and the methodology and planning.
 
 \section{Host Organization Presentation}
 
-The internship was carried out in the context of Huawei Technologies and the ARIA project. Huawei Technologies is a telecommunications and technology company whose activities cover infrastructure, cloud, networks, and digital services. The administrative project sheet identifies the host organization as Huawei Technologies and gives the Tunis office address as Avenue de la Bourse, Immeuble Neifer, 1053 Les Berges du Lac, Tunis, Tunisia.
+The internship was carried out at Huawei Technologies, the host organization for the ARIA project. Huawei is a telecommunications and technology company active in infrastructure, cloud, networks, and digital services. The administrative project sheet lists its Tunis office as Avenue de la Bourse, Immeuble Neifer, 1053 Les Berges du Lac, Tunis, Tunisia.
 
 \begin{table}[H]
 \centering
@@ -29,19 +29,19 @@ Academic supervisor & Mongi Dziri \\
 \end{tabularx}
 \end{table}
 
-The project environment is oriented toward cloud infrastructure, operational cybersecurity, log analysis, security supervision, and response automation. The work therefore sits at the intersection of SOC engineering, SOAR workflow design, backend development, observability, and infrastructure automation.
+The project sits at the intersection of SOC engineering, SOAR workflow design, backend development, observability, and infrastructure automation, covering cloud infrastructure, operational cybersecurity, log analysis, security supervision, and response automation.
 
 \section{Cybersecurity and SOC Context}
 
-A Security Operations Center is the team and tooling responsible for detecting, analyzing, and responding to security events across an organization's information system. A SOC continuously receives telemetry from many sources: host-based detection agents, network intrusion detection engines, runtime security sensors, system metrics, application logs, and manual reports. The value of a SOC depends on its ability to turn this flood of raw signals into a small number of well-understood, prioritized incidents that can be acted upon quickly.
+A Security Operations Center is the team and tooling responsible for detecting, analyzing, and responding to security events across an organization's information system. It continuously receives telemetry from host-based detection agents, network intrusion detection engines, runtime security sensors, system metrics, application logs, and manual reports. Its value lies in turning this flood of raw signals into a small number of well-understood, actionable incidents.
 
-Two operational disciplines are central to this project. The first is \textbf{monitoring and detection}, which provides visibility over the host, network, runtime, and resource layers. The second is \textbf{SOAR} (Security Orchestration, Automation, and Response), which sits above detection and coordinates investigation and remediation. SOAR aims to reduce manual effort and response time by automating repetitive analysis and corrective actions, while keeping the human analyst responsible for risky decisions. ARIA is positioned in this SOAR domain: it consumes the output of monitoring tools and adds the orchestration, intelligence, and controlled automation layer that a SOC needs.
+Two operational disciplines are central to this project. \textbf{Monitoring and detection} provides visibility over the host, network, runtime, and resource layers. \textbf{SOAR} (Security Orchestration, Automation, and Response) sits above detection and coordinates investigation and remediation, automating repetitive analysis and corrective actions to reduce manual effort and response time while keeping the human analyst responsible for risky decisions. ARIA operates in this SOAR domain: it consumes monitoring output and adds the orchestration, intelligence, and controlled automation layer a SOC needs.
 
 The internship work was organized around three complementary technical fronts that together form a complete detection-to-response chain:
 
 \begin{itemize}[leftmargin=1cm]
 \item \textbf{A security monitoring foundation:} Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, and Redis, providing visibility over the host, network, runtime, and resource layers.
-\item \textbf{A cloud infrastructure:} a Huawei Cloud environment that hosts the monitoring stack and the ARIA platform in a controlled, isolated environment.
+\item \textbf{A cloud infrastructure:} a Huawei Cloud environment hosting the monitoring stack and the ARIA platform in a controlled, isolated environment.
 \item \textbf{A backend intelligence layer:} the ARIA platform that transforms raw Elasticsearch documents into normalized alerts, incidents, AI-assisted investigations, controlled remediation, verification, archives, and operator actions.
 \end{itemize}
 
@@ -53,7 +53,7 @@ The complete high-level chain can be summarized as follows:
 
 \section{State of the Art and Identified Gap}
 
-Several commercial and open-source platforms address parts of the SOC workflow. Table~\ref{tab:state-of-the-art} summarizes the most relevant ones and their limits.
+Several commercial and open-source platforms address parts of the SOC workflow. Table~\ref{tab:state-of-the-art} summarizes the most relevant ones.
 
 \begin{table}[H]
 \centering
@@ -73,7 +73,7 @@ Falcon / SentinelOne & Strong EDR capabilities & EDR-centric, limited cross-laye
 \end{tabularx}
 \end{table}
 
-None of these solutions combine multi-layer monitoring (host, network, runtime, and metrics), alert enrichment, incident correlation, AI-generated playbooks, and human-controlled Ansible remediation in a single open, local-deployment platform. This gap is the motivation for ARIA.
+None combine multi-layer monitoring (host, network, runtime, and metrics), alert enrichment, incident correlation, AI-generated playbooks, and human-controlled Ansible remediation in a single open, local-deployment platform. This gap motivates ARIA.
 
 \begin{center}
 \textit{Identified gap: there is no open, integrated solution that turns heterogeneous security and observability telemetry into actionable, approved, and verifiable incidents.}
@@ -81,7 +81,7 @@ None of these solutions combine multi-layer monitoring (host, network, runtime, 
 
 \section{Study of the Existing Situation}
 
-Before the proposed platform, the environment relied on several specialized tools. These tools are powerful individually: Wazuh provides host security visibility, Suricata detects suspicious network behavior, Falco observes runtime behavior, Telegraf collects metrics, Filebeat forwards logs, and Elasticsearch/Kibana store and visualize data. However, a SOC workflow requires more than isolated visibility.
+Before ARIA, the environment relied on several specialized tools: Wazuh for host security visibility, Suricata for suspicious network behavior, Falco for runtime behavior, Telegraf for metrics, Filebeat for log forwarding, and Elasticsearch/Kibana for storage and visualization. These tools are powerful individually, but a SOC workflow requires more than isolated visibility.
 
 \begin{table}[H]
 \centering
@@ -102,7 +102,7 @@ Elasticsearch / Kibana & Central indexing, search, visualization, and dashboardi
 
 \diagramimage{phase1_visibility_layers.png}{Monitoring visibility layers and tool roles}
 
-The mission was not to replace the monitoring tools themselves. The real gap was the operational layer above them. A useful comparison is therefore between three approaches: using each monitoring console separately, using a search and visualization stack, and using a SOAR-style response platform.
+The mission was not to replace the monitoring tools but to fill the operational layer above them. A useful comparison is therefore between three approaches: individual monitoring consoles, a search and visualization stack, and a SOAR-style response platform.
 
 \begin{table}[H]
 \centering
@@ -120,7 +120,7 @@ Manual SOC runbooks & Human judgment remains high and risky actions are controll
 
 \section{Limits of the Existing Situation}
 
-The initial environment produced useful telemetry, but several operational limitations remained:
+The initial environment produced useful telemetry, but had several operational limitations:
 
 \begin{itemize}[leftmargin=1cm]
 \item security and supervision tools produced heterogeneous data formats;
@@ -132,32 +132,32 @@ The initial environment produced useful telemetry, but several operational limit
 \item the complete lifecycle from alert to remediation was dispersed across tools.
 \end{itemize}
 
-These limits share a single root cause: the tools deliver excellent \emph{visibility} but no shared \emph{operational language} and no \emph{controlled response} layer. Every tool speaks its own format and stops at detection, so the human analyst must do all the connecting, interpreting, deciding, and verifying by hand.
+These limits share a single root cause: the tools deliver excellent \emph{visibility} but no shared \emph{operational language} and no \emph{controlled response} layer. Each tool uses its own format and stops at detection, leaving the analyst to connect, interpret, decide, and verify everything by hand.
 
 \section{Problem Statement}
 
-The problem can therefore be formulated as follows: how can a centralized platform collect heterogeneous security and monitoring data, analyze and correlate events automatically, explain incidents through AI assistance, and automate corrective actions while keeping human control over sensitive decisions?
+The problem can be formulated as follows: how can a centralized platform collect heterogeneous security and monitoring data, analyze and correlate events automatically, explain incidents through AI assistance, and automate corrective actions while keeping human control over sensitive decisions?
 
-Several sub-problems follow from this question. First, raw alert formats differ from one source to another, which makes correlation difficult. Second, repeated or noisy alerts can hide important events. Third, the analyst needs context such as IP information, MITRE ATT\&CK techniques, source history, target host, and related incidents. Fourth, automatic remediation can be dangerous if it executes unvalidated commands or targets the wrong host. Finally, the result of a fix must be verified rather than assumed.
+Several sub-problems follow from this question. Raw alert formats differ across sources, making correlation difficult. Repeated or noisy alerts can hide important events. The analyst needs context such as IP information, MITRE ATT\&CK techniques, source history, target host, and related incidents. Automatic remediation can be dangerous if it executes unvalidated commands or targets the wrong host. Finally, the result of a fix must be verified rather than assumed.
 
 \section{Project Objectives}
 
 To answer this problem, the project pursued the following objectives:
 
 \begin{itemize}[leftmargin=1cm]
-\item Build and stabilize a centralized monitoring foundation on a cloud infrastructure so that real host, network, runtime, and resource telemetry reaches Elasticsearch reliably.
+\item Build and stabilize a centralized monitoring foundation on cloud infrastructure so that real host, network, runtime, and resource telemetry reaches Elasticsearch reliably.
 \item Implement a multi-source alert pipeline that polls Elasticsearch and normalizes alerts from security and observability sources into a common model.
 \item Enrich and correlate alerts using GeoIP information, MITRE ATT\&CK mappings, Sigma noise rules, deduplication, and incident grouping.
 \item Provide an AI-assisted response layer able to produce investigation summaries, narratives, risk assessments, and Ansible playbooks.
 \item Add approval, execution, verification, archiving, audit, and safety mechanisms around remediation workflows.
 \item Expose the platform through a FastAPI backend and a Next.js dashboard for SOC analysts and administrators.
-\item Allow new servers to be onboarded automatically as scoped monitored assets, and prepare the solution for production deployment.
+\item Onboard new servers automatically as scoped monitored assets and prepare the solution for production deployment.
 \item Validate the implementation through automated tests, compile/build checks, API checks, and runtime verification reports.
 \end{itemize}
 
 \section{Proposed Solution: ARIA}
 
-The proposed solution is ARIA, an intelligent SOC/SOAR platform. It connects the monitoring foundation built in Chapter~2 to a backend intelligence layer and a Next.js dashboard. ARIA performs four main functions:
+ARIA is an intelligent SOC/SOAR platform that connects the monitoring foundation built in Chapter~2 to a backend intelligence layer and a Next.js dashboard. It performs four main functions:
 
 \begin{itemize}[leftmargin=1cm]
 \item \textbf{Ingest and normalize:} poll Elasticsearch indices and turn heterogeneous raw documents from Wazuh, Suricata, Falco, Telegraf, and generic sources into a common alert model.
@@ -168,19 +168,19 @@ The proposed solution is ARIA, an intelligent SOC/SOAR platform. It connects the
 
 \diagramimage{phase3_global_backend.png}{ARIA backend intelligence layer}
 
-This design keeps the analyst at the center of the decision process. AI is used to accelerate understanding and propose playbooks, but the platform validates and controls execution through approval, admin-secret protection, safety checks, Ansible execution records, fix verification, and audit persistence.
+This design keeps the analyst at the center of the decision process. AI accelerates understanding and proposes playbooks, while the platform controls execution through approval, admin-secret protection, safety checks, Ansible execution records, fix verification, and audit persistence.
 
-The solution was built in three incremental phases that match the engineering story of this report. Phase~1 established the security monitoring foundation. Phase~2 provisioned the Huawei Cloud infrastructure that hosts it. Phase~3 implemented the ARIA backend intelligence and dashboard on top of the telemetry, and was then extended with multi-server onboarding and production-oriented hardening.
+The solution was built in three incremental phases. Phase~1 established the security monitoring foundation. Phase~2 provisioned the Huawei Cloud infrastructure that hosts it. Phase~3 implemented the ARIA backend intelligence and dashboard on top of the telemetry, then extended it with multi-server onboarding and production-oriented hardening.
 
 \diagramimage{phase1_global_architecture.png}{Global architecture and data flow of the solution}
 
-From the user's point of view, the scope of ARIA is best expressed as a global use-case diagram (Figure~\ref{fig:global-usecase}). It shows the primary human actors, the SOC analyst and the administrator, together with the system actors that ARIA coordinates: the monitored servers, Elasticsearch, the AI provider, the Ansible executor, and the monitoring tools. The use cases are grouped into monitoring and triage, investigation and remediation, AI interaction, and administration, which are precisely the four areas detailed in Chapters~\ref{ch:context} to~6. This diagram defines the functional boundary of the platform: everything inside the boundary is an ARIA responsibility, and every external actor is something ARIA integrates with rather than replaces.
+From the user's point of view, the scope of ARIA is best expressed as a global use-case diagram (Figure~\ref{fig:global-usecase}). It shows the primary human actors---the SOC analyst and the administrator---and the system actors ARIA coordinates: monitored servers, Elasticsearch, the AI provider, the Ansible executor, and the monitoring tools. The use cases fall into monitoring and triage, investigation and remediation, AI interaction, and administration, the four areas detailed in Chapters~\ref{ch:context} to~6. The diagram defines the functional boundary of the platform: everything inside is an ARIA responsibility; every external actor is an integration, not a replacement.
 
 \umlfigure{global_use_case.png}{Global use-case diagram of the ARIA platform}{fig:global-usecase}
 
 \section{Methodology and Planning}
 
-The internship followed an Agile iterative methodology organized in two-week sprints. Each sprint delivered a usable increment, followed by a short review and planning session for the next increment. The internship logbook records weekly work from January~12, 2026 to July~12, 2026.
+The internship followed an Agile iterative methodology with two-week sprints. Each sprint delivered a usable increment, followed by a review and planning session for the next. The internship logbook records weekly work from January~12 to July~12, 2026.
 
 Early sprints focused on:
 \begin{itemize}[leftmargin=1cm]
@@ -195,7 +195,7 @@ Later sprints focused on:
 \item multi-server onboarding, hardening, documentation, and final validation.
 \end{itemize}
 
-The methodology was chosen after comparing common project organization models. A strict waterfall model was not appropriate because the monitoring stack, backend workflows, and validation evidence evolved as the environment became available. A full Scrum process was also too heavy for a single-intern implementation context. The adopted approach was therefore a phased iterative method with two-week sprints: each sprint produced a usable technical base, then later sprints refined and extended it.
+The methodology was chosen after comparing common project organization models. Waterfall was inappropriate because the monitoring stack, backend workflows, and validation evidence evolved as the environment became available. A full Scrum process was also too heavy for a single-intern implementation context. The adopted approach was therefore a phased iterative method with two-week sprints: each sprint produced a usable technical base, and later sprints refined and extended it.
 
 \begin{table}[H]
 \centering
@@ -226,7 +226,7 @@ Continuous work & Multi-server onboarding, testing, API checks, frontend build c
 \end{tabularx}
 \end{table}
 
-The product backlog below summarizes the features that were prioritized and implemented across these phases. It served as the working scope of the project and is realized in detail in Chapters~3 to~5.
+The product backlog below summarizes the features prioritized and implemented across these phases, which serve as the working scope and are detailed in Chapters~3 to~5.
 
 \begin{longtable}{@{}p{0.08\textwidth}p{0.32\textwidth}p{0.42\textwidth}p{0.10\textwidth}@{}}
 \caption{Product backlog}\\
@@ -253,7 +253,7 @@ PB-12 & Validation & Compile, test, build, and document verification results. & 
 \bottomrule
 \end{longtable}
 
-The complete planning is summarized in the Gantt chart of Figure~\ref{fig:gantt}, which spans the internship from January~12 to July~12, 2026. The chart shows how the technical work packages overlap: the monitoring foundation begins while cloud preparation is finishing, the backend intelligence layer is built on top of the available telemetry, the dashboard and multi-server work extend through the middle of the internship, and validation and documentation run continuously until the final weeks.
+The complete planning is summarized in the Gantt chart of Figure~\ref{fig:gantt}, spanning January~12 to July~12, 2026. The chart shows how the work packages overlap: the monitoring foundation begins while cloud preparation finishes, the backend intelligence layer builds on the available telemetry, the dashboard and multi-server work extend through the middle of the internship, and validation and documentation run continuously until the final weeks.
 
 \begin{figure}[H]
 \centering
@@ -288,4 +288,4 @@ The complete planning is summarized in the Gantt chart of Figure~\ref{fig:gantt}
 
 \section{Conclusion}
 
-This chapter presented the internship context, the host organization, the cybersecurity and SOC background, the initial monitoring environment, its limitations, the problem statement, the project objectives, and the proposed ARIA solution, together with the methodology and planning. The next chapter starts the engineering story at its foundation: the Huawei Cloud environment and the central monitoring stack that produce and store the real telemetry ARIA consumes.
+This chapter presented the internship context, the host organization, the cybersecurity and SOC background, the initial monitoring environment and its limitations, the problem statement, the project objectives, the proposed ARIA solution, and the methodology and planning. The next chapter starts the engineering story at its foundation: the Huawei Cloud environment and the central monitoring stack that produces and stores the real telemetry ARIA consumes.
