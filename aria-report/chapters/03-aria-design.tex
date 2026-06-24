@@ -14,6 +14,58 @@ This chapter explains how ARIA is designed and, more importantly, the \emph{logi
 
 For each stage we explain not only what happens, but why it is necessary.
 
+\section{Project Repository and Development Environment}
+
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/github.png}}\hspace{0.15cm}The entire ARIA project --- source code, setup scripts, Dockerfiles, Ansible playbooks, documentation, tests, and this report --- is maintained in a single GitHub repository at \url{https://github.com/Ghazimabrouki/Aria-Project}. GitHub is used as the version-control platform, the central source of truth, and the distribution point for the project assets. The repository structure separates the monitoring-tool installers (\sourcefile{aria-tools-setup/}), the containerized application (\sourcefile{aria-application/}), the Ansible automation (\sourcefile{ansible-vm-setup/}), the report and presentation (\sourcefile{aria-report/}), and operational scripts (\sourcefile{scripts/}). This organization makes it possible to clone one repository and deploy the full stack, from the central monitoring foundation to the dashboard and to every monitored server.
+
+\begin{figure}[H]
+\centering
+\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+  font=\small,
+  cat/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=4.6cm, fill=gray!6},
+  item/.style={draw, rounded corners, align=center, text width=2.5cm, minimum height=0.9cm, fill=white, font=\fontsize{9}{11}\selectfont},
+  title/.style={font=\fontsize{12}{14}\selectfont\bfseries},
+  arrow/.style={-Latex, line width=1.1pt}
+]
+% Category backgrounds
+\node[cat] (os) at (0,0) {};
+\node[cat] (sec) at (3.6,0) {};
+\node[cat] (data) at (7.2,0) {};
+\node[cat] (app) at (10.8,0) {};
+\node[cat] (dev) at (14.4,0) {};
+
+% Titles
+\node[title, above=0.15cm of os.north] {OS/Cloud};
+\node[title, above=0.15cm of sec.north] {Security};
+\node[title, above=0.15cm of data.north] {Data/Store};
+\node[title, above=0.15cm of app.north] {Application};
+\node[title, above=0.15cm of dev.north] {DevOps};
+
+% Items
+\node[item] at (0,1.5) {\includegraphics[width=0.45cm]{assets/logos/Huawei-Logo.png}\\Huawei Cloud};
+\node[item] at (0,0.25) {\includegraphics[width=0.45cm]{assets/logos/linux.png}\\Linux/Ubuntu};
+
+\node[item] at (3.6,1.5) {\includegraphics[width=0.45cm]{assets/logos/wazuh.png}\\Wazuh};
+\node[item] at (3.6,0.25) {\includegraphics[width=0.45cm]{assets/logos/suricata.png}\\Suricata};
+\node[item] at (3.6,-0.95) {\includegraphics[width=0.45cm]{assets/logos/falco.png}\\Falco};
+
+\node[item] at (7.2,1.5) {\includegraphics[width=0.45cm]{assets/logos/elasticsearch.png}\\Elasticsearch};
+\node[item] at (7.2,0.25) {\includegraphics[width=0.45cm]{assets/logos/elasticstack.png}\\Kibana};
+\node[item] at (7.2,-0.95) {\includegraphics[width=0.45cm]{assets/logos/redis.png}\\Redis};
+
+\node[item] at (10.8,1.5) {\includegraphics[width=0.45cm]{assets/logos/python.png}\\Python/FastAPI};
+\node[item] at (10.8,0.25) {\includegraphics[width=0.45cm]{assets/logos/nextjs.png}\\Next.js};
+\node[item] at (10.8,-0.95) {\includegraphics[width=0.45cm]{assets/logos/influxdb.png}\\Telegraf};
+
+\node[item] at (14.4,1.5) {\includegraphics[width=0.45cm]{assets/logos/docker.png}\\Docker};
+\node[item] at (14.4,0.25) {\includegraphics[width=0.45cm]{assets/logos/ansible.png}\\Ansible};
+\node[item] at (14.4,-0.95) {\includegraphics[width=0.45cm]{assets/logos/github.png}\\GitHub};
+\end{tikzpicture}\end{adjustbox}
+\caption{ARIA technology stack grouped by role}\label{fig:tech-stack}
+\end{figure}
+
+Version control is used throughout the internship. Each significant change --- report chapters, setup scripts, frontend pages, backend routes, diagrams, and validation evidence --- is committed with a descriptive message. The active branch for the report and presentation work is \codepath{report-and-presentation-updates}. This discipline ensures that the deployment artifacts, the validation evidence, and the written report remain synchronized and reproducible.
+
 \section{Twelve-Step Intelligence Pipeline}
 
 The ARIA workflow can be described as a twelve-step pipeline that carries a signal from raw Elasticsearch document to a closed, auditable case. Figure~\ref{fig:twelve-step} gives the high-level view; the following sections explain the logic of each stage.
@@ -151,7 +203,7 @@ Security context & MITRE ATT\&CK, Sigma & ATT\&CK maps adversary behavior; Sigma
 
 \section{Backend Architecture}
 
-The backend is a FastAPI application organized around domain packages. The route layer receives HTTP and WebSocket requests, the core layer centralizes shared infrastructure clients, the pipeline layer transforms external telemetry into SOC data, and the response layer manages investigations, AI output, automation, verification, and archive. This separation is what allows a background task to crash and restart without taking down the API server.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/python.png}}\hspace{0.1cm}\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/fastapi.png}}\hspace{0.15cm}The backend is a FastAPI application organized around domain packages. The route layer receives HTTP and WebSocket requests, the core layer centralizes shared infrastructure clients, the pipeline layer transforms external telemetry into SOC data, and the response layer manages investigations, AI output, automation, verification, and archive. This separation is what allows a background task to crash and restart without taking down the API server.
 
 \begin{figure}[H]
 \centering
@@ -226,7 +278,7 @@ ANSIBLE_SSH_KEY=/keys/id_ed25519     # path only, key not shown
 
 \section{Frontend Architecture}
 
-The dashboard is a Next.js, React, and TypeScript application that uses Tailwind CSS and shadcn/ui for the interface, SWR for data fetching and caching, Recharts for charts, and a WebSocket context for live updates. Its design goal is a dense, SOC-oriented interface: dark mode, severity badges, data tables, live indicators, page skeletons, and a command menu.
+\raisebox{-0.22cm}{\includegraphics[width=1.0cm]{assets/logos/nextjs.png}}\hspace{0.15cm}The dashboard is a Next.js, React, and TypeScript application that uses Tailwind CSS and shadcn/ui for the interface, SWR for data fetching and caching, Recharts for charts, and a WebSocket context for live updates. Its design goal is a dense, SOC-oriented interface: dark mode, severity badges, data tables, live indicators, page skeletons, and a command menu.
 
 Architecturally, the frontend is built around three ideas. A dashboard shell holds the authentication guard, the sidebar, and the global selected-asset context. A central API client attaches the JWT and the admin-secret header and intercepts protected responses. Domain pages read and write through the SWR cache, synchronizing time filters and the selected \codepath{asset_id} into their queries so that the same component can show global or per-server data. Live events arriving over WebSocket update the cache directly, so investigation, incident, performance, and health changes appear without a manual refresh.
 
