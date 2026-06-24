@@ -205,7 +205,9 @@ Figure~\ref{fig:backend-modules} expands these packages into the real module tre
 
 The application itself is defined in \sourcefile{api/app.py}. It configures CORS, a simple rate-limiting middleware, and an application lifespan that initializes the database, then mounts many routers grouped by domain: alerts, incidents, investigations, archives, and reports; assistant, adaptive, operator, runtime, and infrastructure; monitoring, pipeline, performance, dashboard, search, and IPS; assets, accounts, authentication, settings, and whitelist; plus WebSocket routes for real-time updates. Each domain has a dedicated file under \sourcefile{api/routes/}, which keeps the API maintainable as it grows. The backend is wired to its environment through a single configuration file; Listing~\ref{lst:backend-env} is a sanitized excerpt showing the Elasticsearch, Redis, LLM, Ansible, and admin-secret settings, all with secret values masked.
 
-\begin{lstlisting}[style=aria,language=conf,caption={Backend configuration excerpt (sanitized .env)},label={lst:backend-env}]
+\begin{lstlisting}[style=aria,language=conf,caption={Backend configuration excerpt (sanitized .env)},label={lst:backend-env},
+  emph={ELASTICSEARCH_URL,ELASTICSEARCH_USER,ELASTICSEARCH_PASSWORD,ELASTICSEARCH_USE_SSL,REDIS_HOST,REDIS_PORT,BACKEND_PORT,ARIA_ADMIN_SECRET,LLM_PROVIDER,LLM_MODEL,LLM_ENABLED,ANSIBLE_ENABLED,ANSIBLE_SSH_PORT,ANSIBLE_SSH_KEY},
+  emphstyle=\color{codekw}\bfseries]
 ELASTICSEARCH_URL=https://<central-host>:9200
 ELASTICSEARCH_USER=elastic
 ELASTICSEARCH_PASSWORD=******
@@ -319,7 +321,9 @@ Once normalized, the alert is enriched with the context an analyst would otherwi
 
 Concretely, whatever the source, the pipeline produces one common shape. Listing~\ref{lst:normalized-alert} shows a normalized and enriched alert (a Wazuh SSH brute-force event) as stored in the \codepath{alerts} table; the same fields are present for a Suricata, Falco, or Filebeat alert, which is exactly what makes downstream correlation and AI analysis source-independent.
 
-\begin{lstlisting}[style=aria,caption={Normalized and enriched alert (sanitized)},label={lst:normalized-alert}]
+\begin{lstlisting}[style=aria,caption={Normalized and enriched alert (sanitized)},label={lst:normalized-alert},
+  emph={source,source_id,severity,category,title,source_ip,hostname,rule_name,dedup_key,asset_id,iocs,alert_metadata,geoip,mitre,status,occurrence_count},
+  emphstyle=\color{codekw}\bfseries]
 {
   "source": "wazuh",
   "source_id": "Jx8...e1",
