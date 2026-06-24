@@ -6,21 +6,26 @@
   \node[anchor=center, inner sep=0] at (current page.center)
     {\includegraphics[width=\paperwidth,height=\paperheight]{assets/cover/esprit-cover-front.png}};
 
-  % --- Specialty line (unified, centered, with subtle backing for contrast) ---
-  \node[anchor=center, fill=white, fill opacity=1, text opacity=1, rounded corners=6pt, minimum width=10.5cm, inner sep=6pt]
+  % --- Thin white band to mask the pre-printed "SPECIALTY" on the ESPRIT
+  %      background while keeping a clean, subtitle-like look (not a pill) ---
+  \fill[white] ([yshift=-12.125cm,xshift=-8cm]current page.north)
+    rectangle ([yshift=-11.675cm,xshift=8cm]current page.north);
+
+  % --- Specialty line (clean centered subtitle) ---
+  \node[anchor=center]
     at ([yshift=-11.9cm]current page.north)
     {\sffamily\large\bfseries Specialty:\hspace{0.45em}\mdseries Cloud Computing};
 
-  % --- ARIA logo (official logo, slightly enlarged, on subtle navy support for contrast) ---
+  % --- ARIA logo (official asset, reduced and centered, below the strip) ---
   \node[anchor=north, inner sep=0]
-    at ([yshift=-11.8cm]current page.north)
-    {\includegraphics[width=4.8cm,keepaspectratio]{assets/logos/aria-logo-cover-panel.png}};
+    at ([yshift=-12.6cm]current page.north)
+    {\includegraphics[width=4.2cm,keepaspectratio]{assets/logos/aria-logo-cover.png}};
 
-  % --- Project title block (ARIA wordmark comes from the logo above) ---
-  \node[anchor=north, align=center, text width=16cm]
-    at ([yshift=-15.0cm]current page.north)
-    {{\Large\bfseries \projectlong}\\[0.30cm]
-     {\large AI-Assisted Security Operations, Incident Response,\\and Remediation Platform}};
+  % --- Project title block (more space below logo, refined sans weight) ---
+  \node[anchor=north, align=center, text width=15cm]
+    at ([yshift=-16.1cm]current page.north)
+    {{\sffamily\LARGE\mdseries \projectlong}\\[0.35cm]
+     {\sffamily\large AI-Assisted Security Operations, Incident Response,\\and Remediation Platform}};
 
   % --- Author and supervision details ---
   \node[anchor=north]
