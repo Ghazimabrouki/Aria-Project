@@ -1,8 +1,8 @@
+% --- Arabic opening page (full-page, centered, no header/footer) ---
 \thispagestyle{empty}
-\null
-\vfill
-\begin{center}
-\includegraphics[width=0.95\textwidth]{assets/logos/arabic-quote.png}
-\end{center}
-\vfill
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=center, inner sep=0]
+    at (current page.center)
+    {\includegraphics[height=0.85\textheight,keepaspectratio]{assets/logos/arabic-quote.png}};
+\end{tikzpicture}
 \newpage

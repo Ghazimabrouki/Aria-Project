@@ -379,53 +379,46 @@ The pages above are not used in isolation; they form end-to-end flows. The follo
 
 \begin{figure}[H]
 \centering
-\begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
+\begin{tikzpicture}[
   font=\small,
-  detect/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=blue!10, font=\fontsize{12}{14}\selectfont},
-  case/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=orange!10, font=\fontsize{12}{14}\selectfont},
-  analysis/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=purple!10, font=\fontsize{12}{14}\selectfont},
-  gate/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=red!10, font=\fontsize{12}{14}\selectfont},
-  act/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=green!10, font=\fontsize{12}{14}\selectfont},
+  detect/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.3cm, fill=blue!10, font=\fontsize{11}{13}\selectfont},
+  case/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.3cm, fill=orange!10, font=\fontsize{11}{13}\selectfont},
+  analysis/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.3cm, fill=purple!10, font=\fontsize{11}{13}\selectfont},
+  gate/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.3cm, fill=red!10, font=\fontsize{11}{13}\selectfont},
+  act/.style={draw, rounded corners, align=center, text width=3.0cm, minimum height=1.3cm, fill=green!10, font=\fontsize{11}{13}\selectfont},
   arrow/.style={-Latex, line width=1.2pt},
-  label/.style={font=\fontsize{11}{13}\selectfont, text=gray!70!black, align=center}
+  label/.style={font=\fontsize{10}{12}\selectfont\itshape, text=gray!70!black, align=center}
 ]
 % Top row: detection to analysis
 \node[detect] (alert) {\textbf{Normalized alert or anomaly}};
-\node[case, right=0.7cm of alert] (incident) {\textbf{Incident or case}};
-\node[case, right=0.7cm of incident] (invest) {\textbf{Investigation evidence}};
-\node[analysis, right=0.7cm of invest] (ai) {\textbf{AI or rule-based analysis}};
+\node[case, right=0.9cm of alert] (incident) {\textbf{Incident or case}};
+\node[case, right=0.9cm of incident] (invest) {\textbf{Investigation evidence}};
+\node[analysis, right=0.9cm of invest] (ai) {\textbf{AI or rule-based analysis}};
 
-% Bottom row: governance to archive
-\node[gate, below=1.2cm of ai] (approval) {\textbf{Approval and target validation}};
-\node[act, left=0.7cm of approval] (run) {\textbf{Controlled execution}};
-\node[act, left=0.7cm of run] (verify) {\textbf{Verification}};
-\node[act, left=0.7cm of verify] (archive) {\textbf{Archive}};
+% Bottom row: governance to archive (right to left)
+\node[gate, below=1.6cm of ai] (approval) {\textbf{Approval and target validation}};
+\node[act, left=0.9cm of approval] (run) {\textbf{Controlled execution}};
+\node[act, left=0.9cm of run] (verify) {\textbf{Verification}};
+\node[act, left=0.9cm of verify] (archive) {\textbf{Archive}};
 
-% Arrows top row
-\draw[arrow] (alert) -- (incident);
-\draw[arrow] (incident) -- (invest);
-\draw[arrow] (invest) -- (ai);
+% Arrows top row with labels above
+\draw[arrow] (alert) -- node[label, midway, above=0.45cm] {correlation} (incident);
+\draw[arrow] (incident) -- node[label, midway, above=0.45cm] {case building} (invest);
+\draw[arrow] (invest) -- node[label, midway, above=0.45cm] {analysis} (ai);
 
-% Arrow down to approval
-\draw[arrow] (ai) -- (approval);
+% Arrow down to approval with label on the right
+\draw[arrow] (ai) -- node[label, midway, right=0.45cm, rotate=90, anchor=south] {decide} (approval);
 
-% Arrows bottom row
-\draw[arrow] (approval) -- (run);
-\draw[arrow] (run) -- (verify);
-\draw[arrow] (verify) -- (archive);
-
-% Phase labels
-\node[label, above=0.35cm] at ($(alert.east)!0.5!(incident.west)$) {correlation};
-\node[label, above=0.35cm] at ($(incident.east)!0.5!(invest.west)$) {case building};
-\node[label, above=0.35cm] at ($(invest.east)!0.5!(ai.west)$) {analysis};
-\node[label, right=0.25cm, rotate=90, anchor=south] at ($(ai.south)!0.5!(approval.north)$) {decide};
-\node[label, above=0.35cm] at ($(approval.east)!0.5!(run.west)$) {act};
-\node[label, above=0.35cm] at ($(run.east)!0.5!(verify.west)$) {prove fix};
-\node[label, above=0.35cm] at ($(verify.east)!0.5!(archive.west)$) {close};
-\end{tikzpicture}\end{adjustbox}
+% Arrows bottom row with labels above
+\draw[arrow] (approval) -- node[label, midway, above=0.45cm] {act} (run);
+\draw[arrow] (run) -- node[label, midway, above=0.45cm] {prove fix} (verify);
+\draw[arrow] (verify) -- node[label, midway, above=0.45cm] {close} (archive);
+\end{tikzpicture}
 \caption{Detection-to-response lifecycle across all ARIA features}
 \end{figure}
 
+\FloatBarrier
+\Needspace{28\baselineskip}
 The following table consolidates the workflow coverage of the dashboard pages described above.
 
 \begin{table}[H]

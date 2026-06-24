@@ -6,15 +6,15 @@
   \node[anchor=center, inner sep=0] at (current page.center)
     {\includegraphics[width=\paperwidth,height=\paperheight]{assets/cover/esprit-cover-front.png}};
 
-  % --- Specialty (next to the printed "SPECIALTY :" label) ---
-  \node[anchor=west, font=\bfseries\normalsize]
-    at ([xshift=10.5cm,yshift=-11.9cm]current page.north west)
-    {Cloud Computing};
+  % --- Specialty line (unified, centered, with subtle backing for contrast) ---
+  \node[anchor=center, fill=white, fill opacity=1, text opacity=1, rounded corners=6pt, minimum width=10.5cm, inner sep=6pt]
+    at ([yshift=-11.9cm]current page.north)
+    {\sffamily\large\bfseries Specialty:\hspace{0.45em}\mdseries Cloud Computing};
 
-  % --- ARIA logo (official transparent logo with subtle shadow for visibility) ---
+  % --- ARIA logo (official logo, slightly enlarged, on subtle navy support for contrast) ---
   \node[anchor=north, inner sep=0]
     at ([yshift=-11.8cm]current page.north)
-    {\includegraphics[width=4.0cm,keepaspectratio]{assets/logos/aria-logo-cover.png}};
+    {\includegraphics[width=4.8cm,keepaspectratio]{assets/logos/aria-logo-cover-panel.png}};
 
   % --- Project title block (ARIA wordmark comes from the logo above) ---
   \node[anchor=north, align=center, text width=16cm]
