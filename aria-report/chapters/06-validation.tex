@@ -41,10 +41,12 @@ The Huawei Cloud environment that hosts the central stack is documented by real 
 
 Installation is performed by the setup scripts described in Chapter~2 (Elasticsearch, Kibana, and Filebeat via the SIEM setup script, then Wazuh, Suricata, Telegraf, and Falco/Falcosidekick via their component scripts). Each script installs its packages in a fixed order, writes its configuration against the central Elasticsearch endpoint, and stops on hard failures, so a successful run is itself an installation check. Because re-running the installers on the live central host from the reporting environment would be destructive, the installation is validated here as a \emph{controlled simulation} derived directly from the script logic (Listing~\ref{lst:central-sim}). The activity diagram of the central setup in Chapter~2 documents the same sequence.
 
-\begin{lstlisting}[style=ariaterm,caption={Central environment setup --- controlled simulation derived from the setup scripts and current configuration; not a live production capture},label={lst:central-sim}]
+\begin{lstlisting}[style=ariaterm,caption={Controlled Simulation Result: central environment setup validation},label={lst:central-sim},
+  emph={[2]PASS}, emphstyle={[2]\color{green!60!black}\bfseries}]
 ARIA Central Environment Setup
-Execution mode: Controlled simulation
-Source: tools/ siem_setup.sh + component setup scripts and current configuration
+
+Mode:   Controlled simulation
+Source: siem_setup.sh + component setup scripts and current configuration
 
 [01/08] Validating operating system (Ubuntu) ........ PASS
 [02/08] Checking root privileges and prerequisites .. PASS
@@ -124,25 +126,34 @@ The backend was validated by direct execution. First, the entire backend source 
 $ python -m compileall main.py config core pipeline response api
 $ echo $?
 0
-# 146 Python modules compiled successfully; no SyntaxError reported.
+
+# 146 Python modules compiled successfully
+# No SyntaxError reported
 \end{lstlisting}
 
 \screenshot{aria_api_root.png}{Live API service root: ARIA service metadata, version, and endpoint inventory returned with HTTP~200}{fig:val-api}
 
 The captured root response, reproduced in Listing~\ref{lst:api-root}, enumerates the public endpoint groups that the frontend consumes. The project API-test records (\sourcefile{docs/validation/API_TEST_RESULTS.md}) document the same groups returning records, and the endpoint inventory is reproduced in Appendix~\ref{app:api}.
 
-\begin{lstlisting}[style=ariaterm,caption={Service root payload captured from the running backend (sanitized)},label={lst:api-root}]
+\begin{lstlisting}[style=ariaterm,caption={Service root payload captured from the running backend (sanitized)},label={lst:api-root},
+  emph={service,version,endpoints,alerts,incidents,investigations,archives,pipeline,dashboard,search,metrics,assistant,docs},
+  emphstyle=\color{codekw}\bfseries]
 GET /  ->  200 OK
+
 {
   "service": "ARIA - Adaptive Response Intelligence Automation",
   "version": "1.0.0",
   "endpoints": {
-    "alerts": "/api/v1/alerts",      "incidents": "/api/v1/incidents",
+    "alerts":       "/api/v1/alerts",
+    "incidents":    "/api/v1/incidents",
     "investigations": "/api/v1/investigations",
-    "archives": "/api/v1/archives",  "pipeline": "/api/v1/pipeline/status",
-    "dashboard": "/api/v1/dashboard/summary",
-    "search": "/api/v1/search",      "metrics": "/api/v1/metrics/dashboard",
-    "assistant": "/api/v1/assistant/query", "docs": "/docs"
+    "archives":     "/api/v1/archives",
+    "pipeline":     "/api/v1/pipeline/status",
+    "dashboard":    "/api/v1/dashboard/summary",
+    "search":       "/api/v1/search",
+    "metrics":      "/api/v1/metrics/dashboard",
+    "assistant":    "/api/v1/assistant/query",
+    "docs":         "/docs"
   }
 }
 \end{lstlisting}

@@ -24,18 +24,20 @@ After the guard, the script collects the onboarding inputs: the server name, an 
 \begin{figure}[H]
 \centering
 \begin{adjustbox}{max width=\textwidth}\begin{tikzpicture}[
-  vmstep/.style={draw, rounded corners, align=center, text width=2.55cm, minimum height=0.85cm, fill=gray!8},
-  check/.style={draw, rounded corners, align=center, text width=2.55cm, minimum height=0.85cm, fill=green!8},
-  arrow/.style={-Latex, thick}
+  font=\small,
+  bstep/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=gray!8, font=\fontsize{11}{13}\selectfont},
+  check/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=green!10, font=\fontsize{11}{13}\selectfont},
+  gate/.style={draw, rounded corners, align=center, text width=2.7cm, minimum height=1.0cm, fill=red!10, font=\fontsize{11}{13}\selectfont},
+  arrow/.style={-Latex, line width=1.1pt}
 ]
-\node[vmstep] (safe) {Confirm target\\is monitored VM};
-\node[vmstep, right=0.55cm of safe] (collect) {Collect VM and\\central stack values};
-\node[check, right=0.55cm of collect] (test) {Test central\\Elasticsearch};
-\node[vmstep, below=0.75cm of test] (install) {Install selected\\agents};
-\node[vmstep, left=0.55cm of install] (config) {Write configs\\with asset fields};
-\node[check, left=0.55cm of config] (verify) {Verify services\\and indices};
-\node[vmstep, below=0.75cm of verify] (payload) {Print ARIA\\asset payload};
-\node[vmstep, right=0.55cm of payload] (aria) {Register asset\\and validate sources};
+\node[gate] (safe) {\textbf{Confirm target}\\is monitored VM};
+\node[bstep, right=0.7cm of safe] (collect) {\textbf{Collect VM and}\\central stack values};
+\node[check, right=0.7cm of collect] (test) {\textbf{Test central}\\Elasticsearch};
+\node[bstep, below=0.85cm of test] (install) {\textbf{Install selected}\\agents};
+\node[bstep, left=0.7cm of install] (config) {\textbf{Write configs}\\with asset fields};
+\node[check, left=0.7cm of config] (verify) {\textbf{Verify services}\\and indices};
+\node[bstep, below=0.85cm of verify] (payload) {\textbf{Print ARIA}\\asset payload};
+\node[check, right=0.7cm of payload] (aria) {\textbf{Register asset}\\and validate sources};
 \draw[arrow] (safe) -- (collect);
 \draw[arrow] (collect) -- (test);
 \draw[arrow] (test) -- (install);
@@ -44,7 +46,7 @@ After the guard, the script collects the onboarding inputs: the server name, an 
 \draw[arrow] (verify) -- (payload);
 \draw[arrow] (payload) -- (aria);
 \end{tikzpicture}\end{adjustbox}
-\caption{Monitored server bootstrap flow}
+\caption{Monitored server bootstrap flow}\label{fig:bootstrap-flow}
 \end{figure}
 
 Figure~\ref{fig:act-bootstrap} expands this flow into the activity diagram of the real script, including its decision points (the safety guard, the apt-lock wait, and the per-service health checks with restart-on-failure), and Figure~\ref{fig:seq-onboard} shows the same onboarding as a sequence across the administrator, the new server, the central stack, Elasticsearch, and the ARIA asset API.
@@ -81,7 +83,9 @@ Every agent on a monitored server points back to the same central Elasticsearch,
 
 The bootstrap script ends by printing a JSON payload for ARIA's asset API (\codepath{POST /api/v1/assets}). This is the connective tissue between onboarding and the platform: the script already knows the server's identity and exactly which sources were installed, so it emits a payload that describes them precisely. The payload carries the asset identifier, name, hostname, IP, environment, an enabled flag, a remediation flag (off by default for safety), and a \codepath{source_config_json} that lists, for each installed source, its per-server index pattern and host identity, including the Wazuh \codepath{agent_id} when applicable. Listing~\ref{lst:asset-payload} shows the payload printed for the \codepath{dash-linux} server.
 
-\begin{lstlisting}[style=aria,caption={ARIA asset payload printed by the bootstrap script (sanitized)},label={lst:asset-payload}]
+\begin{lstlisting}[style=aria,caption={Asset Registration JSON printed by the bootstrap script (sanitized)},label={lst:asset-payload},
+  emph={asset_id,name,hostname,ip_address,environment,enabled,remediation_enabled,source_config_json,wazuh,falco,telegraf,filebeat,index_pattern,agent_name,agent_id,host_name},
+  emphstyle=\color{codekw}\bfseries]
 {
   "asset_id": "dash-linux",
   "name": "dash-linux",
@@ -139,10 +143,14 @@ Suricata & \codepath{filebeat-dash-linux-*} & Missing & 0 documents; expected, s
 
 This validation step turns onboarding into a repeatable, verifiable workflow rather than a hopeful one. A source with zero documents is either a real problem or, as with Suricata above, an expected consequence of not installing that component, and the asset configuration records which case applies. Because re-running the installer on a live host from the reporting environment would modify that host, Listing~\ref{lst:bootstrap-out} reproduces the script's own validation sequence as a \emph{controlled simulation} derived directly from the bootstrap script branches; no production host was modified to produce it.
 
-\begin{lstlisting}[style=ariaterm,caption={Monitored-server bootstrap --- controlled simulation derived from the bootstrap script; not a live production capture},label={lst:bootstrap-out}]
+\begin{lstlisting}[style=ariaterm,caption={Controlled Simulation Result: monitored-server bootstrap validation},label={lst:bootstrap-out},
+  emph={[2]PASS,FAIL,WARNING}, emphstyle={[2]\color{green!60!black}\bfseries}]
 ARIA Monitored Server Bootstrap
-Mode: Controlled simulation    Asset: vm-test    Environment: test
-Central Elasticsearch: https://<CENTRAL_ES>:9200
+
+Mode:        Controlled simulation
+Asset:       vm-test
+Environment: test
+Endpoint:    https://<CENTRAL_ES>:9200
 
 [PASS] Not running on the central ARIA server (guard check)
 [PASS] Elasticsearch endpoint reachable and authenticated
@@ -215,10 +223,10 @@ Beyond individual agents, the platform itself is deployed as cooperating service
 The ARIA containers are pre-built and published to Docker Hub under the \codepath{ghaziiii/aria_project} namespace. This means the brain server does not build images locally; it pulls the published tags:
 
 \begin{itemize}[leftmargin=1cm]
-\item \codepath{ghaziiii/aria_project:redis-latest} for the Redis cache and cursor store;
-\item \codepath{ghaziiii/aria_project:backend-latest} for the FastAPI service;
-\item \codepath{ghaziiii/aria_project:worker-latest} for the background polling and correlation worker;
-\item \codepath{ghaziiii/aria_project:frontend-latest} for the Next.js dashboard.
+\item \textbf{\codepath{ghaziiii/aria_project:redis-latest}} --- Redis cache and cursor store.
+\item \textbf{\codepath{ghaziiii/aria_project:backend-latest}} --- FastAPI service.
+\item \textbf{\codepath{ghaziiii/aria_project:worker-latest}} --- Background polling and correlation worker.
+\item \textbf{\codepath{ghaziiii/aria_project:frontend-latest}} --- Next.js dashboard.
 \end{itemize}
 
 The backend and worker share the same image but run different commands: the backend starts \codepath{uvicorn} on port~8001, while the worker runs \codepath{python3 main.py} with \codepath{SKIP_RESPONSE_API=1} so it does not try to bind the API port. The frontend container builds the Next.js application in a multi-stage Dockerfile and serves it internally on port~3000, mapped to host port~3001. Redis persists its data in a named Docker volume and is exposed on host port~6380 mapped to container port~6379.
@@ -253,20 +261,26 @@ The backend and worker share the same image but run different commands: the back
 
 The containerized layout is captured in the Docker Compose file shown in Listing~\ref{lst:docker-compose}. Redis is exposed on host port~6380 and mapped to the standard container port~6379; the API and worker share the same backend image but run different commands; and the frontend container listens internally on port~3000 while the host exposes port~3001.
 
-\begin{lstlisting}[style=aria,language=yaml,caption={Docker Compose services excerpt},label={lst:docker-compose}]
+\begin{lstlisting}[style=aria,language=yaml,caption={Docker Compose services excerpt},label={lst:docker-compose},
+  emph={services,redis,api,worker,frontend,image,container_name,ports,volumes,environment,depends_on,restart,command},
+  emphstyle=\color{codekw}\bfseries]
 services:
   redis:
     image: ghaziiii/aria_project:redis-latest
+    container_name: aria-redis
     ports:
       - "6380:6379"
     volumes:
       - redis-data:/data
+    command: redis-server --appendonly yes
 
   api:
     image: ghaziiii/aria_project:backend-latest
+    container_name: aria-api
     ports:
       - "8001:8001"
     environment:
+      - REDIS_HOST=redis
       - BACKEND_PORT=8001
       - CORS_ORIGINS=http://localhost:3001
     depends_on:
@@ -274,18 +288,75 @@ services:
 
   worker:
     image: ghaziiii/aria_project:worker-latest
+    container_name: aria-worker
     environment:
+      - REDIS_HOST=redis
       - BACKEND_PORT=8001
+      - SKIP_RESPONSE_API=1
     depends_on:
       - api
       - redis
 
   frontend:
     image: ghaziiii/aria_project:frontend-latest
+    container_name: aria-frontend
     ports:
       - "3001:3000"
     environment:
       - NODE_ENV=production
+\end{lstlisting}
+
+\subsection{Dockerfile and Image Build}
+
+The published images are built from Dockerfiles in \sourcefile{aria-application/}. The backend Dockerfile starts from a Python 3.12 slim image, installs build tools, Ansible, SSH client, network utilities, and the Python dependencies listed in \codepath{requirements.txt}, then copies the application code and exposes port~8001. This single image serves both the API and the worker because the Compose file overrides the command at runtime.
+
+The frontend Dockerfile is a multi-stage Node.js 22 Alpine build. It enables \codepath{pnpm}, installs dependencies with \codepath{--frozen-lockfile}, injects the API and WebSocket URLs as build arguments, builds the Next.js application, and copies only the production artifacts into the final stage. The runner stage exposes port~3000 and starts the application with \codepath{pnpm start}.
+
+Images are built locally with \codepath{docker build}, tagged as \codepath{ghaziiii/aria_project:<service>-latest}, and pushed to Docker Hub. The brain server therefore does not need the source code or a build environment; it only needs the Compose file, a readable \codepath{.env}, and Docker credentials to pull the images.
+
+\begin{lstlisting}[style=aria,language=bash,caption={Backend Dockerfile excerpt},label={lst:dockerfile-backend}]
+FROM python:3.12-slim AS base
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc python3-dev libffi-dev \
+    ansible sshpass openssh-client \
+    curl ca-certificates
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+ENV PYTHONPATH=/app PYTHONUNBUFFERED=1
+EXPOSE 8001
+CMD ["python3", "-m", "uvicorn", "api.app:app",
+     "--host", "0.0.0.0", "--port", "8001"]
+\end{lstlisting}
+
+\begin{lstlisting}[style=aria,language=bash,caption={Frontend Dockerfile multi-stage build excerpt},label={lst:dockerfile-frontend}]
+FROM node:22-alpine AS base
+ENV PNPM_HOME="/pnpm" PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+FROM base AS deps
+WORKDIR /app
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ARG NEXT_PUBLIC_API_URL=http://localhost:8001
+ARG NEXT_PUBLIC_WS_URL=ws://localhost:8001/ws
+RUN pnpm build
+
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production PORT=3000 HOSTNAME="0.0.0.0"
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./package.json
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+EXPOSE 3000
+CMD ["pnpm", "start"]
 \end{lstlisting}
 
 \section{Mass Deployment with Ansible}
@@ -327,6 +398,46 @@ The playbook performs the following steps for each target host:
 \item Runs the script in non-interactive mode with the central Elasticsearch IP, credentials, Wazuh group, and environment tag.
 \item Streams the script output back to the Ansible console for auditing.
 \end{enumerate}
+
+Listing~\ref{lst:ansible-playbook} shows the core tasks of the playbook.
+
+\begin{lstlisting}[style=aria,language=yaml,caption={Ansible playbook excerpt for monitored-VM deployment},label={lst:ansible-playbook},
+  emph={hosts,vars,tasks,name,environment,ARIA_ES_PASSWORD,MONITORED_VM_CONFIRM,async,poll},
+  emphstyle=\color{codekw}\bfseries]
+- name: Deploy and run bootstrap_monitored_vm.sh on monitored VMs
+  hosts: monitored_vms
+  gather_facts: yes
+
+  vars:
+    vm_environment: "safe"
+    es_ip: "<CENTRAL_ES_IP>"
+    es_user: "elastic"
+    es_password: "<REDACTED>"
+    wazuh_group: "default"
+
+  tasks:
+    - name: Copy bootstrap script to remote VM
+      ansible.builtin.copy:
+        src: "bootstrap_monitored_vm.sh"
+        dest: "/tmp/bootstrap_monitored_vm.sh"
+        mode: "0755"
+
+    - name: Run bootstrap_monitored_vm.sh with supplied answers
+      ansible.builtin.command:
+        argv:
+          - "bash"
+          - "/tmp/bootstrap_monitored_vm.sh"
+          - "--yes"
+          - "--vm-name"
+          - "{{ _vm_name }}"
+          - "--es-ip"
+          - "{{ es_ip }}"
+      environment:
+        ARIA_ES_PASSWORD: "{{ es_password }}"
+        MONITORED_VM_CONFIRM: "I_UNDERSTAND_THIS_IS_A_MONITORED_VM"
+      async: 1800
+      poll: 10
+\end{lstlisting}
 
 The operator only needs to keep the Ansible inventory file up to date and run the playbook; every new VM receives the same agents, the same central target, and the same index-naming convention. After the playbook finishes, the administrator registers each generated asset payload in ARIA and runs source validation exactly as with a manual onboarding.
 
