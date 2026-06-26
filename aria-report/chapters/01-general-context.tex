@@ -180,111 +180,98 @@ From the user's point of view, the scope of ARIA is best expressed as a global u
 
 \section{Methodology and Planning}
 
-The internship followed an Agile iterative methodology with two-week sprints. Each sprint delivered a usable increment, followed by a review and planning session for the next. The internship logbook records weekly work from January~12 to July~12, 2026.
+\subsection{Choice and Justification}
 
-Early sprints focused on:
+We selected Scrum as the guiding methodology, adapted for a single-developer internship context. The justification rests on three factors:
+
+\begin{enumerate}[leftmargin=1cm]
+  \item \textbf{Emergent requirements.} At the start of the internship the precise behavior of the AI playbook engine, the optimal enrichment taxonomy (MITRE, GeoIP, Sigma, IOC, whitelist), and the multi-server scoping model were unknown. Scrum allowed us to refine these through working software reviewed at the end of each sprint.
+  \item \textbf{Frequent supervisor feedback.} Bi-weekly sprint reviews with the company supervisors, plus checkpoint reviews with the academic supervisor, ensured alignment with Huawei's production constraints and ESPRIT's academic expectations and prevented divergence from operational reality.
+  \item \textbf{Incremental validation.} Each sprint produced a demonstrable increment: event detection and normalization in Sprint~5, incident correlation in Sprint~6, AI-assisted investigations in Sprint~7, controlled remediation loops in Sprint~9, and multi-server onboarding in Sprint~11. This made integration issues visible early and gave continuous evidence that the objectives were achievable.
+\end{enumerate}
+
+The Scrum Guide \cite{scrum_guide} provides the theoretical basis; the ceremonies were scaled down to fit a six-month internship and a single main developer.
+
+\subsection{Adapted Scrum Process}
+
+The internship was organized into thirteen two-week sprints from January~12 to July~12, 2026. The process kept the essential Scrum artifacts and events but removed overhead that would be excessive for one intern:
+
 \begin{itemize}[leftmargin=1cm]
-\item cloud and Linux preparation;
-\item Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Redis, and initial ARIA setup.
+  \item \textbf{Product backlog:} a single prioritized list of features, described in Table~\ref{tab:backlog}.
+  \item \textbf{Sprint backlog:} at the start of each sprint a small subset of product-backlog items was selected, decomposed into concrete tasks, and written in the internship logbook.
+  \item \textbf{Daily tracking:} the logbook recorded daily progress, blockers, and decisions instead of a formal daily stand-up.
+  \item \textbf{Sprint review:} every two weeks the current increment was demonstrated to the company supervisors; feedback was captured as new or refined backlog items.
+  \item \textbf{Sprint retrospective:} a short internal review at the end of each sprint identified what to keep, adjust, or stop for the next sprint.
 \end{itemize}
 
-Later sprints focused on:
-\begin{itemize}[leftmargin=1cm]
-\item backend configuration, Sigma filtering, and deduplication;
-\item AI playbook generation and watcher logic;
-\item multi-server onboarding, hardening, documentation, and final validation.
-\end{itemize}
+Documentation, validation, and report writing were not postponed to the end; they ran continuously, so each sprint closed with both working code and updated evidence.
 
-The methodology was chosen after comparing common project organization models. Waterfall was inappropriate because the monitoring stack, backend workflows, and validation evidence evolved as the environment became available. A full Scrum process was also too heavy for a single-intern implementation context. The adopted approach was therefore a phased iterative method with two-week sprints: each sprint produced a usable technical base, and later sprints refined and extended it.
+\subsection{Sprint Planning}
 
-\begin{table}[H]
-\centering
-\caption{Methodology comparison}
-\begin{tabularx}{\textwidth}{@{}p{0.18\textwidth}p{0.24\textwidth}p{0.24\textwidth}Y@{}}
+Table~\ref{tab:sprints} lists the thirteen sprints, their dates, objectives, deliverables, and the report chapters they feed.
+
+{\small\setlength{\tabcolsep}{2pt}
+\begin{longtable}{@{}p{0.07\textwidth}@{}p{0.12\textwidth}@{}p{0.16\textwidth}@{}p{0.46\textwidth}@{}p{0.10\textwidth}@{}}
+\caption{Sprint planning (January 12 -- July 12, 2026)}\label{tab:sprints}\\
 \toprule
-\textbf{Method} & \textbf{Advantages} & \textbf{Limits for this project} & \textbf{Decision} \\
-\midrule
-Waterfall & Clear sequence and documentation. & Too rigid for infrastructure and integration discoveries. & Not selected. \\
-Scrum & Strong feedback rhythm and backlog refinement. & Heavy ceremonies for a compact internship and single main developer. & Used only as inspiration for iterative validation \cite{scrum_guide}. \\
-Phased iterative work (2-week sprints) & Fits monitoring, cloud, backend, and validation increments. & Requires careful documentation to keep continuity. & Selected. \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Main internship phases}
-\begin{tabularx}{\textwidth}{@{}p{0.18\textwidth}Y@{}}
-\toprule
-\textbf{Phase} & \textbf{Main work} \\
-\midrule
-Phase 1 & Server preparation, Linux hardening, Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, Redis, and initial dashboards. \\
-Phase 2 & Huawei Cloud infrastructure: VPC, subnet, security group, Elastic IP, ECS host, storage, and access control. \\
-Phase 3 & ARIA backend: polling, mapping, filtering, deduplication, enrichment, incidents, investigations, AI response, Ansible remediation, and dashboard integration. \\
-Continuous work & Multi-server onboarding, testing, API checks, frontend build checks, admin-secret verification, and documentation. \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-The product backlog below summarizes the features prioritized and implemented across these phases, which serve as the working scope and are detailed in Chapters~3 to~5.
-
-\begin{longtable}{@{}p{0.08\textwidth}p{0.32\textwidth}p{0.42\textwidth}p{0.10\textwidth}@{}}
-\caption{Product backlog}\\
-\toprule
-\textbf{ID} & \textbf{Feature} & \textbf{Description} & \textbf{Priority} \\
+\textbf{Sprint} & \textbf{Dates} & \textbf{Objective} & \textbf{Key deliverables} & \textbf{Chapters} \\
 \midrule
 \endfirsthead
 \toprule
-\textbf{ID} & \textbf{Feature} & \textbf{Description} & \textbf{Priority} \\
+\textbf{Sprint} & \textbf{Dates} & \textbf{Objective} & \textbf{Key deliverables} & \textbf{Chapters} \\
 \midrule
 \endhead
-PB-01 & Monitoring foundation & Install and stabilize the central security and observability stack on cloud infrastructure. & High \\
-PB-02 & Alert ingestion & Poll Elasticsearch sources and persist normalized alerts. & High \\
-PB-03 & Alert enrichment & Add GeoIP, MITRE, Sigma, severity, IOC, and whitelist logic. & High \\
-PB-04 & Incident correlation & Group related alerts into incidents and investigations. & High \\
-PB-05 & AI response & Generate summary, narrative, risk assessment, and playbook. & High \\
-PB-06 & Analyst workflow & Approve, decline, edit, execute, archive, and audit investigations. & High \\
-PB-07 & Safe remediation & Validate playbooks, protect dangerous actions, execute via Ansible, verify fixes. & High \\
-PB-08 & Dashboard & Provide alerts, incidents, investigations, assistant, IPS, metrics, and settings pages. & High \\
-PB-09 & Runtime remediation & Diagnose runtime findings and staged remediation actions. & Medium \\
-PB-10 & Infrastructure monitoring & Poll Telegraf metrics and detect anomalies. & Medium \\
-PB-11 & Multi-server onboarding & Add asset registry, bootstrap monitored servers, and scope data by server. & Medium \\
-PB-12 & Validation & Compile, test, build, and document verification results. & High \\
+S1 & 12 Jan -- 25 Jan & Research, context, requirements & Host organization study, problem statement, objectives, methodology & 1 \\
+S2 & 26 Jan -- 08 Feb & Cloud environment setup & VPC, subnet, security group, EIP, ECS host, storage & 2 \\
+S3 & 09 Feb -- 22 Feb & Monitoring foundation & Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, Redis & 2 \\
+S4 & 23 Feb -- 08 Mar & Architecture \& design & ARIA backend skeleton, domain model, API design, architecture diagrams & 3 \\
+S5 & 09 Mar -- 22 Mar & Alert ingestion & Cursor-based polling, source mapping, normalized alert persistence & 3 \\
+S6 & 23 Mar -- 05 Apr & Enrichment \& correlation & GeoIP, MITRE, Sigma, IOC, whitelist, incident grouping & 3 \\
+S7 & 06 Apr -- 19 Apr & AI response & AI summary, narrative, risk assessment, playbook generation & 3/4 \\
+S8 & 20 Apr -- 03 May & Dashboard \& analyst workflow & Alerts, incidents, investigations UI & 4 \\
+S9 & 04 May -- 17 May & Safe remediation & Approval workflow, admin secrets, Ansible execution, verification & 4 \\
+S10 & 18 May -- 31 May & Runtime \& infrastructure & Runtime diagnostics, metrics anomalies, IPS visualization & 4 \\
+S11 & 01 Jun -- 14 Jun & Multi-server onboarding & Asset registry, bootstrap, asset scoping & 5 \\
+S12 & 15 Jun -- 28 Jun & Validation \& testing & Build checks, API tests, live evidence, automated tests & 6 \\
+S13 & 29 Jun -- 12 Jul & Documentation \& final report & Report corrections, defense preparation, final submission & 1/6/Concl. \\
 \bottomrule
 \end{longtable}
+\par}
 
-The complete planning is summarized in the Gantt chart of Figure~\ref{fig:gantt}, spanning January~12 to July~12, 2026. The chart shows how the work packages overlap: the monitoring foundation begins while cloud preparation finishes, the backend intelligence layer builds on the available telemetry, the dashboard and multi-server work extend through the middle of the internship, and validation and documentation run continuously until the final weeks.
+\subsection{Product Backlog}
 
-\begin{figure}[H]
-\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{tikzpicture}[x=0.48cm,y=0.78cm,
-  bar/.style={fill=blue!55,draw=blue!70!black,rounded corners=1pt},
-  bar2/.style={fill=teal!55,draw=teal!65!black,rounded corners=1pt},
-  tasklabel/.style={anchor=east,font=\small}]
-% month headers
-\foreach \m/\a/\b in {January/0/3, February/3/7, March/7/11, April/11/16, May/16/20, June/20/25, July/25/26}{%
-  \draw[gray!55] (\a,0.7) -- (\b,0.7);
-  \node[font=\small\bfseries] at ({(\a+\b)/2},1.05) {\m};
-}
-% week gridlines
-\foreach \w in {0,1,...,26}{\draw[gray!25] (\w,0.7) -- (\w,-5.1);}
-% rows: label / y / xstart / xend / style
-\foreach \name/\y/\s/\e/\st in {%
-  {Cloud and Linux preparation}/0/0/3/bar,
-  {Monitoring foundation}/{-0.8}/1/8/bar,
-  {Backend intelligence layer}/{-1.6}/5/16/bar,
-  {Dashboard and SOC workflows}/{-2.4}/9/20/bar,
-  {Multi-server and hardening}/{-3.2}/12/22/bar2,
-  {Validation and documentation}/{-4.0}/10/26/bar2}{%
-  \node[tasklabel] at (-0.25,\y) {\name};
-  \fill[\st] (\s,\y-0.26) rectangle (\e,\y+0.26);
-}
-\end{tikzpicture}
-\end{adjustbox}
-\caption{Gantt chart of the internship planning (January 12 -- July 12, 2026)}
-\label{fig:gantt}
-\end{figure}
+The product backlog in Table~\ref{tab:backlog} summarizes the features prioritized and implemented across the sprints. Each item is mapped to the sprint(s) in which it was delivered and to the acceptance criteria used to confirm it.
+
+{\small\setlength{\tabcolsep}{2pt}
+\begin{longtable}{@{}p{0.06\textwidth}@{}p{0.16\textwidth}@{}p{0.48\textwidth}@{}p{0.09\textwidth}@{}p{0.10\textwidth}@{}}
+\caption{Product backlog with sprint mapping and acceptance criteria}\label{tab:backlog}\\
+\toprule
+\textbf{ID} & \textbf{Feature} & \textbf{Description / Acceptance criteria} & \textbf{Priority} & \textbf{Sprint(s)} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Feature} & \textbf{Description / Acceptance criteria} & \textbf{Priority} & \textbf{Sprint(s)} \\
+\midrule
+\endhead
+PB-01 & Monitoring foundation & Install and stabilize the central security and observability stack on cloud infrastructure. \textbf{Acceptance:} all services reachable; Kibana shows indices; health checks pass. & High & S2--S3 \\
+PB-02 & Alert ingestion & Poll Elasticsearch sources and persist normalized alerts. \textbf{Acceptance:} cursor advances; no duplicate processing; normalized alerts stored in SQLite. & High & S5 \\
+PB-03 & Alert enrichment & Add GeoIP, MITRE, Sigma, severity, IOC, and whitelist logic. \textbf{Acceptance:} enrichment fields populated; whitelist suppresses false positives. & High & S6 \\
+PB-04 & Incident correlation & Group related alerts into incidents and investigations. \textbf{Acceptance:} correlation rules configurable; related alerts appear under one incident. & High & S6 \\
+PB-05 & AI response & Generate summary, narrative, risk assessment, and playbook. \textbf{Acceptance:} investigation contains all fields; malformed LLM output handled gracefully. & High & S7 \\
+PB-06 & Analyst workflow & Approve, decline, edit, execute, archive, and audit investigations. \textbf{Acceptance:} state machine enforces allowed transitions; audit records persisted. & High & S8--S9 \\
+PB-07 & Safe remediation & Validate playbooks, protect dangerous actions, execute via Ansible, verify fixes. \textbf{Acceptance:} admin-secret gate; dry-run available; execution log and verification saved. & High & S9 \\
+PB-08 & Dashboard & Provide alerts, incidents, investigations, assistant, IPS, metrics, and settings pages. \textbf{Acceptance:} all pages render; API checks pass; production build succeeds. & High & S8, S10 \\
+PB-09 & Runtime remediation & Diagnose runtime findings and staged remediation actions. \textbf{Acceptance:} observe cases never produce corrective playbooks; remediation requires explicit approval. & Medium & S10 \\
+PB-10 & Infrastructure monitoring & Poll Telegraf metrics and detect anomalies. \textbf{Acceptance:} metrics ingested; anomaly rules trigger investigations. & Medium & S10 \\
+PB-11 & Multi-server onboarding & Add asset registry, bootstrap monitored servers, and scope data by server. \textbf{Acceptance:} new asset added; bootstrap installs required services; endpoints filter by \codepath{asset\_id}. & Medium & S11 \\
+PB-12 & Validation & Compile, test, build, and document verification results. \textbf{Acceptance:} automated tests pass; build checks green; evidence screenshots collected. & High & S12--S13 \\
+\bottomrule
+\end{longtable}
+\par}
+
+The complete planning is visualized in the Gantt chart of Figure~\ref{fig:gantt}.
+
+\input{chapters/gantt-chart}
 
 \section{Conclusion}
 
