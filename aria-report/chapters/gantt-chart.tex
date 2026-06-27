@@ -3,125 +3,133 @@
 \thispagestyle{fancy}
 \begin{figure}[p]
 \centering
-\newcommand{\ganttleft}{-5.5}
+
+\newcommand{\ganttleft}{-7.2}
 \newcommand{\ganttwidth}{26}
-\newcommand{\gantttop}{15}
-\newcommand{\rowzero}{13.5}
+\newcommand{\rowzero}{12.5}
+\newcommand{\barheight}{0.30}
 
-\begin{tikzpicture}[x=0.62cm,y=0.78cm, >=stealth]
-  % ---- Custom palette ----
-  \definecolor{lavender}{RGB}{230,230,250}
-  \definecolor{paleyellow}{RGB}{255,250,205}
-  \definecolor{palegray}{RGB}{240,240,240}
+\begin{tikzpicture}[x=0.62cm, y=0.76cm, >=stealth]
+  % ---- Palette and styles ----
+  \definecolor{ganttgray}{RGB}{160,160,160}
+  \definecolor{ganttbar}{RGB}{180,180,180}
+  \definecolor{ganttpurple}{RGB}{130,90,170}
+  \definecolor{ganttgrid}{RGB}{220,220,220}
+  \definecolor{ganttsprint}{RGB}{190,190,190}
 
-  % ---- Styles ----
   \tikzset{
-    gridline/.style={gray!35, very thin},
-    sprintline/.style={gray!65, thin},
-    milestone/.style={diamond, fill=violet!70, draw=violet!50!black, line width=0.4pt, inner sep=2.2pt},
-    milestonelabel/.style={font=\tiny\bfseries, text=violet!80!black, anchor=south},
-    taskbar/.style={rounded corners=2pt, line width=0.35pt, draw=gray!55!black},
-    deliverbar/.style={rounded corners=2pt, line width=0.35pt, draw=gray!55!black},
+    gridline/.style={ganttgrid, very thin},
+    sprintline/.style={ganttsprint, thin},
+    monthline/.style={gray!65, thin},
+    barbase/.style={rounded corners=1.6pt, line width=0.30pt, draw=gray!55!black},
+    workbar/.style={barbase, fill=ganttbar},
+    deliverbar/.style={barbase, fill=ganttpurple},
+    milestone/.style={diamond, fill=ganttpurple, draw=violet!50!black, line width=0.35pt, inner sep=2.0pt},
+    milestonelabel/.style={font=\scriptsize\bfseries, text=ganttpurple},
+    milestonenote/.style={font=\scriptsize\bfseries, text=ganttpurple, anchor=west, text width=2.1cm, align=flush left},
+    leader/.style={gray!60, thin},
+    progressty/.style={red!80!black, line width=0.6pt, dash pattern=on 4pt off 2.5pt},
   }
 
   % ---- Title ----
-  \node[font=\bfseries\Large] at ({\ganttwidth/2},\gantttop+1.3)
+  \node[font=\bfseries\Large] at ({(\ganttleft+\ganttwidth)/2},\rowzero+1.6)
     {Adaptive Response Intelligence Automation --- Project Plan};
 
-  % ---- Month header ----
-  \draw[sprintline] (0,\rowzero+0.55) -- (0,\rowzero-0.55);
-  \node[font=\small\bfseries] at (1.43,\rowzero) {Jan};
-  \draw[sprintline] (2.857,\rowzero+0.55) -- (2.857,\rowzero-0.55);
-  \node[font=\small\bfseries] at (4.857,\rowzero) {Feb};
-  \draw[sprintline] (6.857,\rowzero+0.55) -- (6.857,\rowzero-0.55);
-  \node[font=\small\bfseries] at (9.071,\rowzero) {Mar};
-  \draw[sprintline] (11.286,\rowzero+0.55) -- (11.286,\rowzero-0.55);
-  \node[font=\small\bfseries] at (13.429,\rowzero) {Apr};
-  \draw[sprintline] (15.571,\rowzero+0.55) -- (15.571,\rowzero-0.55);
-  \node[font=\small\bfseries] at (17.786,\rowzero) {May};
-  \draw[sprintline] (20.0,\rowzero+0.55) -- (20.0,\rowzero-0.55);
-  \node[font=\small\bfseries] at (22.143,\rowzero) {Jun};
-  \draw[sprintline] (24.286,\rowzero+0.55) -- (24.286,\rowzero-0.55);
-  \node[font=\small\bfseries] at (25.143,\rowzero) {Jul};
-  \draw[sprintline] (\ganttwidth,\rowzero+0.55) -- (\ganttwidth,\rowzero-0.55);
+  % ---- Month header band ----
+  \fill[gray!10] (\ganttleft,\rowzero+0.55) rectangle (\ganttwidth,\rowzero-0.55);
+  \foreach \a/\b/\m in {0/2.857/Jan, 2.857/6.857/Feb, 6.857/11.286/Mar, 11.286/15.571/Apr, 15.571/20.0/May, 20.0/24.286/Jun, 24.286/\ganttwidth/Jul}{%
+    \draw[monthline] (\a,\rowzero+0.55) -- (\a,\rowzero-0.55);
+    \node[font=\small\bfseries] at ({(\a+\b)/2},\rowzero) {\m};
+  }
+  \draw[monthline] (\ganttwidth,\rowzero+0.55) -- (\ganttwidth,\rowzero-0.55);
 
   % ---- Row helper ----
   % #1 = row index (0 at top), #2 = label, #3 = start week, #4 = end week,
-  % #5 = bar fill, #6 = bar label, #7 = band color
-  \newcommand{\ganttrow}[7]{%
-    \fill[#7, opacity=0.22] (\ganttleft,{\rowzero-#1-0.48}) rectangle (\ganttwidth,{\rowzero-#1+0.48});
-    \draw[gridline] (\ganttleft,{\rowzero-#1-0.5}) -- (\ganttwidth,{\rowzero-#1-0.5});
-    \node[anchor=east, font=\small, text width=5cm, align=right] at (-0.3,{\rowzero-#1}) {#2};
-    \fill[#5, taskbar] (#3,{\rowzero-#1-0.28}) rectangle (#4,{\rowzero-#1+0.28});
-    \node[anchor=west, font=\tiny\bfseries, text=white] at (#3+0.12,{\rowzero-#1}) {#6};
+  % #5 = bar style (workbar/deliverbar)
+  \newcommand{\ganttrow}[5]{%
+    \draw[gridline] (\ganttleft,{\rowzero-#1-0.50}) -- (\ganttwidth,{\rowzero-#1-0.50});
+    \node[anchor=east, font=\small, text width=6.4cm, align=flush right] at (-0.35,{\rowzero-#1}) {#2};
+    \fill[#5] (#3,{\rowzero-#1-\barheight}) rectangle (#4,{\rowzero-#1+\barheight});
   }
 
   % ---- Rows ----
-  \ganttrow{0}{Research / Discovery}{0}{2}{gray!55}{Context research}{lavender!40}
-  \ganttrow{1}{Requirements \& Specification}{0}{3}{gray!55}{Requirements}{yellow!30}
-  \ganttrow{2}{Cloud \& Linux Environment}{2}{5}{gray!55}{Cloud setup}{gray!20}
-  \ganttrow{3}{Monitoring Foundation}{4}{7}{gray!55}{Monitoring stack}{lavender!40}
-  \ganttrow{4}{Architecture \& Design}{6}{9}{blue!45!violet!65}{Architecture}{yellow!30}
-  \ganttrow{5}{Backend: Ingestion}{8}{11}{gray!55}{Ingestion}{gray!20}
-  \ganttrow{6}{Backend: Enrichment \& Correlation}{10}{13}{gray!55}{Enrichment}{lavender!40}
-  \ganttrow{7}{Backend: AI Response}{12}{15}{gray!55}{AI response}{yellow!30}
-  \ganttrow{8}{Dashboard \& SOC Workflows}{14}{18}{gray!55}{Dashboard}{gray!20}
-  \ganttrow{9}{Safe Remediation}{16}{19}{gray!55}{Remediation}{lavender!40}
-  \ganttrow{10}{Runtime \& Infrastructure Monitoring}{18}{21}{gray!55}{Runtime / Infra}{yellow!30}
-  \ganttrow{11}{Multi-server Onboarding \& Hardening}{20}{23}{gray!55}{Multi-server}{gray!20}
-  \ganttrow{12}{Testing \& Validation}{22}{25}{blue!45!violet!65}{Validation}{lavender!40}
-  \ganttrow{13}{Documentation \& Final Report}{23}{26}{blue!45!violet!65}{Documentation}{yellow!30}
+  \ganttrow{0}{Research / Discovery}{0}{2}{workbar}
+  \ganttrow{1}{Requirements \& Specification}{0}{3}{workbar}
+  \ganttrow{2}{Cloud \& Linux Environment}{2}{5}{workbar}
+  \ganttrow{3}{Monitoring Foundation}{4}{7}{workbar}
+  \ganttrow{4}{Architecture \& Design}{6}{9}{deliverbar}
+  \ganttrow{5}{Backend: Ingestion}{8}{11}{workbar}
+  \ganttrow{6}{Backend: Enrichment \& Correlation}{10}{13}{workbar}
+  \ganttrow{7}{Backend: AI Response}{12}{15}{workbar}
+  \ganttrow{8}{Dashboard \& SOC Workflows}{14}{18}{workbar}
+  \ganttrow{9}{Safe Remediation}{16}{19}{workbar}
+  \ganttrow{10}{Runtime \& Infrastructure Monitoring}{18}{21}{workbar}
+  \ganttrow{11}{Multi-server Onboarding \& Hardening}{20}{23}{workbar}
+  \ganttrow{12}{Testing \& Validation}{22}{25}{deliverbar}
+  \ganttrow{13}{Documentation \& Final Report}{23}{26}{deliverbar}
 
   % ---- Bottom separator ----
-  \draw[gridline] (\ganttleft,{\rowzero-14+0.5}) -- (\ganttwidth,{\rowzero-14+0.5});
+  \draw[gridline] (\ganttleft,{\rowzero-14+0.50}) -- (\ganttwidth,{\rowzero-14+0.50});
 
   % ---- Vertical grid: every week thin, every sprint thicker ----
   \foreach \w in {0,1,...,\ganttwidth}{%
-    \draw[gridline] (\w,\rowzero-0.5) -- (\w,{\rowzero-14+0.5});
+    \draw[gridline] (\w,\rowzero-0.50) -- (\w,{\rowzero-14+0.50});
   }
   \foreach \w in {0,2,4,...,\ganttwidth}{%
-    \draw[sprintline] (\w,\rowzero-0.5) -- (\w,{\rowzero-14+0.5});
+    \draw[sprintline] (\w,\rowzero-0.50) -- (\w,{\rowzero-14+0.50});
   }
 
   % ---- Sprint labels ----
   \foreach \s/\w in {1/0,2/2,3/4,4/6,5/8,6/10,7/12,8/14,9/16,10/18,11/20,12/22,13/24}{%
-    \node[font=\tiny, below, text=gray!80!black] at (\w+1,{\rowzero-14+0.4}) {S\s};
+    \node[font=\tiny, below, text=gray!80!black] at (\w+1,{\rowzero-14+0.35}) {S\s};
   }
 
   % ---- Milestones ----
-  % Architecture validated (end of architecture design)
+  % Architecture validated (end of architecture design, week 9)
   \node[milestone] (m1) at (9,\rowzero-4+0.55) {};
-  \node[milestonelabel] at (m1.north) {Architecture validated};
-  % PoC completed (first end-to-end alert-to-remediation loop)
-  \node[milestone] (m2) at (13,\rowzero-7+0.55) {};
-  \node[milestonelabel] at (m2.north) {PoC completed};
-  % Test campaign completed
-  \node[milestone] (m3) at (25,\rowzero-12+0.55) {};
-  \node[milestonelabel] at (m3.north) {Test campaign completed};
-  % Documentation completed
-  \node[milestone] (m4) at (25.5,\rowzero-13+0.55) {};
-  \node[milestonelabel, anchor=south east] at (m4.north west) {Documentation completed};
-  % Final report submitted
-  \node[milestone] (m5) at (26,\rowzero-13+0.55) {};
-  \node[milestonelabel, anchor=south west] at (m5.north east) {Final report submitted};
+  \node[milestonenote] (m1l) at (26.0,{\rowzero-3.5}) {Architecture validated};
+  \draw[leader] (m1.east) -- (m1l.west);
 
-  % ---- Current progress line (around 23 June 2026 = week 23.29) ----
-  \draw[red, line width=1pt, dashed] (23.29,\rowzero+0.6) -- (23.29,{\rowzero-14+0.2});
-  \node[font=\small\bfseries, text=red, anchor=south] at (23.29,\rowzero+0.65) {Current progress};
+  % PoC completed (first end-to-end alert-to-remediation loop, week 13)
+  \node[milestone] (m2) at (13,\rowzero-7+0.55) {};
+  \node[milestonenote] (m2l) at (26.0,{\rowzero-6.5}) {PoC completed};
+  \draw[leader] (m2.east) -- (m2l.west);
+
+  % Test campaign completed (week 25)
+  \node[milestone] (m3) at (25,\rowzero-12+0.55) {};
+  \node[milestonenote] (m3l) at (26.0,{\rowzero-11}) {Test campaign completed};
+  \draw[leader] (m3.east) -- (m3l.west);
+
+  % Documentation completed (week 25.5)
+  \node[milestone] (m4) at (25.5,\rowzero-13+0.55) {};
+  \node[milestonenote] (m4l) at (26.0,0.4) {Documentation completed};
+  \draw[leader] (m4.east) -- (m4l.west);
+
+  % Final report submitted (week 26)
+  \node[milestone] (m5) at (26,\rowzero-13+0.55) {};
+  \node[milestonenote] (m5l) at (26.0,-0.7) {Final report submitted};
+  \draw[leader] (m5.east) -- (m5l.west);
+
+  % ---- Current progress line (June 23, 2026 ~= week 23.29) ----
+  \draw[progressty] (23.29,\rowzero+0.65) -- (23.29,{\rowzero-14+0.15});
+  \node[font=\small\bfseries, text=red!80!black, anchor=south east] at (23.29,\rowzero+0.70) {Current progress};
 
   % ---- Legend ----
-  \fill[gray!55, taskbar] (\ganttleft,-1.1) rectangle (\ganttleft+2,-0.7);
-  \node[anchor=west, font=\small] at (\ganttleft+2.2,-0.9) {Work package};
+  \begin{scope}[shift={({(\ganttleft+\ganttwidth)/2-11.8},{\rowzero-16.0})}]
+    \fill[workbar] (0,0) rectangle (2.0,0.40);
+    \node[anchor=west, font=\small] at (2.4,0.20) {Work package};
 
-  \fill[blue!45!violet!65, taskbar] (\ganttleft+5.5,-1.1) rectangle (\ganttleft+7.5,-0.7);
-  \node[anchor=west, font=\small] at (\ganttleft+7.7,-0.9) {Key deliverable};
+    \fill[deliverbar] (6.4,0) rectangle (8.4,0.40);
+    \node[anchor=west, font=\small] at (8.8,0.20) {Key deliverable};
 
-  \node[milestone] at (\ganttleft+11.5,-0.9) {};
-  \node[anchor=west, font=\small] at (\ganttleft+12,-0.9) {Milestone};
+    \node[milestone] at (13.6,0.20) {};
+    \node[anchor=west, font=\small] at (14.0,0.20) {Milestone};
 
-  \draw[red, line width=1pt, dashed] (\ganttleft+15,-0.9) -- (\ganttleft+17,-0.9);
-  \node[anchor=west, font=\small, text=red] at (\ganttleft+17.2,-0.9) {Current progress};
+    \draw[progressty] (18.4,0.20) -- (20.6,0.20);
+    \node[anchor=west, font=\small, text=red!80!black] at (21.0,0.20) {Current progress};
+  \end{scope}
 \end{tikzpicture}
+\captionsetup{justification=raggedright}
 \caption{Project Gantt chart showing the full internship timeline across project phases and planned deliverables.}
 \label{fig:gantt}
 \end{figure}
