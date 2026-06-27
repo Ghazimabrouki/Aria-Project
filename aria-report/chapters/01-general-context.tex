@@ -210,8 +210,12 @@ Documentation, validation, and report writing were not postponed to the end; the
 
 Table~\ref{tab:sprints} lists the thirteen sprints, their dates, objectives, deliverables, and the report chapters they feed.
 
-{\small\setlength{\tabcolsep}{2pt}
-\begin{longtable}{@{}p{0.07\textwidth}@{}p{0.12\textwidth}@{}p{0.16\textwidth}@{}p{0.46\textwidth}@{}p{0.10\textwidth}@{}}
+{\small
+\setlength{\tabcolsep}{5pt}
+\setlength{\extrarowheight}{2.5pt}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\begin{longtable}{@{}>{\centering\arraybackslash}m{0.07\textwidth}>{\RaggedRight\arraybackslash}m{0.13\textwidth}>{\RaggedRight\arraybackslash}m{0.17\textwidth}>{\RaggedRight\arraybackslash}m{0.44\textwidth}>{\centering\arraybackslash}m{0.10\textwidth}@{}}
 \caption{Sprint planning (January 12 -- July 12, 2026)}\label{tab:sprints}\\
 \toprule
 \textbf{Sprint} & \textbf{Dates} & \textbf{Objective} & \textbf{Key deliverables} & \textbf{Chapters} \\
@@ -221,6 +225,11 @@ Table~\ref{tab:sprints} lists the thirteen sprints, their dates, objectives, del
 \textbf{Sprint} & \textbf{Dates} & \textbf{Objective} & \textbf{Key deliverables} & \textbf{Chapters} \\
 \midrule
 \endhead
+\midrule
+\multicolumn{5}{r}{\small\textit{Continued on the next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
 S1 & 12 Jan -- 25 Jan & Research, context, requirements & Host organization study, problem statement, objectives, methodology & 1 \\
 S2 & 26 Jan -- 08 Feb & Cloud environment setup & VPC, subnet, security group, EIP, ECS host, storage & 2 \\
 S3 & 09 Feb -- 22 Feb & Monitoring foundation & Elasticsearch, Kibana, Wazuh, Suricata, Falco, Filebeat, Telegraf, Redis & 2 \\
@@ -234,7 +243,6 @@ S10 & 18 May -- 31 May & Runtime \& infrastructure & Runtime diagnostics, metric
 S11 & 01 Jun -- 14 Jun & Multi-server onboarding & Asset registry, bootstrap, asset scoping & 5 \\
 S12 & 15 Jun -- 28 Jun & Validation \& testing & Build checks, API tests, live evidence, automated tests & 6 \\
 S13 & 29 Jun -- 12 Jul & Documentation \& final report & Report corrections, defense preparation, final submission & 1/6/Concl. \\
-\bottomrule
 \end{longtable}
 \par}
 
@@ -242,30 +250,40 @@ S13 & 29 Jun -- 12 Jul & Documentation \& final report & Report corrections, def
 
 The product backlog in Table~\ref{tab:backlog} summarizes the features prioritized and implemented across the sprints. Each item is mapped to the sprint(s) in which it was delivered and to the acceptance criteria used to confirm it.
 
-{\small\setlength{\tabcolsep}{2pt}
-\begin{longtable}{@{}p{0.06\textwidth}@{}p{0.16\textwidth}@{}p{0.48\textwidth}@{}p{0.09\textwidth}@{}p{0.10\textwidth}@{}}
+{\small
+\setlength{\tabcolsep}{3.5pt}
+\setlength{\extrarowheight}{2pt}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\newcommand{\backlogdesc}[2]{#1\par\vspace{1.5pt}\textbf{Acceptance:} #2}
+\begin{longtable}{@{}>{\centering\arraybackslash}m{0.06\textwidth}>{\RaggedRight\arraybackslash}m{0.16\textwidth}>{\RaggedRight\arraybackslash}m{0.54\textwidth}>{\centering\arraybackslash}m{0.08\textwidth}>{\centering\arraybackslash}m{0.10\textwidth}@{}}
 \caption{Product backlog with sprint mapping and acceptance criteria}\label{tab:backlog}\\
 \toprule
 \textbf{ID} & \textbf{Feature} & \textbf{Description / Acceptance criteria} & \textbf{Priority} & \textbf{Sprint(s)} \\
 \midrule
 \endfirsthead
+\caption[]{Product backlog with sprint mapping and acceptance criteria (continued)}\\
 \toprule
 \textbf{ID} & \textbf{Feature} & \textbf{Description / Acceptance criteria} & \textbf{Priority} & \textbf{Sprint(s)} \\
 \midrule
 \endhead
-PB-01 & Monitoring foundation & Install and stabilize the central security and observability stack on cloud infrastructure. \textbf{Acceptance:} all services reachable; Kibana shows indices; health checks pass. & High & S2--S3 \\
-PB-02 & Alert ingestion & Poll Elasticsearch sources and persist normalized alerts. \textbf{Acceptance:} cursor advances; no duplicate processing; normalized alerts stored in SQLite. & High & S5 \\
-PB-03 & Alert enrichment & Add GeoIP, MITRE, Sigma, severity, IOC, and whitelist logic. \textbf{Acceptance:} enrichment fields populated; whitelist suppresses false positives. & High & S6 \\
-PB-04 & Incident correlation & Group related alerts into incidents and investigations. \textbf{Acceptance:} correlation rules configurable; related alerts appear under one incident. & High & S6 \\
-PB-05 & AI response & Generate summary, narrative, risk assessment, and playbook. \textbf{Acceptance:} investigation contains all fields; malformed LLM output handled gracefully. & High & S7 \\
-PB-06 & Analyst workflow & Approve, decline, edit, execute, archive, and audit investigations. \textbf{Acceptance:} state machine enforces allowed transitions; audit records persisted. & High & S8--S9 \\
-PB-07 & Safe remediation & Validate playbooks, protect dangerous actions, execute via Ansible, verify fixes. \textbf{Acceptance:} admin-secret gate; dry-run available; execution log and verification saved. & High & S9 \\
-PB-08 & Dashboard & Provide alerts, incidents, investigations, assistant, IPS, metrics, and settings pages. \textbf{Acceptance:} all pages render; API checks pass; production build succeeds. & High & S8, S10 \\
-PB-09 & Runtime remediation & Diagnose runtime findings and staged remediation actions. \textbf{Acceptance:} observe cases never produce corrective playbooks; remediation requires explicit approval. & Medium & S10 \\
-PB-10 & Infrastructure monitoring & Poll Telegraf metrics and detect anomalies. \textbf{Acceptance:} metrics ingested; anomaly rules trigger investigations. & Medium & S10 \\
-PB-11 & Multi-server onboarding & Add asset registry, bootstrap monitored servers, and scope data by server. \textbf{Acceptance:} new asset added; bootstrap installs required services; endpoints filter by \codepath{asset\_id}. & Medium & S11 \\
-PB-12 & Validation & Compile, test, build, and document verification results. \textbf{Acceptance:} automated tests pass; build checks green; evidence screenshots collected. & High & S12--S13 \\
+\midrule
+\multicolumn{5}{r}{\small\textit{Continued on the next page}} \\
+\endfoot
 \bottomrule
+\endlastfoot
+PB-01 & Monitoring foundation & \backlogdesc{Install and stabilize the central security and observability stack on cloud infrastructure.}{all services reachable; Kibana shows indices; health checks pass.} & High & S2--S3 \\
+PB-02 & Alert ingestion & \backlogdesc{Poll Elasticsearch sources and persist normalized alerts.}{cursor advances; no duplicate processing; normalized alerts stored in SQLite.} & High & S5 \\
+PB-03 & Alert enrichment & \backlogdesc{Add GeoIP, MITRE, Sigma, severity, IOC, and whitelist logic.}{enrichment fields populated; whitelist suppresses false positives.} & High & S6 \\
+PB-04 & Incident correlation & \backlogdesc{Group related alerts into incidents and investigations.}{correlation rules configurable; related alerts appear under one incident.} & High & S6 \\
+PB-05 & AI response & \backlogdesc{Generate summary, narrative, risk assessment, and playbook.}{investigation contains all fields; malformed LLM output handled gracefully.} & High & S7 \\
+PB-06 & Analyst workflow & \backlogdesc{Approve, decline, edit, execute, archive, and audit investigations.}{state machine enforces allowed transitions; audit records persisted.} & High & S8--S9 \\
+PB-07 & Safe remediation & \backlogdesc{Validate playbooks, protect dangerous actions, execute via Ansible, verify fixes.}{admin-secret gate; dry-run available; execution log and verification saved.} & High & S9 \\
+PB-08 & Dashboard & \backlogdesc{Provide alerts, incidents, investigations, assistant, IPS, metrics, and settings pages.}{all pages render; API checks pass; production build succeeds.} & High & S8, S10 \\
+PB-09 & Runtime remediation & \backlogdesc{Diagnose runtime findings and staged remediation actions.}{observe cases never produce corrective playbooks; remediation requires explicit approval.} & Medium & S10 \\
+PB-10 & Infrastructure monitoring & \backlogdesc{Poll Telegraf metrics and detect anomalies.}{metrics ingested; anomaly rules trigger investigations.} & Medium & S10 \\
+PB-11 & Multi-server onboarding & \backlogdesc{Add asset registry, bootstrap monitored servers, and scope data by server.}{new asset added; bootstrap installs required services; endpoints filter by \codepath{asset\_id}.} & Medium & S11 \\
+PB-12 & Validation & \backlogdesc{Compile, test, build, and document verification results.}{automated tests pass; build checks green; evidence screenshots collected.} & High & S12--S13 \\
 \end{longtable}
 \par}
 
