@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 230" width="1180" height="230" font-family="'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="ARIA Brain VM setup order">
+  <defs>
+    <linearGradient id="sob" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1020"/><stop offset="1" stop-color="#070b14"/>
+    </linearGradient>
+    <linearGradient id="prog" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2563eb"/><stop offset="0.5" stop-color="#22d3ee"/><stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1180" height="230" rx="18" fill="url(#sob)"/>
+  <text x="34" y="40" font-size="15" font-weight="800" letter-spacing="2" fill="#7dd3fc">BRAIN VM — PROVISIONING ORDER</text>
+  <text x="34" y="60" font-size="12" fill="#64748b">sudo bash scripts/install_brain_vm.sh  →  setup_script_telegraf.sh  →  docker compose up -d</text>
+
+  <!-- base + progress track -->
+  <line x1="70" y1="120" x2="1110" y2="120" stroke="#1e293b" stroke-width="4"/>
+  <line x1="70" y1="120" x2="1110" y2="120" stroke="url(#prog)" stroke-width="4" stroke-linecap="round" stroke-dasharray="1040" stroke-dashoffset="1040">
+    <animate attributeName="stroke-dashoffset" values="1040;0;0" keyTimes="0;0.85;1" dur="8s" repeatCount="indefinite"/>
+  </line>
+  <!-- travelling pulse -->
+  <circle r="6" fill="#22d3ee"><animateMotion dur="8s" repeatCount="indefinite" path="M70,120 L1110,120"/></circle>
+
+  <!-- 8 stages: cx = 70 + k*148.5 -->
+  <g text-anchor="middle">
+    <!-- helper: each circle animates dark->green wave -->
+    <!-- 1 -->
+    <g>
+      <circle cx="70" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="0s" repeatCount="indefinite"/></circle>
+      <text x="70" y="126" font-size="15" font-weight="800" fill="#e2e8f0">1</text>
+      <text x="70" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">SIEM</text>
+      <text x="70" y="183" font-size="10" fill="#64748b">ES·Kibana·Filebeat</text>
+    </g>
+    <!-- 2 -->
+    <g>
+      <circle cx="218.5" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="0.9s" repeatCount="indefinite"/></circle>
+      <text x="218.5" y="126" font-size="15" font-weight="800" fill="#e2e8f0">2</text>
+      <text x="218.5" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">Suricata</text>
+      <text x="218.5" y="183" font-size="10" fill="#64748b">NIDS</text>
+    </g>
+    <!-- 3 -->
+    <g>
+      <circle cx="367" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="1.8s" repeatCount="indefinite"/></circle>
+      <text x="367" y="126" font-size="15" font-weight="800" fill="#e2e8f0">3</text>
+      <text x="367" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">Wazuh</text>
+      <text x="367" y="183" font-size="10" fill="#64748b">HIDS manager</text>
+    </g>
+    <!-- 4 -->
+    <g>
+      <circle cx="515.5" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="2.7s" repeatCount="indefinite"/></circle>
+      <text x="515.5" y="126" font-size="15" font-weight="800" fill="#e2e8f0">4</text>
+      <text x="515.5" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">Falco</text>
+      <text x="515.5" y="183" font-size="10" fill="#64748b">+ Falcosidekick</text>
+    </g>
+    <!-- 5 -->
+    <g>
+      <circle cx="664" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="3.6s" repeatCount="indefinite"/></circle>
+      <text x="664" y="126" font-size="15" font-weight="800" fill="#e2e8f0">5</text>
+      <text x="664" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">Telegraf</text>
+      <text x="664" y="183" font-size="10" fill="#64748b">host metrics</text>
+    </g>
+    <!-- 6 -->
+    <g>
+      <circle cx="812.5" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="4.5s" repeatCount="indefinite"/></circle>
+      <text x="812.5" y="126" font-size="15" font-weight="800" fill="#e2e8f0">6</text>
+      <text x="812.5" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">Detection Rules</text>
+      <text x="812.5" y="183" font-size="10" fill="#64748b">Kibana SIEM</text>
+    </g>
+    <!-- 7 -->
+    <g>
+      <circle cx="961" cy="120" r="22" stroke="#334155" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#16a34a;#16a34a;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="5.4s" repeatCount="indefinite"/></circle>
+      <text x="961" y="126" font-size="15" font-weight="800" fill="#e2e8f0">7</text>
+      <text x="961" y="166" font-size="12.5" font-weight="700" fill="#cbd5e1">Hardening</text>
+      <text x="961" y="183" font-size="10" fill="#64748b">Fail2Ban·UFW·SSH</text>
+    </g>
+    <!-- 8 -->
+    <g>
+      <circle cx="1109.5" cy="120" r="22" stroke="#22d3ee" stroke-width="2" fill="#101a30">
+        <animate attributeName="fill" values="#101a30;#2563eb;#2563eb;#101a30" keyTimes="0;0.08;0.92;1" dur="8s" begin="6.3s" repeatCount="indefinite"/></circle>
+      <text x="1109.5" y="126" font-size="15" font-weight="800" fill="#e2e8f0">8</text>
+      <text x="1109.5" y="166" font-size="12.5" font-weight="700" fill="#bfdbfe">ARIA Stack</text>
+      <text x="1109.5" y="183" font-size="10" fill="#64748b">redis·api·worker·web</text>
+    </g>
+  </g>
+
+  <text x="590" y="214" text-anchor="middle" font-size="11" fill="#475569">native systemd SIEM foundation  →  hardening last  →  then the ARIA Docker Compose stack  →  validate  →  onboard monitored VMs</text>
+</svg>

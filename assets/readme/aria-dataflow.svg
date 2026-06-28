@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 560" width="1180" height="560" font-family="'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="ARIA telemetry data flow from sensors through Elasticsearch to ARIA">
+  <defs>
+    <linearGradient id="dbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1020"/><stop offset="1" stop-color="#070b14"/>
+    </linearGradient>
+    <linearGradient id="escyl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b3a4a"/><stop offset="1" stop-color="#072530"/>
+    </linearGradient>
+    <radialGradient id="nodeg" cx="0.3" cy="0.3" r="0.9">
+      <stop offset="0" stop-color="#161f31"/><stop offset="1" stop-color="#0d1322"/>
+    </radialGradient>
+    <filter id="dglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <rect width="1180" height="560" rx="18" fill="url(#dbg)"/>
+  <text x="34" y="40" font-size="15" font-weight="800" letter-spacing="3" fill="#7dd3fc">TELEMETRY DATA FLOW</text>
+  <text x="34" y="60" font-size="12.5" fill="#64748b">sensors  →  Elasticsearch  →  ARIA worker  →  state + dashboard</text>
+
+  <!-- column headers -->
+  <text x="145" y="92" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="2" fill="#475569">SENSORS</text>
+  <text x="660" y="92" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="2" fill="#475569">ELASTICSEARCH</text>
+  <text x="1010" y="92" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="2" fill="#475569">ARIA</text>
+
+  <!-- flow paths (drawn first, under nodes) -->
+  <g fill="none" stroke-width="2" opacity="0.45">
+    <path id="pW" d="M285,140 C430,140 470,285 560,278" stroke="#3b82f6"/>
+    <path id="pS" d="M285,215 C440,215 470,285 560,283" stroke="#ef4444"/>
+    <path id="pF" d="M285,290 C430,290 470,290 560,290" stroke="#06b6d4"/>
+    <path id="pB" d="M285,365 C440,365 470,295 560,297" stroke="#f59e0b"/>
+    <path id="pT" d="M285,440 C430,440 470,300 560,302" stroke="#38bdf8"/>
+  </g>
+  <!-- animated pulses -->
+  <circle r="5" fill="#3b82f6" filter="url(#dglow)"><animateMotion dur="2.6s" repeatCount="indefinite" begin="0s" path="M285,140 C430,140 470,285 560,278"/></circle>
+  <circle r="5" fill="#ef4444" filter="url(#dglow)"><animateMotion dur="2.6s" repeatCount="indefinite" begin="0.5s" path="M285,215 C440,215 470,285 560,283"/></circle>
+  <circle r="5" fill="#06b6d4" filter="url(#dglow)"><animateMotion dur="2.6s" repeatCount="indefinite" begin="1.0s" path="M285,290 C430,290 470,290 560,290"/></circle>
+  <circle r="5" fill="#f59e0b" filter="url(#dglow)"><animateMotion dur="2.6s" repeatCount="indefinite" begin="1.5s" path="M285,365 C440,365 470,295 560,297"/></circle>
+  <circle r="5" fill="#38bdf8" filter="url(#dglow)"><animateMotion dur="2.6s" repeatCount="indefinite" begin="2.0s" path="M285,440 C430,440 470,300 560,302"/></circle>
+
+  <!-- SENSOR NODES -->
+  <g font-family="'Segoe UI',Arial">
+    <!-- Wazuh -->
+    <g>
+      <rect x="30" y="110" width="255" height="60" rx="11" fill="url(#nodeg)" stroke="#1e293b"/>
+      <rect x="30" y="110" width="6" height="60" rx="3" fill="#3b82f6"/>
+      <text x="48" y="134" font-size="15" font-weight="700" fill="#e2e8f0">Wazuh Agent</text>
+      <text x="48" y="154" font-size="11" fill="#7891ad">→ Wazuh Mgr :1514/1515 → Filebeat</text>
+    </g>
+    <!-- Suricata -->
+    <g>
+      <rect x="30" y="185" width="255" height="60" rx="11" fill="url(#nodeg)" stroke="#1e293b"/>
+      <rect x="30" y="185" width="6" height="60" rx="3" fill="#ef4444"/>
+      <text x="48" y="209" font-size="15" font-weight="700" fill="#e2e8f0">Suricata  (NIDS)</text>
+      <text x="48" y="229" font-size="11" fill="#7891ad">→ eve.json → Filebeat suricata module</text>
+    </g>
+    <!-- Falco -->
+    <g>
+      <rect x="30" y="260" width="255" height="60" rx="11" fill="url(#nodeg)" stroke="#1e293b"/>
+      <rect x="30" y="260" width="6" height="60" rx="3" fill="#06b6d4"/>
+      <text x="48" y="284" font-size="15" font-weight="700" fill="#e2e8f0">Falco  (runtime)</text>
+      <text x="48" y="304" font-size="11" fill="#7891ad">→ Falcosidekick :2801 → ES</text>
+    </g>
+    <!-- Filebeat/system -->
+    <g>
+      <rect x="30" y="335" width="255" height="60" rx="11" fill="url(#nodeg)" stroke="#1e293b"/>
+      <rect x="30" y="335" width="6" height="60" rx="3" fill="#f59e0b"/>
+      <text x="48" y="359" font-size="15" font-weight="700" fill="#e2e8f0">System logs  (Filebeat)</text>
+      <text x="48" y="379" font-size="11" fill="#7891ad">auth.log · syslog · /var/log/*</text>
+    </g>
+    <!-- Telegraf -->
+    <g>
+      <rect x="30" y="410" width="255" height="60" rx="11" fill="url(#nodeg)" stroke="#1e293b"/>
+      <rect x="30" y="410" width="6" height="60" rx="3" fill="#38bdf8"/>
+      <text x="48" y="434" font-size="15" font-weight="700" fill="#e2e8f0">Telegraf  (metrics)</text>
+      <text x="48" y="454" font-size="11" fill="#7891ad">cpu · mem · disk · net · procs → ES</text>
+    </g>
+  </g>
+
+  <!-- ELASTICSEARCH cylinder -->
+  <g>
+    <ellipse cx="660" cy="232" rx="100" ry="20" fill="#0e4456" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <rect x="560" y="232" width="200" height="116" fill="url(#escyl)" stroke="#22d3ee" stroke-opacity="0.4"/>
+    <ellipse cx="660" cy="348" rx="100" ry="20" fill="#0a2f3c" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <ellipse cx="660" cy="232" rx="100" ry="20" fill="none" stroke="#22d3ee" stroke-opacity="0.7"/>
+    <text x="660" y="238" text-anchor="middle" font-size="16" font-weight="800" fill="#a5f3fc">Elasticsearch</text>
+    <text x="660" y="300" text-anchor="middle" font-size="11.5" fill="#7dd3fc">wazuh-alerts-4.x-*</text>
+    <text x="660" y="318" text-anchor="middle" font-size="11.5" fill="#7dd3fc">filebeat-* · falco-events-server-*</text>
+    <text x="660" y="336" text-anchor="middle" font-size="11.5" fill="#7dd3fc">telegraf-* · system-auth-*</text>
+  </g>
+
+  <!-- ES -> Worker -->
+  <path id="pES" d="M760,278 C815,265 835,210 880,205" fill="none" stroke="#818cf8" stroke-width="2.5" opacity="0.5"/>
+  <circle r="5.5" fill="#818cf8" filter="url(#dglow)"><animateMotion dur="1.8s" repeatCount="indefinite" path="M760,278 C815,265 835,210 880,205"/></circle>
+
+  <!-- ARIA WORKER -->
+  <g>
+    <rect x="880" y="165" width="270" height="84" rx="13" fill="#101a30" stroke="#818cf8" stroke-opacity="0.6"/>
+    <text x="1015" y="192" text-anchor="middle" font-size="15" font-weight="800" fill="#c7d2fe">ARIA Worker</text>
+    <text x="1015" y="213" text-anchor="middle" font-size="11" fill="#94a3b8">poll · map · enrich · dedup</text>
+    <text x="1015" y="231" text-anchor="middle" font-size="11" fill="#94a3b8">correlate · investigate · respond</text>
+  </g>
+
+  <!-- worker -> SQLite -->
+  <path id="pDB" d="M960,249 C950,280 945,300 940,320" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.45"/>
+  <circle r="4.5" fill="#22d3ee"><animateMotion dur="1.6s" repeatCount="indefinite" path="M960,249 C950,280 945,300 940,320"/></circle>
+  <g>
+    <ellipse cx="940" cy="338" rx="58" ry="13" fill="#0e2230" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <rect x="882" y="338" width="116" height="56" fill="#0b1a26" stroke="#22d3ee" stroke-opacity="0.35"/>
+    <ellipse cx="940" cy="394" rx="58" ry="13" fill="#0a1620" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <text x="940" y="372" text-anchor="middle" font-size="12" font-weight="700" fill="#a5f3fc">SQLite state</text>
+  </g>
+
+  <!-- worker -> dashboard -->
+  <path id="pUI" d="M1075,249 C1085,290 1090,330 1090,360" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.45"/>
+  <circle r="4.5" fill="#60a5fa"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.4s" path="M1075,249 C1085,290 1090,330 1090,360"/></circle>
+  <g>
+    <rect x="1015" y="360" width="150" height="64" rx="12" fill="#0d1830" stroke="#3b82f6" stroke-opacity="0.6"/>
+    <text x="1090" y="386" text-anchor="middle" font-size="13.5" font-weight="800" fill="#bfdbfe">Dashboard</text>
+    <text x="1090" y="406" text-anchor="middle" font-size="10.5" fill="#94a3b8">FastAPI :8001 · Next.js :3001</text>
+  </g>
+
+  <!-- response loop back to monitored host (SSH) -->
+  <path d="M882,366 C700,470 470,470 300,455" fill="none" stroke="#27c93f" stroke-width="2" stroke-dasharray="7 7" opacity="0.5">
+    <animate attributeName="stroke-dashoffset" from="0" to="-28" dur="0.9s" repeatCount="indefinite"/>
+  </path>
+  <text x="590" y="500" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4ade80">approval-gated Ansible remediation  ·  SSH :22  ·  ES re-query verifies the fix</text>
+
+  <!-- legend -->
+  <g font-size="11" fill="#94a3b8">
+    <circle cx="44" cy="528" r="5" fill="#3b82f6"/><text x="54" y="532">Wazuh</text>
+    <circle cx="124" cy="528" r="5" fill="#ef4444"/><text x="134" y="532">Suricata</text>
+    <circle cx="214" cy="528" r="5" fill="#06b6d4"/><text x="224" y="532">Falco</text>
+    <circle cx="284" cy="528" r="5" fill="#f59e0b"/><text x="294" y="532">Filebeat/system</text>
+    <circle cx="414" cy="528" r="5" fill="#38bdf8"/><text x="424" y="532">Telegraf</text>
+  </g>
+</svg>

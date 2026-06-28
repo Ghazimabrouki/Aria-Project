@@ -75,6 +75,9 @@ configure_ufw_firewall() {
   ufw allow ssh
   ufw allow 22/tcp
 
+  # Note: 8001 (ARIA API) is best placed behind an authenticated TLS reverse
+  # proxy in production. It is allowed here so the platform is reachable in a
+  # lab/default deployment; restrict it with ARIA_ALLOWED_CIDR when possible.
   if [[ "$allowed_cidr" == "any" ]]; then
     ufw allow 5601/tcp comment "Kibana"
     ufw allow 9200/tcp comment "Elasticsearch ingest"
@@ -82,12 +85,18 @@ configure_ufw_firewall() {
     ufw allow 1514/udp comment "Wazuh agent events"
     ufw allow 1515/tcp comment "Wazuh agent enrollment"
     ufw allow 55000/tcp comment "Wazuh API"
+    ufw allow 3001/tcp comment "ARIA dashboard"
+    ufw allow 8001/tcp comment "ARIA API"
+    ufw allow 11434/tcp comment "Ollama local LLM"
   else
     ufw allow from "$allowed_cidr" to any port 5601 proto tcp comment "Kibana"
     ufw allow from "$allowed_cidr" to any port 9200 proto tcp comment "Elasticsearch ingest"
     ufw allow from "$allowed_cidr" to any port 1514 comment "Wazuh agent events"
     ufw allow from "$allowed_cidr" to any port 1515 proto tcp comment "Wazuh agent enrollment"
     ufw allow from "$allowed_cidr" to any port 55000 proto tcp comment "Wazuh API"
+    ufw allow from "$allowed_cidr" to any port 3001 proto tcp comment "ARIA dashboard"
+    ufw allow from "$allowed_cidr" to any port 8001 proto tcp comment "ARIA API"
+    ufw allow from "$allowed_cidr" to any port 11434 proto tcp comment "Ollama local LLM"
   fi
 
   ufw --force enable
@@ -168,7 +177,7 @@ show_summary() {
   echo ""
   echo "Applied hardening measures:"
   echo "  1. Fail2Ban - Blocks IPs after 5 failed SSH attempts"
-  echo "  2. UFW Firewall - Only SSH and Elastic services allowed"
+  echo "  2. UFW Firewall - SSH, Elastic/Wazuh/Kibana, and ARIA (3001/8001) allowed"
   echo "  3. SSH Hardening:"
   echo "     - Root login disabled"
   echo "     - Password authentication disabled"
