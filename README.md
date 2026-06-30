@@ -218,30 +218,66 @@ Every case — **security, infrastructure, or runtime** — walks the **same eig
 </tr>
 </table>
 
-<details>
-<summary><b>📸 Click to expand the full screenshot gallery</b></summary>
+### ▶️ Take the 60-second tour
+
+<div align="center">
+<img src="assets/readme/aria-modules.gif" alt="ARIA module carousel — Investigations, Runtime Security, AI Operator, Infrastructure, Whitelist, Settings" width="86%"/>
+</div>
+
+<details open>
+<summary><b>📸 Full screenshot gallery — every module, grouped exactly like the sidebar</b></summary>
 
 <br/>
+
+#### 🧭 Overview
 
 | Sign-in | Security Dashboard |
 |:--:|:--:|
 | <img src="assets/readme/shots/login.png" width="100%"/> | <img src="assets/readme/shots/dashboard.png" width="100%"/> |
 
-| Incident Correlation | AI Investigation (live) |
-|:--:|:--:|
-| <img src="assets/readme/shots/incidents.png" width="100%"/> | <img src="assets/readme/shots/investigation.png" width="100%"/> |
+#### 🛡️ Security Operations
 
-| Auditable SOC Workflow | AI Security Assistant |
+| Incident Correlation | Investigations queue (state machine) |
 |:--:|:--:|
-| <img src="assets/readme/shots/workflow.png" width="100%"/> | <img src="assets/readme/shots/assistant.png" width="100%"/> |
+| <img src="assets/readme/shots/incidents.png" width="100%"/> | <img src="assets/readme/shots/investigations.png" width="100%"/> |
 
-| Performance Monitoring | Infrastructure Anomaly |
+| AI Investigation (live, per incident) | Auditable SOC Workflow |
+|:--:|:--:|
+| <img src="assets/readme/shots/investigation.png" width="100%"/> | <img src="assets/readme/shots/workflow.png" width="100%"/> |
+
+**IPS Map — real-time traffic visualization** (attacker geolocation → ARIA, with blocked / allowed / whitelisted decisions)
+
+<div align="center">
+<img src="assets/readme/aria-ipsmap.svg" alt="ARIA IPS Map — real-time traffic visualization" width="98%"/>
+</div>
+
+| Whitelist (trusted IP / subnet / domain) | |
+|:--:|:--:|
+| <img src="assets/readme/shots/whitelist.png" width="100%"/> | |
+
+#### 📈 Infrastructure & Performance
+
+| Performance — live hardware (Telegraf) | Infrastructure anomaly (AI-diagnosed) |
 |:--:|:--:|
 | <img src="assets/readme/shots/performance.png" width="100%"/> | <img src="assets/readme/shots/infrastructure.png" width="100%"/> |
 
-| Verified Archive (PDF-exportable) | |
+#### 🧬 Runtime Security
+
+| Falco runtime events · classification · decision routing | |
 |:--:|:--:|
-| <img src="assets/readme/shots/archive.png" width="100%"/> | |
+| <img src="assets/readme/shots/runtime.png" width="100%"/> | |
+
+#### 🧠 AI Intelligence
+
+| AI Security Assistant (estate-wide chat) | AI Operator (natural language → Ansible) |
+|:--:|:--:|
+| <img src="assets/readme/shots/assistant.png" width="100%"/> | <img src="assets/readme/shots/operator.png" width="100%"/> |
+
+#### 📦 System Management
+
+| Settings Center (data sources · AI · Ansible · workflow…) | Verified Archive (PDF-exportable) |
+|:--:|:--:|
+| <img src="assets/readme/shots/settings.png" width="100%"/> | <img src="assets/readme/shots/archive.png" width="100%"/> |
 
 </details>
 
