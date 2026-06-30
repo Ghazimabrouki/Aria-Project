@@ -5,7 +5,7 @@ SOC teams receive heterogeneous alerts from host, network, runtime, and metric s
 
 ARIA ingests Wazuh, Suricata/Filebeat, Falco, Telegraf, and generic alerts; deduplicates and filters noise; enriches events with GeoIP and MITRE ATT\&CK context; groups related alerts into incidents; and uses a FastAPI backend plus Next.js dashboard to expose triage, investigation, remediation, and monitoring workflows. An AI response layer generates summaries, risk scores, narratives, and playbooks, while approval gates, admin-secret protection, safety checks, and audit logging keep remediation controlled.
 
-Validation confirms a working multi-server deployment, 910 passing automated tests, backend/frontend build success, and honest limits around single-node SQLite storage and internal-trusted authentication.
+Validation confirms a working multi-server deployment, a recorded 910 passing automated tests at the May~17 acceptance, backend/frontend build success, and honest limits around single-node SQLite storage and internal-trusted authentication.
 
 \textbf{Keywords:} SOAR, SOC automation, FastAPI, Next.js, Elasticsearch, Redis, SQLite, Ansible, MITRE ATT\&CK, Sigma, AI-assisted incident response.
 
@@ -17,7 +17,7 @@ This final-year project presents \project{} (\projectlong{}), a SOAR/SOC automat
 
 ARIA brings these alerts together in one open, locally deployable platform. It ingests host, network, runtime, and metric telemetry from Elasticsearch; normalizes heterogeneous alerts into one model; enriches them with GeoIP and MITRE ATT\&CK context; removes duplicates and noise; correlates related events into incidents; and uses AI to generate summaries, risk scores, narratives, and Ansible playbooks. Every sensitive action passes through an analyst approval gate protected by an admin-secret check, and every remediation is verified before the case is closed.
 
-The result is an end-to-end detection-to-response workflow that reduces analyst workload, accelerates incident understanding, and keeps humans in control of risky decisions. The implementation is validated by a working multi-server deployment, 910 passing automated tests, backend and frontend build success, and live operational evidence captured on the running platform.
+The result is an end-to-end detection-to-response workflow that reduces analyst workload, accelerates incident understanding, and keeps humans in control of risky decisions. The implementation is validated by a working multi-server deployment, a recorded 910 passing automated tests at the May~17 acceptance, backend and frontend build success, and live operational evidence captured on the running platform.
 
 This report describes why ARIA was built, how it works, what the dashboard looks like, how new servers are onboarded, and how the solution was tested.
 
