@@ -248,7 +248,7 @@ Every case — **security, infrastructure, or runtime** — walks the **same eig
 **IPS Map — real-time traffic visualization** (attacker geolocation → ARIA, with blocked / allowed / whitelisted decisions)
 
 <div align="center">
-<img src="assets/readme/aria-ipsmap.svg" alt="ARIA IPS Map — real-time traffic visualization" width="98%"/>
+<img src="assets/readme/aria-ipsmap.gif" alt="ARIA IPS Map — real-time traffic visualization" width="98%"/>
 </div>
 
 | Whitelist (trusted IP / subnet / domain) | |
