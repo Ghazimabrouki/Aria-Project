@@ -209,6 +209,15 @@ detect_es_version() {
   local v
   v="$(curl_es "/" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("version",{}).get("number",""))' 2>/dev/null || true)"
   if [[ -z "$v" ]]; then
+    warn "CA-verified connection to ${ES_URL} failed (likely hostname/IP not in cert SAN)."
+    warn "Retrying with TLS verification disabled to detect Elasticsearch version..."
+    v="$(curl -sS -k -u "${ES_USER}:${ES_PASS}" --connect-timeout 5 --max-time 20 "${ES_URL}/" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("version",{}).get("number",""))' 2>/dev/null || true)"
+    if [[ -n "$v" ]]; then
+      ES_CA=""
+      warn "Elasticsearch TLS certificate does not cover ${ES_URL}; Telegraf will use insecure_skip_verify=true."
+    fi
+  fi
+  if [[ -z "$v" ]]; then
     err "Cannot detect Elasticsearch version. Check auth/TLS/network."
     exit 1
   fi
@@ -814,4 +823,3 @@ main() {
 }
 
 main
-
